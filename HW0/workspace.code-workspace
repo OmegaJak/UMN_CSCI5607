@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "/home/jak/Documents/CSCI5607"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"cstdio": "cpp",
+			"istream": "cpp",
+			"iostream": "cpp"
+		}
+	}
+}
