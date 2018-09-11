@@ -125,24 +125,25 @@ unsigned char* loadImage(int& img_w, int& img_h){
 }
 
 //TODO: Account for rotation by g_angle
-void updateVertices(){ 
-	float vx = g_size;
-	float vy =  g_size;
+void updateVertices() {
+	float r = sqrtf(g_size * g_size * 2); // c = sqrt(a^2 + b^2), but a == b
+	float vx = r * cosf(g_angle + M_PI_4);
+	float vy =  r * sinf(g_angle + M_PI_4);
 	vertices[0] = g_pos_x + vx;  //Top right x
 	vertices[1] = g_pos_y + vy;  //Top right y
 	
-	vx = g_size;
-	vy = - g_size;
+	vx = r * cosf(g_angle - M_PI_4);
+	vy = r * sinf(g_angle - M_PI_4);
 	vertices[7] = g_pos_x + vx;  //Bottom right x
 	vertices[8] = g_pos_y + vy;  //Bottom right y
 	
-	vx = - g_size;
-	vy = + g_size;
+	vx = r * cosf(g_angle + M_PI - M_PI_4);
+	vy = r * sinf(g_angle + M_PI - M_PI_4);
 	vertices[14] =  g_pos_x + vx;  //Top left x
 	vertices[15] =  g_pos_y + vy;  //Top left y
 	
-	vx = - g_size;
-	vy = - g_size;
+	vx = r * cosf(g_angle + M_PI + M_PI_4);
+	vy = r * sinf(g_angle + M_PI + M_PI_4);
 	vertices[21] =  g_pos_x + vx;  //Bottom left x
 	vertices[22] =  g_pos_y + vy;  //Bottom left y
 }
@@ -168,38 +169,56 @@ void mouseClicked(float m_x, float m_y){
 	x = x / g_size;
 	y = y / g_size;
 	
-	printf("Normalized click coord: %f, %f\n",x,y);
+	// Account for rotation
+	float s = sin(-g_angle);
+	float c = cos(-g_angle);
+	float newX = x * c - y * s;
+	y = x * s + y * c;
+	x = newX;
 	
-	if (x > 1.05 || y > 1.05 || x < -1.05 || y < -1.05) //TODO: Test your understanding: Why 1.05 and not 1?
+	if (x > 1.05 || y > 1.05 || x < -1.05 || y < -1.05)
 		return;
-		
-	if (x < .9 && x > -.9 && y < .9 && y > -.9) { //TODO: Test your understanding: What happens if you change .9 to .8?
+
+	bool isOnLeft = x < -0.9;
+	bool isOnRight = x > 0.9;
+	bool isOnTop = y > 0.9;
+	bool isOnBottom = y < -0.9;
+	if (x < .9 && x > -.9 && y < .9 && y > -.9) {
+		printf("Translate!\n");
 		g_bTranslate = true;
+	} else if ((isOnBottom && (isOnLeft || isOnRight)) || (isOnTop && (isOnLeft || isOnRight))) {
+		printf("Rotate!\n");
+		g_bRotate = true;
 	} else {
+		printf("Scale!\n");
 		g_bScale = true;
 	}
 }
 
 //TODO: Update the position, rotation, or scale based on the mouse movement
-//  I've implemented the logic for position, you need to do scaling and angle
+//  I've implemented the logic for position, you need to do angle
 //TODO: Notice how smooth draging the square is (e.g., there are no "jumps" when you click), 
 //      try to make your implementation of rotate and scale as smooth
-void mouseDragged(float m_x, float m_y) {   
-	
+void mouseDragged(float m_x, float m_y) {
 	if (g_bTranslate) {
 		g_pos_x = m_x - g_clicked_x + g_lastCenter_x;
 		g_pos_y = m_y - g_clicked_y + g_lastCenter_y;
 	}
 	
-	if (g_bScale) {
+	if (g_bScale) { // Compute the new size, g_size, based on the mouse positions
 		float initialDistance = distanceFrom(g_lastCenter_x, g_lastCenter_y, g_clicked_x, g_clicked_y); // Could calculate just once per click and store in a global but meh
 		float currentDistance = distanceFrom(g_lastCenter_x, g_lastCenter_y, m_x, m_y);
 		g_size = g_clicked_size * (currentDistance / initialDistance);
-		//Compute the new size, g_size, based on the mouse positions
 	}
 	
-	if (g_bRotate) {
-		 //Compute the new angle, g_angle, based on the mouse positions
+	if (g_bRotate) { // Compute the new angle, g_angle, based on the mouse positions
+		float currentAngle = atan2(m_y - g_pos_y, m_x - g_pos_x);
+		printf("CurrentAngle: %f\n", (currentAngle / M_PI) * 180);
+		float initialAngle = atan2(g_clicked_y - g_lastCenter_y, g_clicked_x - g_lastCenter_x);
+		printf("initialAngle: %f\n", (initialAngle / M_PI) * 180);
+
+		g_angle = g_clicked_angle + currentAngle - initialAngle;
+		printf("g_angle: %f\n", (g_angle / M_PI) * 180);
 	}
 	
 	updateVertices();
@@ -214,7 +233,7 @@ void updateBrightness(int increment, int img_w, int img_h) {
 }
 
 float distanceFrom(float x1, float y1, float x2, float y2) {
-	sqrtf(powf(x2 - x1, 2) + powf(y2 - y1, 2));
+	return sqrtf(powf(x2 - x1, 2) + powf(y2 - y1, 2));
 }
 
 /////////////////////////////
@@ -390,7 +409,7 @@ int main(int argc, char *argv[]){
 			//List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
 			//Scancode referes to a keyboard position, keycode referes to the letter (e.g., EU keyboards)
 			if (windowEvent.type == SDL_KEYUP) {
-				if (windowEvent.key.keysym.sym == SDLK_ESCAPE) 
+				if (windowEvent.key.keysym.sym == SDLK_ESCAPE)
 					done = true; //Exit event loop
 
 				if (windowEvent.key.keysym.sym == SDLK_f) //If "f" is pressed
@@ -404,6 +423,15 @@ int main(int argc, char *argv[]){
 				if (windowEvent.key.keysym.sym == SDLK_MINUS) {
 					printf("Darken!\n");
 					updateBrightness(-lightness_increment, img_w, img_h);
+				}
+
+				if (windowEvent.key.keysym.sym == SDLK_r) {
+					printf("Reset!\n");
+					g_pos_x = 0.0f;
+					g_pos_y = 0.0f;
+					g_size = 0.6f;
+					g_angle = 0;
+					updateVertices();
 				}
 			}
 			
