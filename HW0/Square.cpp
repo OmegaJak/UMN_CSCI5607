@@ -15,7 +15,9 @@
 #include <fstream>
 #include <string>
 #include <cmath>
+#include <chrono>
 using namespace std;
+using namespace std::chrono;
 
 //Name of image texture
 string textureName = "test.ppm";
@@ -55,6 +57,7 @@ void updateTextureData(int img_w, int img_h);
 bool g_bTranslate = false;
 bool g_bRotate = false;
 bool g_bScale = false;
+bool g_fun_mode = false;
 
 //////////////////////////
 ///  Begin your code here
@@ -108,18 +111,6 @@ unsigned char* loadImage(int& img_w, int& img_h){
 			y_coord--;
 		}
 	}
-
-	//TODO: This loop puts in fake data, replace with the actual pixels read from the file
-	/* for (int i = 0; i < img_h; i++){
-	   float fi = i/(float)img_h;
-	   for (int j = 0; j < img_w; j++){
-	      float fj = j/(float)img_w;
-	      img_data[i*img_w*4 + j*4] = 50;  //Red
-	      img_data[i*img_w*4 + j*4 + 1] = fj*150;  //Green
-	      img_data[i*img_w*4 + j*4 + 2] = fi*250;  //Blue
-	      img_data[i*img_w*4 + j*4 + 3] = 255;  //Alpha
-	   }
-	} */
 
 	return img_data;
 }
@@ -221,6 +212,16 @@ void mouseDragged(float m_x, float m_y) {
 		printf("g_angle: %f\n", (g_angle / M_PI) * 180);
 	}
 	
+	updateVertices();
+}
+
+void funModeUpdate() {
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	float angle_amt = sin(((ms.count() % 10000) / 10000.0) * M_PI * 2);
+	printf("Sine: %f\n", angle_amt);
+	g_angle += angle_amt / 250;
+
 	updateVertices();
 }
 
@@ -403,8 +404,8 @@ int main(int argc, char *argv[]){
 	//Event Loop (Loop forever processing each event as fast as possible)
 	SDL_Event windowEvent;
 	bool done = false;
-	while (!done){
-		while (SDL_PollEvent(&windowEvent)){  //Process input events (e.g., mouse & keyboard)
+	while (!done) {
+		while (SDL_PollEvent(&windowEvent)) {  //Process input events (e.g., mouse & keyboard)
 			if (windowEvent.type == SDL_QUIT) done = true;
 			//List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
 			//Scancode referes to a keyboard position, keycode referes to the letter (e.g., EU keyboards)
@@ -431,7 +432,18 @@ int main(int argc, char *argv[]){
 					g_pos_y = 0.0f;
 					g_size = 0.6f;
 					g_angle = 0;
+					g_fun_mode = false;
 					updateVertices();
+				}
+
+				if (windowEvent.key.keysym.sym == SDLK_s) {
+					if (!g_fun_mode) {
+						printf("Fun mode activated!\n");
+					} else {
+						printf("Fun mode deactivated!\n");
+					}
+
+					g_fun_mode = !g_fun_mode;
 				}
 			}
 			
@@ -451,7 +463,11 @@ int main(int argc, char *argv[]){
 		else{
 			g_mouse_down = false;
 		}
-		
+
+		if (g_fun_mode) {
+			funModeUpdate();
+		}
+
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW); //upload vertices to vbo
 
 		

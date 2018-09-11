@@ -9,7 +9,8 @@
 			"cstdio": "cpp",
 			"istream": "cpp",
 			"iostream": "cpp",
-			"cmath": "cpp"
+			"cmath": "cpp",
+			"chrono": "cpp"
 		}
 	}
 }
