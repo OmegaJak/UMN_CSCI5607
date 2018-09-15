@@ -10,7 +10,8 @@
 			"istream": "cpp",
 			"iostream": "cpp",
 			"cmath": "cpp",
-			"chrono": "cpp"
+			"chrono": "cpp",
+			"ratio": "cpp"
 		}
 	}
 }

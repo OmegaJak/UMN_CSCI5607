@@ -43,8 +43,9 @@ float vertices[] = {  //These values should be updated to match the square's sta
 	-0.3f, -0.3f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
 }; 
 
-int screen_width = 800;
-int screen_height = 800;
+int window_width = 800;
+int window_height = 800;
+float aspect_ratio = 1;
 int lightness_increment = 15;
 
 float g_mouse_down = false;
@@ -142,6 +143,11 @@ void updateVertices() {
 	vy = r * sinf(g_angle + M_PI + M_PI_4);
 	vertices[21] =  g_pos_x + vx;  //Bottom left x
 	vertices[22] =  g_pos_y + vy;  //Bottom left y
+
+	// Adjust for aspect ratio changes
+	for (int i = 0; i <= 21; i += 7) {
+		vertices[i] /= aspect_ratio;
+	}
 }
 
 //TODO: Choose between translate, rotate, and scale based on where the user clicked
@@ -160,7 +166,7 @@ void mouseClicked(float m_x, float m_y){
 	g_bScale = false;
 	
 	// x and y is the click position normalized to size of the square, with (-1,-1) at one corner (1,1) the other. (0, 0) is the center
-	float x = m_x - g_pos_x;
+	float x = (m_x * aspect_ratio) - g_pos_x;
 	float y = m_y - g_pos_y;
 	x = x / g_size;
 	y = y / g_size;
@@ -199,13 +205,15 @@ void mouseReleased() {
 }
 
 void mouseDragged(float m_x, float m_y) {
+	m_x = m_x * aspect_ratio;
+
 	if (g_bTranslate) {
-		g_pos_x = m_x - g_clicked_x + g_lastCenter_x;
+		g_pos_x = m_x - (g_clicked_x * aspect_ratio) + g_lastCenter_x;
 		g_pos_y = m_y - g_clicked_y + g_lastCenter_y;
 	}
 	
 	if (g_bScale) { // Compute the new size, g_size, based on the mouse positions
-		float initialDistance = distanceFrom(g_lastCenter_x, g_lastCenter_y, g_clicked_x, g_clicked_y); // Could calculate just once per click and store in a global but meh
+		float initialDistance = distanceFrom(g_lastCenter_x, g_lastCenter_y, g_clicked_x * aspect_ratio, g_clicked_y); // Could calculate just once per click and store in a global but meh
 		float currentDistance = distanceFrom(g_lastCenter_x, g_lastCenter_y, m_x, m_y);
 		g_size = g_clicked_size * (currentDistance / initialDistance);
 	}
@@ -213,7 +221,7 @@ void mouseDragged(float m_x, float m_y) {
 	if (g_bRotate) { // Compute the new angle, g_angle, based on the mouse positions
 		float currentAngle = atan2(m_y - g_pos_y, m_x - g_pos_x);
 		printf("CurrentAngle: %f\n", (currentAngle / M_PI) * 180);
-		float initialAngle = atan2(g_clicked_y - g_lastCenter_y, g_clicked_x - g_lastCenter_x);
+		float initialAngle = atan2(g_clicked_y - g_lastCenter_y, (g_clicked_x * aspect_ratio) - g_lastCenter_x);
 		printf("initialAngle: %f\n", (initialAngle / M_PI) * 180);
 
 		g_angle = g_clicked_angle + currentAngle - initialAngle;
@@ -227,7 +235,7 @@ void funModeUpdate() {
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 	float angle_amt = sin(((ms.count() % 10000) / 10000.0) * M_PI * 2);
-	printf("Sine: %f\n", angle_amt);
+	//printf("Sine: %f\n", angle_amt);
 	g_angle += angle_amt / 250;
 
 	updateVertices();
@@ -291,16 +299,14 @@ int main(int argc, char *argv[]){
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	 
 	//Create a window (offsetx, offsety, width, height, flags)
-	SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, screen_width, screen_height, SDL_WINDOW_OPENGL);
+	SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	//TODO: Test your understanding: Try changing the title of the window to something more personalized.
 	 
 	//The above window cannot be resized which makes some code slightly easier.
 	//Below show how to make a full screen window or allow resizing
-	//SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 0, 0, screen_width, screen_height, SDL_WINDOW_FULLSCREEN|SDL_WINDOW_OPENGL);
-	//SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, screen_width, screen_height, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL);
+	//SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 0, 0, window_width, window_height, SDL_WINDOW_FULLSCREEN|SDL_WINDOW_OPENGL);
+	//SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, window_width, window_height, SDL_WINDOW_RESIZABLE|SDL_WINDOW_OPENGL);
 	//SDL_Window* window = SDL_CreateWindow("My OpenGL Program",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,0,0,SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_OPENGL); //Boarderless window "fake" full screen
-
-	float aspect = screen_width/(float)screen_height; //aspect ratio (needs to be updated if the window is resized)
 	 
 	updateVertices(); //set initial position of the square to match it's state
 	 
@@ -414,46 +420,61 @@ int main(int argc, char *argv[]){
 	bool done = false;
 	while (!done) {
 		while (SDL_PollEvent(&windowEvent)) {  //Process input events (e.g., mouse & keyboard)
-			if (windowEvent.type == SDL_QUIT) done = true;
 			//List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
 			//Scancode referes to a keyboard position, keycode referes to the letter (e.g., EU keyboards)
-			if (windowEvent.type == SDL_KEYUP) {
-				if (windowEvent.key.keysym.sym == SDLK_ESCAPE)
-					done = true; //Exit event loop
+			switch (windowEvent.type) {
+				case SDL_QUIT:
+					done = true;
+					break;
+				case SDL_KEYUP:
+					if (windowEvent.key.keysym.sym == SDLK_ESCAPE)
+						done = true; //Exit event loop
 
-				if (windowEvent.key.keysym.sym == SDLK_f) //If "f" is pressed
-					fullscreen = !fullscreen;
+					if (windowEvent.key.keysym.sym == SDLK_f) //If "f" is pressed
+						fullscreen = !fullscreen;
 
-				if (windowEvent.key.keysym.sym == SDLK_EQUALS) {
-					printf("Brighten!\n");
-					updateBrightness(lightness_increment, img_w, img_h);
-				}
-				
-				if (windowEvent.key.keysym.sym == SDLK_MINUS) {
-					printf("Darken!\n");
-					updateBrightness(-lightness_increment, img_w, img_h);
-				}
-
-				if (windowEvent.key.keysym.sym == SDLK_r) {
-					printf("Reset!\n");
-					g_pos_x = 0.0f;
-					g_pos_y = 0.0f;
-					g_size = 0.6f;
-					g_angle = 0;
-					g_fun_mode = false;
-					updateVertices();
-				}
-
-				if (windowEvent.key.keysym.sym == SDLK_s) {
-					if (!g_fun_mode) {
-						printf("Fun mode activated!\n");
-					} else {
-						printf("Fun mode deactivated!\n");
+					if (windowEvent.key.keysym.sym == SDLK_EQUALS) {
+						printf("Brighten!\n");
+						updateBrightness(lightness_increment, img_w, img_h);
+					}
+					
+					if (windowEvent.key.keysym.sym == SDLK_MINUS) {
+						printf("Darken!\n");
+						updateBrightness(-lightness_increment, img_w, img_h);
 					}
 
-					g_fun_mode = !g_fun_mode;
-				}
-			}
+					if (windowEvent.key.keysym.sym == SDLK_r) {
+						printf("Reset!\n");
+						g_pos_x = 0.0f;
+						g_pos_y = 0.0f;
+						g_size = 0.6f;
+						g_angle = 0;
+						g_fun_mode = false;
+						updateVertices();
+					}
+
+					if (windowEvent.key.keysym.sym == SDLK_s) {
+						if (!g_fun_mode) {
+							printf("Fun mode activated!\n");
+						} else {
+							printf("Fun mode deactivated!\n");
+						}
+
+						g_fun_mode = !g_fun_mode;
+					}
+					break;
+				case SDL_WINDOWEVENT:
+					// Docs & example found here: https://wiki.libsdl.org/SDL_WindowEventID#SDL_WindowEventID-1
+					if (windowEvent.window.event == SDL_WINDOWEVENT_RESIZED) {
+						window_width = windowEvent.window.data1;
+						window_height = windowEvent.window.data2;
+						aspect_ratio = window_width/(float)window_height;
+						printf("Resized! Width: %i, Height %i\n", window_width, window_height);
+						glViewport(0, 0, window_width, window_height);
+						updateVertices();
+					}
+					break;
+			};
 			
 			SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0); //Set to full screen 
 		}
@@ -462,9 +483,9 @@ int main(int argc, char *argv[]){
 		int mx, my;
 		if (SDL_GetMouseState(&mx, &my) & SDL_BUTTON(SDL_BUTTON_LEFT)) { //Is the mouse down?
 			if (g_mouse_down == false){
-				mouseClicked(2*mx/(float)screen_width - 1, 1-2*my/(float)screen_height);
+				mouseClicked(2*mx/(float)window_width - 1, 1-2*my/(float)window_height);
 			} else {
-				mouseDragged(2*mx/(float)screen_width-1, 1-2*my/(float)screen_height);
+				mouseDragged(2*mx/(float)window_width-1, 1-2*my/(float)window_height);
 			}
 			g_mouse_down = true;
 		} else {
