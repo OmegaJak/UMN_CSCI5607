@@ -29,6 +29,12 @@ float g_size = 0.6f;
 float g_angle = 0;
 unsigned char* g_img_data;
 
+const float default_color[] = { 1.0f, 1.0f, 1.0f };
+const float translating_color[] = { 1.0f, 0.0f, 0.0f };
+const float scaling_color[] = { 0.0f, 1.0f, 0.0f };
+const float rotating_color[] = { 0.0f, 0.0f, 1.0f };
+const float* g_background_color = default_color;
+
 float vertices[] = {  //These values should be updated to match the square's state when it changes
 //    X      Y     R     G     B     U     V
 	 0.3f,  0.3f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // top right
@@ -63,7 +69,6 @@ bool g_fun_mode = false;
 ///  Begin your code here
 /////////////////////////
 
-//TODO: Read from ASCII (P6) PPM files
 //Inputs are output variables for returning the image width and heigth
 unsigned char* loadImage(int& img_w, int& img_h){
 
@@ -177,19 +182,22 @@ void mouseClicked(float m_x, float m_y){
 	if (x < .9 && x > -.9 && y < .9 && y > -.9) {
 		printf("Translate!\n");
 		g_bTranslate = true;
+		g_background_color = translating_color;
 	} else if ((isOnBottom && (isOnLeft || isOnRight)) || (isOnTop && (isOnLeft || isOnRight))) {
 		printf("Rotate!\n");
 		g_bRotate = true;
+		g_background_color = rotating_color;
 	} else {
 		printf("Scale!\n");
 		g_bScale = true;
+		g_background_color = scaling_color;
 	}
 }
 
-//TODO: Update the position, rotation, or scale based on the mouse movement
-//  I've implemented the logic for position, you need to do angle
-//TODO: Notice how smooth draging the square is (e.g., there are no "jumps" when you click), 
-//      try to make your implementation of rotate and scale as smooth
+void mouseReleased() {
+	g_background_color = default_color;
+}
+
 void mouseDragged(float m_x, float m_y) {
 	if (g_bTranslate) {
 		g_pos_x = m_x - g_clicked_x + g_lastCenter_x;
@@ -459,8 +467,10 @@ int main(int argc, char *argv[]){
 				mouseDragged(2*mx/(float)screen_width-1, 1-2*my/(float)screen_height);
 			}
 			g_mouse_down = true;
-		} 
-		else{
+		} else {
+			if (g_mouse_down = true)
+				mouseReleased();
+				
 			g_mouse_down = false;
 		}
 
@@ -472,7 +482,7 @@ int main(int argc, char *argv[]){
 
 		
 		// Clear the screen to white
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClearColor(g_background_color[0], g_background_color[1], g_background_color[2], 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 					
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); //Draw the two triangles (4 vertices) making up the square
