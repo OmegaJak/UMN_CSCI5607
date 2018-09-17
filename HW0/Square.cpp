@@ -65,6 +65,7 @@ bool g_bTranslate = false;
 bool g_bRotate = false;
 bool g_bScale = false;
 bool g_fun_mode = false;
+bool g_motion_indicators = false;
 
 //////////////////////////
 ///  Begin your code here
@@ -462,6 +463,16 @@ int main(int argc, char *argv[]){
 
 						g_fun_mode = !g_fun_mode;
 					}
+
+					if (windowEvent.key.keysym.sym == SDLK_g) {
+						if (g_motion_indicators) {
+							printf("Motion indicators deactivated!");
+						} else {
+							printf("Motion indicators activated!");
+						}
+
+						g_motion_indicators = !g_motion_indicators;
+					}
 					break;
 				case SDL_WINDOWEVENT:
 					// Docs & example found here: https://wiki.libsdl.org/SDL_WindowEventID#SDL_WindowEventID-1
@@ -501,7 +512,8 @@ int main(int argc, char *argv[]){
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW); //upload vertices to vbo
 
-		
+		if (!g_motion_indicators) g_background_color = default_color; // Override changes if motion indicators are off
+
 		// Clear the screen to white
 		glClearColor(g_background_color[0], g_background_color[1], g_background_color[2], 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
