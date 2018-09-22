@@ -160,6 +160,9 @@ public:
 
     // Sample image using current sampling method.
     Pixel Sample(double u, double v);
+
+    // Gets the index of the pixel at the given coordinate
+    int PixelIndex(int x, int y);
 };
 
 #endif

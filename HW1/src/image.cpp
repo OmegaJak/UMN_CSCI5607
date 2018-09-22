@@ -38,8 +38,8 @@ Image::Image (const Image& src) {
     
     data.raw = new uint8_t[num_pixels*4];
     
-    //memcpy(data.raw, src.data.raw, num_pixels);
-    *data.raw = *src.data.raw;
+    memcpy(data.raw, src.data.raw, num_pixels * 4);
+    //*data.raw = *src.data.raw;
 }
 
 Image::Image (char* fname) {
@@ -110,7 +110,29 @@ void Image::ChangeSaturation(double factor) {
 
 
 Image* Image::Crop(int x, int y, int w, int h) {
-	/* WORK HERE */
+	if (x < Width() && y < Height()) {
+		if (w < Width() - x && y < Height() - y) {
+			Image* image = new Image(w, h);
+
+			int src_index, dst_index;
+			for (int i = 0; i < w; i++) {
+				for (int j = 0; j < h; j++) {
+					src_index = PixelIndex(x + i, y + j);
+					dst_index = image->PixelIndex(i, j);
+					image->data.pixels[dst_index].Set(data.pixels[src_index]);
+				}
+			}
+
+			return image;
+		} else {
+			fprintf(stderr, "Invalid width or height parameter. "
+							"The input image is %ix%i pixels.\n", Width(), Height());
+		}
+	} else {
+		fprintf(stderr, "Invalid crop corner. The corner coordinates must be within the image. "
+						"X value must be strictly less than the image width,  Y value must be less than the image height. "
+						"The top left corner of the image is (0,0). The bottom right pixel is (%i, %i).\n", Width() - 1, Height() - 1);
+	}
 	return NULL;
 }
 
@@ -191,4 +213,8 @@ void Image::SetSamplingMethod(int method) {
 Pixel Image::Sample (double u, double v) {
     /* WORK HERE */
 	return Pixel();
+}
+
+int Image::PixelIndex(int x, int y) {
+	return x + Width() * y;
 }
