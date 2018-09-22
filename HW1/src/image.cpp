@@ -138,7 +138,20 @@ Image* Image::Crop(int x, int y, int w, int h) {
 
 
 void Image::ExtractChannel(int channel) {
-	/* WORK HERE */
+	if (channel < 0 || channel > 3) {
+		fprintf(stderr, "Invalid channel number. It must be a number between 0 and 3 (inclusive). Following are the channel mappings: \n"
+						"red: 0\ngreen: 1\nblue: 2\nalpha: 3\n");
+
+		return;
+	}
+
+	for (int i = 0; i < num_pixels; i++) {
+		for (int j = 0; j < 4; j++) {
+			if (j != channel) {
+				data.raw[i * 4 + j] = 0;
+			}
+		}
+	}
 }
 
 
