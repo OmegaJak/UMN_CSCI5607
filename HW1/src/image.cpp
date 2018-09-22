@@ -111,15 +111,12 @@ void Image::ChangeSaturation(double factor) {
 
 Image* Image::Crop(int x, int y, int w, int h) {
 	if (x < Width() && y < Height()) {
-		if (w < Width() - x && y < Height() - y) {
+		if (w <= Width() - x && h <= Height() - y) {
 			Image* image = new Image(w, h);
 
-			int src_index, dst_index;
 			for (int i = 0; i < w; i++) {
 				for (int j = 0; j < h; j++) {
-					src_index = PixelIndex(x + i, y + j);
-					dst_index = image->PixelIndex(i, j);
-					image->data.pixels[dst_index].Set(data.pixels[src_index]);
+					image->GetPixel(i, j).Set(GetPixel(x + i, y + j));
 				}
 			}
 
@@ -226,8 +223,4 @@ void Image::SetSamplingMethod(int method) {
 Pixel Image::Sample (double u, double v) {
     /* WORK HERE */
 	return Pixel();
-}
-
-int Image::PixelIndex(int x, int y) {
-	return x + Width() * y;
 }
