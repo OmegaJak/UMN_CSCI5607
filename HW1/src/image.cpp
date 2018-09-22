@@ -62,7 +62,7 @@ Image::~Image () {
     data.raw = NULL;
 }
 
-void Image::Write(char* fname) {
+void Image::Write(const char* fname) {
 	int lastc = strlen(fname);
 
 	switch (fname[lastc-1]){

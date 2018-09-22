@@ -34,6 +34,7 @@ using namespace std;
  **/
 static void ShowUsage(void);
 static void CheckOption(char *option, int argc, int minargc);
+static void Output(char *name);
 
 int main( int argc, char* argv[] ){
 	srand(time(NULL)); // Initialize random seed, so each run is using rand is different
@@ -289,7 +290,10 @@ int main( int argc, char* argv[] ){
 
 	if (!did_output)
 	{
-		fprintf( stderr, "Warning, you didn't tell me to output anything.  I hope that's OK.\n" );
+		printf("You didn't tell me to output anything, so I'm just going to output to \"out.jpg\".\n" );
+		
+		if (img == NULL) ShowUsage();
+		img->Write("out.jpg");
 	}
 
 	delete img;

@@ -80,7 +80,7 @@ public:
     int NumPixels () const { return num_pixels; }
 
 	// Make file from image
-	void Write( char *fname );
+	void Write(const char *fname );
 
     // Adds noise to an image.  The amount of noise is given by the factor
     // in the range [0.0..1.0].  0.0 adds no noise.  1.0 adds a lot of noise.
