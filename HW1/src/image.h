@@ -41,7 +41,7 @@ enum {
 class Image
 {
 public:
-    //A union lets us view the data two differen ways
+    //A union lets us view the data two different ways
     // either as a collection of pixels (for easy per-pixel processing), and
     // or as just a list of raw bytes (for loading from a file, or cute tricks like quickly setting everything to 0)
     union PixelData{  

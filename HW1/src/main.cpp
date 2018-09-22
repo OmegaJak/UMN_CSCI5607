@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <time.h>
 
 
 #define STB_IMAGE_IMPLEMENTATION //only place once in one .cpp file
@@ -35,6 +36,8 @@ static void ShowUsage(void);
 static void CheckOption(char *option, int argc, int minargc);
 
 int main( int argc, char* argv[] ){
+	srand(time(NULL)); // Initialize random seed, so each run is using rand is different
+
 	Image *img = NULL;
 	bool did_output = false;
 
@@ -58,7 +61,7 @@ int main( int argc, char* argv[] ){
 	{
 		if (**argv == '-')
 		{
-			if (!strcmp(*argv, "-input"))
+			if (!strcmp(*argv, "-input") || !strcmp(*argv, "-in") || !strcmp(*argv, "-i") )
 			{
 				CheckOption(*argv, argc, 2);
 				if (img != NULL)
@@ -67,7 +70,7 @@ int main( int argc, char* argv[] ){
 				argv += 2, argc -= 2;
 			}
 
-			else if (!strcmp(*argv, "-output"))
+			else if (!strcmp(*argv, "-output") || !strcmp(*argv, "-out") || !strcmp(*argv, "-o"))
 			{
 				CheckOption(*argv, argc, 2);
 				if (img == NULL) ShowUsage();
@@ -299,8 +302,8 @@ int main( int argc, char* argv[] ){
  **/
 static char options[] =
 "-help\n"
-"-input <file>\n"
-"-output <file>\n"
+"[-input | -in | -i] <file>\n"
+"[-output | -out | -o] <file>\n"
 "-noise <factor>\n"
 "-brightness <factor>\n"
 "-contrast <factor>\n"

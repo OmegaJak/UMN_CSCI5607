@@ -1,5 +1,5 @@
-project(hw1)
-cmake_minimum_required(VERSION 3.10)
+project(Image.out)
+cmake_minimum_required(VERSION 3.5.1)
 
 file(GLOB SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp

@@ -90,6 +90,12 @@ Pixel operator* (const Pixel& p, double f)
 }
 
 
+Pixel operator* (double f, const Pixel& p)
+{
+    return p * f;
+}
+
+
 Pixel PixelLerp (const Pixel& p, const Pixel& q, double t)
 {
     return Pixel(

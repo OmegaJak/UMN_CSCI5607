@@ -7,8 +7,7 @@
 /**
  * Image
  **/
-Image::Image (int width_, int height_){
-
+Image::Image (int width_, int height_) {
     assert(width_ > 0);
     assert(height_ > 0);
 
@@ -19,8 +18,8 @@ Image::Image (int width_, int height_){
     
     data.raw = new uint8_t[num_pixels*4];
 	int b = 0; //which byte to write to
-	for (int j = 0; j < height; j++){
-		for (int i = 0; i < width; i++){
+	for (int j = 0; j < height; j++) {
+		for (int i = 0; i < width; i++) {
 			data.raw[b++] = 0;
 			data.raw[b++] = 0;
 			data.raw[b++] = 0;
@@ -31,8 +30,7 @@ Image::Image (int width_, int height_){
     assert(data.raw != NULL);
 }
 
-Image::Image (const Image& src){
-	
+Image::Image (const Image& src) {
 	width           = src.width;
     height          = src.height;
     num_pixels      = width * height;
@@ -44,8 +42,7 @@ Image::Image (const Image& src){
     *data.raw = *src.data.raw;
 }
 
-Image::Image (char* fname){
-
+Image::Image (char* fname) {
 	int numComponents; //(e.g., Y, YA, RGB, or RGBA)
 	data.raw = stbi_load(fname, &width, &height, &numComponents, 4);
 	
@@ -60,13 +57,12 @@ Image::Image (char* fname){
 	
 }
 
-Image::~Image (){
+Image::~Image () {
     delete data.raw;
     data.raw = NULL;
 }
 
-void Image::Write(char* fname){
-	
+void Image::Write(char* fname) {
 	int lastc = strlen(fname);
 
 	switch (fname[lastc-1]){
@@ -85,18 +81,16 @@ void Image::Write(char* fname){
 	}
 }
 
-void Image::AddNoise (double factor)
-{
-	/* WORK HERE */
+void Image::AddNoise (double factor) {
+	for (int i = 0; i < num_pixels; i++) {
+		data.pixels[i] = data.pixels[i] + (PixelRandom() * factor);
+	}
 }
 
-void Image::Brighten (double factor)
-{
+void Image::Brighten (double factor) {
 	int x,y;
-	for (x = 0 ; x < Width() ; x++)
-	{
-		for (y = 0 ; y < Height() ; y++)
-		{
+	for (x = 0; x < Width(); x++) {
+		for (y = 0; y < Height(); y++) {
 			Pixel p = GetPixel(x, y);
 			Pixel scaled_p = p*factor;
 			GetPixel(x,y) = scaled_p;
@@ -105,38 +99,32 @@ void Image::Brighten (double factor)
 }
 
 
-void Image::ChangeContrast (double factor)
-{
+void Image::ChangeContrast (double factor) {
 	/* WORK HERE */
 }
 
 
-void Image::ChangeSaturation(double factor)
-{
+void Image::ChangeSaturation(double factor) {
 	/* WORK HERE */
 }
 
 
-Image* Image::Crop(int x, int y, int w, int h)
-{
+Image* Image::Crop(int x, int y, int w, int h) {
 	/* WORK HERE */
 	return NULL;
 }
 
 
-void Image::ExtractChannel(int channel)
-{
+void Image::ExtractChannel(int channel) {
 	/* WORK HERE */
 }
 
 
-void Image::Quantize (int nbits)
-{
+void Image::Quantize (int nbits) {
 	/* WORK HERE */
 }
 
-void Image::RandomDither (int nbits)
-{
+void Image::RandomDither (int nbits) {
 	/* WORK HERE */
 }
 
@@ -150,8 +138,7 @@ static int Bayer4[4][4] =
 };
 
 
-void Image::OrderedDither(int nbits)
-{
+void Image::OrderedDither(int nbits) {
 	/* WORK HERE */
 }
 
@@ -162,54 +149,46 @@ const double
     GAMMA = 5.0 / 16.0,
     DELTA = 1.0 / 16.0;
 
-void Image::FloydSteinbergDither(int nbits)
-{
+void Image::FloydSteinbergDither(int nbits) {
 	/* WORK HERE */
 }
 
-void Image::Blur(int n)
-{
+void Image::Blur(int n) {
 	/* WORK HERE */
 }
 
-void Image::Sharpen(int n)
-{
+void Image::Sharpen(int n) {
 	/* WORK HERE */
 }
 
-void Image::EdgeDetect()
-{
+void Image::EdgeDetect() {
 	/* WORK HERE */
 }
 
-Image* Image::Scale(double sx, double sy)
-{
+Image* Image::Scale(double sx, double sy) {
 	/* WORK HERE */
 	return NULL;
 }
 
-Image* Image::Rotate(double angle)
-{
+Image* Image::Rotate(double angle) {
 	/* WORK HERE */
 	return NULL;
 }
 
-void Image::Fun()
-{
+void Image::Fun() {
 	/* WORK HERE */
 }
 
 /**
  * Image Sample
  **/
-void Image::SetSamplingMethod(int method)
-{
+void Image::SetSamplingMethod(int method) {
     assert((method >= 0) && (method < IMAGE_N_SAMPLING_METHODS));
     sampling_method = method;
 }
 
 
-Pixel Image::Sample (double u, double v){
+Pixel Image::Sample (double u, double v) {
     /* WORK HERE */
 	return Pixel();
 }
