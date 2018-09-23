@@ -160,6 +160,9 @@ public:
 
     // Sample image using current sampling method.
     Pixel Sample(double u, double v);
+
+    // An interesting effect that turns reds purple and blues green.
+    void Purplify(double factor);
 };
 
 #endif

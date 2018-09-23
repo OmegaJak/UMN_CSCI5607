@@ -7,19 +7,22 @@
 /**
  * Image
  **/
-Image::Image (int width_, int height_) {
-    assert(width_ > 0);
-    assert(height_ > 0);
+Image::Image(int width_, int height_)
+{
+	assert(width_ > 0);
+	assert(height_ > 0);
 
-    width           = width_;
-    height          = height_;
-    num_pixels      = width * height;
-    sampling_method = IMAGE_SAMPLING_POINT;
-    
-    data.raw = new uint8_t[num_pixels*4];
+	width = width_;
+	height = height_;
+	num_pixels = width * height;
+	sampling_method = IMAGE_SAMPLING_POINT;
+
+	data.raw = new uint8_t[num_pixels * 4];
 	int b = 0; //which byte to write to
-	for (int j = 0; j < height; j++) {
-		for (int i = 0; i < width; i++) {
+	for (int j = 0; j < height; j++)
+	{
+		for (int i = 0; i < width; i++)
+		{
 			data.raw[b++] = 0;
 			data.raw[b++] = 0;
 			data.raw[b++] = 0;
@@ -27,200 +30,286 @@ Image::Image (int width_, int height_) {
 		}
 	}
 
-    assert(data.raw != NULL);
+	assert(data.raw != NULL);
 }
 
-Image::Image (const Image& src) {
-	width           = src.width;
-    height          = src.height;
-    num_pixels      = width * height;
-    sampling_method = IMAGE_SAMPLING_POINT;
-    
-    data.raw = new uint8_t[num_pixels*4];
-    
-    memcpy(data.raw, src.data.raw, num_pixels * 4);
-    //*data.raw = *src.data.raw;
+Image::Image(const Image &src)
+{
+	width = src.width;
+	height = src.height;
+	num_pixels = width * height;
+	sampling_method = IMAGE_SAMPLING_POINT;
+
+	data.raw = new uint8_t[num_pixels * 4];
+
+	memcpy(data.raw, src.data.raw, num_pixels * 4);
+	//*data.raw = *src.data.raw;
 }
 
-Image::Image (char* fname) {
+Image::Image(char *fname)
+{
 	int numComponents; //(e.g., Y, YA, RGB, or RGBA)
 	data.raw = stbi_load(fname, &width, &height, &numComponents, 4);
-	
-	if (data.raw == NULL){
+
+	if (data.raw == NULL)
+	{
 		printf("Error loading image: %s", fname);
 		exit(-1);
 	}
-	
 
 	num_pixels = width * height;
 	sampling_method = IMAGE_SAMPLING_POINT;
-	
 }
 
-Image::~Image () {
-    delete data.raw;
-    data.raw = NULL;
+Image::~Image()
+{
+	delete data.raw;
+	data.raw = NULL;
 }
 
-void Image::Write(const char* fname) {
+void Image::Write(const char *fname)
+{
 	int lastc = strlen(fname);
 
-	switch (fname[lastc-1]){
-	   case 'g': //jpeg (or jpg) or png
-	     if (fname[lastc-2] == 'p' || fname[lastc-2] == 'e') //jpeg or jpg
-	        stbi_write_jpg(fname, width, height, 4, data.raw, 95);  //95% jpeg quality
-	     else //png
-	        stbi_write_png(fname, width, height, 4, data.raw, width*4);
-	     break;
-	   case 'a': //tga (targa)
-	     stbi_write_tga(fname, width, height, 4, data.raw);
-	     break;
-	   case 'p': //bmp
-	   default:
-	     stbi_write_bmp(fname, width, height, 4, data.raw);
+	switch (fname[lastc - 1])
+	{
+	case 'g':													   //jpeg (or jpg) or png
+		if (fname[lastc - 2] == 'p' || fname[lastc - 2] == 'e')	//jpeg or jpg
+			stbi_write_jpg(fname, width, height, 4, data.raw, 95); //95% jpeg quality
+		else													   //png
+			stbi_write_png(fname, width, height, 4, data.raw, width * 4);
+		break;
+	case 'a': //tga (targa)
+		stbi_write_tga(fname, width, height, 4, data.raw);
+		break;
+	case 'p': //bmp
+	default:
+		stbi_write_bmp(fname, width, height, 4, data.raw);
 	}
 }
 
-void Image::AddNoise (double factor) {
-	for (int i = 0; i < num_pixels; i++) {
+void Image::AddNoise(double factor)
+{
+	for (int i = 0; i < num_pixels; i++)
+	{
 		data.pixels[i] = data.pixels[i] + (PixelRandom() * factor);
 	}
 }
 
-void Image::Brighten (double factor) {
-	int x,y;
-	for (x = 0; x < Width(); x++) {
-		for (y = 0; y < Height(); y++) {
+void Image::Brighten(double factor)
+{
+	int x, y;
+	for (x = 0; x < Width(); x++)
+	{
+		for (y = 0; y < Height(); y++)
+		{
 			Pixel p = GetPixel(x, y);
-			Pixel scaled_p = p*factor;
-			GetPixel(x,y) = scaled_p;
+			Pixel scaled_p = p * factor;
+			GetPixel(x, y) = scaled_p;
 		}
 	}
 }
 
+void Image::ChangeContrast(double factor)
+{
+	int total_luminance = 0;
+	for (int i = 0; i < num_pixels; i++)
+	{
+		total_luminance += data.pixels[i].Luminance();
+	}
+	printf("total_luminance: %i\n", total_luminance);
+	double average_luminance = total_luminance / (double)num_pixels;
+	printf("average_luminance: %f\n", average_luminance);
 
-void Image::ChangeContrast (double factor) {
+	const double red_factor = 76 / 256.0;
+	const double green_factor = 150 / 256.0;
+	const double blue_factor = 29 / 256.0;
+
+	for (int i = 0; i < num_pixels; i++)
+	{
+		double luminance_diff = (average_luminance - data.pixels[i].Luminance()) * factor;
+		Pixel addPixel = Pixel(red_factor * luminance_diff, green_factor * luminance_diff, blue_factor * luminance_diff);
+		data.pixels[i] = data.pixels[i] + addPixel;
+		//printf("luminance_diff: %f\n", luminance_diff);
+		//double desired_luminance = average_luminance + (factor * luminance_diff);
+		//double l_factor = desired_luminance / average_luminance;
+		//data.pixels[i] = data.pixels[i] * l_factor;
+		// double green_red = data.pixels[i].g / (double)data.pixels[i].r;
+		// double blue_red = data.pixels[i].b / (double)data.pixels[i].b;
+		// printf("desired_luminance: %f\n", desired_luminance);
+		// double new_red = desired_luminance / (red_factor + green_factor * green_red + blue_factor * blue_red);
+		// printf("New_red: %i\n", (int)new_red);
+		// data.pixels[i].SetClamp(new_red, green_red * new_red, blue_red * new_red);
+	}
+}
+
+void Image::ChangeSaturation(double factor)
+{
 	/* WORK HERE */
 }
 
+Image *Image::Crop(int x, int y, int w, int h)
+{
+	if (x < Width() && y < Height())
+	{
+		if (w <= Width() - x && h <= Height() - y)
+		{
+			Image *image = new Image(w, h);
 
-void Image::ChangeSaturation(double factor) {
-	/* WORK HERE */
-}
-
-
-Image* Image::Crop(int x, int y, int w, int h) {
-	if (x < Width() && y < Height()) {
-		if (w <= Width() - x && h <= Height() - y) {
-			Image* image = new Image(w, h);
-
-			for (int i = 0; i < w; i++) {
-				for (int j = 0; j < h; j++) {
+			for (int i = 0; i < w; i++)
+			{
+				for (int j = 0; j < h; j++)
+				{
 					image->GetPixel(i, j).Set(GetPixel(x + i, y + j));
 				}
 			}
 
 			return image;
-		} else {
-			fprintf(stderr, "Invalid width or height parameter. "
-							"The input image is %ix%i pixels.\n", Width(), Height());
 		}
-	} else {
+		else
+		{
+			fprintf(stderr, "Invalid width or height parameter. "
+							"The input image is %ix%i pixels.\n",
+					Width(), Height());
+		}
+	}
+	else
+	{
 		fprintf(stderr, "Invalid crop corner. The corner coordinates must be within the image. "
 						"X value must be strictly less than the image width,  Y value must be less than the image height. "
-						"The top left corner of the image is (0,0). The bottom right pixel is (%i, %i).\n", Width() - 1, Height() - 1);
+						"The top left corner of the image is (0,0). The bottom right pixel is (%i, %i).\n",
+				Width() - 1, Height() - 1);
 	}
 	return NULL;
 }
 
-
-void Image::ExtractChannel(int channel) {
-	if (channel < 0 || channel > 3) {
+void Image::ExtractChannel(int channel)
+{
+	if (channel < 0 || channel > 3)
+	{
 		fprintf(stderr, "Invalid channel number. It must be a number between 0 and 3 (inclusive). Following are the channel mappings: \n"
 						"red: 0\ngreen: 1\nblue: 2\nalpha: 3\n");
 
 		return;
 	}
 
-	for (int i = 0; i < num_pixels; i++) {
-		for (int j = 0; j < 4; j++) {
-			if (j != channel) {
+	for (int i = 0; i < num_pixels; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			if (j != channel)
+			{
 				data.raw[i * 4 + j] = 0;
 			}
 		}
 	}
 }
 
-
-void Image::Quantize (int nbits) {
-	/* WORK HERE */
+void Image::Quantize(int nbits)
+{
+	double fraction, newFraction;
+	int quantizedVal;
+	for (int i = 0; i < num_pixels * 4; i++)
+	{
+		if (i % 4 == 0) // Don't mess with alpha
+			continue;
+		fraction = data.raw[i] / 255.0;
+		quantizedVal = round(fraction * nbits);
+		newFraction = quantizedVal / (double)nbits;
+		data.raw[i] = round(newFraction * 255.0);
+	}
 }
 
-void Image::RandomDither (int nbits) {
+void Image::RandomDither(int nbits)
+{
 	/* WORK HERE */
 }
-
 
 static int Bayer4[4][4] =
+	{
+		{15, 7, 13, 5},
+		{3, 11, 1, 9},
+		{12, 4, 14, 6},
+		{0, 8, 2, 10}};
+
+void Image::OrderedDither(int nbits)
 {
-    {15,  7, 13,  5},
-    { 3, 11,  1,  9},
-    {12,  4, 14,  6},
-    { 0,  8,  2, 10}
-};
-
-
-void Image::OrderedDither(int nbits) {
 	/* WORK HERE */
 }
 
 /* Error-diffusion parameters */
 const double
-    ALPHA = 7.0 / 16.0,
-    BETA  = 3.0 / 16.0,
-    GAMMA = 5.0 / 16.0,
-    DELTA = 1.0 / 16.0;
+	ALPHA = 7.0 / 16.0,
+	BETA = 3.0 / 16.0,
+	GAMMA = 5.0 / 16.0,
+	DELTA = 1.0 / 16.0;
 
-void Image::FloydSteinbergDither(int nbits) {
+void Image::FloydSteinbergDither(int nbits)
+{
 	/* WORK HERE */
 }
 
-void Image::Blur(int n) {
+void Image::Blur(int n)
+{
 	/* WORK HERE */
 }
 
-void Image::Sharpen(int n) {
+void Image::Sharpen(int n)
+{
 	/* WORK HERE */
 }
 
-void Image::EdgeDetect() {
+void Image::EdgeDetect()
+{
 	/* WORK HERE */
 }
 
-Image* Image::Scale(double sx, double sy) {
+Image *Image::Scale(double sx, double sy)
+{
 	/* WORK HERE */
 	return NULL;
 }
 
-Image* Image::Rotate(double angle) {
+Image *Image::Rotate(double angle)
+{
 	/* WORK HERE */
 	return NULL;
 }
 
-void Image::Fun() {
+void Image::Fun()
+{
 	/* WORK HERE */
 }
 
 /**
  * Image Sample
  **/
-void Image::SetSamplingMethod(int method) {
-    assert((method >= 0) && (method < IMAGE_N_SAMPLING_METHODS));
-    sampling_method = method;
+void Image::SetSamplingMethod(int method)
+{
+	assert((method >= 0) && (method < IMAGE_N_SAMPLING_METHODS));
+	sampling_method = method;
 }
 
-
-Pixel Image::Sample (double u, double v) {
-    /* WORK HERE */
+Pixel Image::Sample(double u, double v)
+{
+	/* WORK HERE */
 	return Pixel();
+}
+
+void Image::Purplify(double factor)
+{
+	const double red_factor = 76 / 256.0;
+	const double green_factor = 150 / 256.0;
+	const double blue_factor = 29 / 256.0;
+
+	for (int i = 0; i < num_pixels; i++)
+	{
+		double luminance_diff = data.pixels[i].Luminance();
+		double desired_luminance = factor * luminance_diff;
+		double green_red = data.pixels[i].g / (double)data.pixels[i].r;
+		double blue_red = data.pixels[i].b / (double)data.pixels[i].b;
+
+		double new_red = desired_luminance / (red_factor + green_factor * green_red + blue_factor * blue_red);
+		data.pixels[i].SetClamp(new_red, green_red * new_red, blue_red * new_red);
+	}
 }
