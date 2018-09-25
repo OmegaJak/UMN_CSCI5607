@@ -203,21 +203,53 @@ void Image::ExtractChannel(int channel)
 void Image::Quantize(int nbits)
 {
 	double fraction, newFraction;
-	int quantizedVal;
+	int quantizedVal, maxValue;
 	for (int i = 0; i < num_pixels * 4; i++)
 	{
-		if (i % 4 == 0) // Don't mess with alpha
+		if (i % 4 == 3)
+		{ // Don't mess with alpha
+			//printf("(r, g, b): (%i, %i, %i)\n", data.pixels[i / 4].r, data.pixels[i / 4].g, data.pixels[i / 4].b);
 			continue;
+		}
+
+		maxValue = pow(2, nbits) - 1;
 		fraction = data.raw[i] / 255.0;
-		quantizedVal = round(fraction * nbits);
-		newFraction = quantizedVal / (double)nbits;
+		quantizedVal = round(fraction * maxValue);
+		newFraction = quantizedVal / (double)maxValue;
 		data.raw[i] = round(newFraction * 255.0);
 	}
 }
 
+int random(double chanceToGetAOne)
+{
+	double res = rand() % 1000;
+	if (res < chanceToGetAOne * 1000)
+		return 1;
+	else
+		return 0;
+}
+
 void Image::RandomDither(int nbits)
 {
-	/* WORK HERE */
+	double fractional, newFraction, diff;
+	int quantizedVal, maxValue;
+	for (int i = 0; i < num_pixels * 4; i++)
+	{
+		if (i % 4 == 3)
+		{ // Don't mess with alpha
+			//printf("(r, g, b): (%i, %i, %i)\n", data.pixels[i / 4].r, data.pixels[i / 4].g, data.pixels[i / 4].b);
+			continue;
+		}
+
+		maxValue = pow(2, nbits) - 1;
+		fractional = (data.raw[i] / 255.0) * maxValue;
+		diff = fractional - floor(fractional);
+		quantizedVal = floor(fractional) + random(diff); // Clamp to nearest number that can be stored with nbits
+
+		// Scale back up to 0 to 255
+		newFraction = quantizedVal / (double)maxValue;
+		data.raw[i] = round(newFraction * 255.0);
+	}
 }
 
 static int Bayer4[4][4] =
