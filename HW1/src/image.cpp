@@ -117,35 +117,27 @@ void Image::ChangeContrast(double factor)
 	{
 		total_luminance += data.pixels[i].Luminance();
 	}
-	printf("total_luminance: %i\n", total_luminance);
 	double average_luminance = total_luminance / (double)num_pixels;
-	printf("average_luminance: %f\n", average_luminance);
 
-	const double red_factor = 76 / 256.0;
-	const double green_factor = 150 / 256.0;
-	const double blue_factor = 29 / 256.0;
-
+	Pixel luminant_pixel = Pixel(average_luminance, average_luminance, average_luminance, 1.0);
 	for (int i = 0; i < num_pixels; i++)
 	{
-		double luminance_diff = (average_luminance - data.pixels[i].Luminance()) * factor;
-		Pixel addPixel = Pixel(red_factor * luminance_diff, green_factor * luminance_diff, blue_factor * luminance_diff);
-		data.pixels[i] = data.pixels[i] + addPixel;
-		//printf("luminance_diff: %f\n", luminance_diff);
-		//double desired_luminance = average_luminance + (factor * luminance_diff);
-		//double l_factor = desired_luminance / average_luminance;
-		//data.pixels[i] = data.pixels[i] * l_factor;
-		// double green_red = data.pixels[i].g / (double)data.pixels[i].r;
-		// double blue_red = data.pixels[i].b / (double)data.pixels[i].b;
-		// printf("desired_luminance: %f\n", desired_luminance);
-		// double new_red = desired_luminance / (red_factor + green_factor * green_red + blue_factor * blue_red);
-		// printf("New_red: %i\n", (int)new_red);
-		// data.pixels[i].SetClamp(new_red, green_red * new_red, blue_red * new_red);
+		// Interpolate from the average luminant pixel and this one by factor
+		data.pixels[i] = PixelLerp(luminant_pixel, data.pixels[i], factor);
 	}
 }
 
 void Image::ChangeSaturation(double factor)
 {
-	/* WORK HERE */
+	int local_luminance;
+	Pixel local_grayscale;
+	for (int i = 0; i < num_pixels; i++)
+	{
+		// Interpolate from the greyscale version of this pixel and itself by factor
+		local_luminance = data.pixels[i].Luminance();
+		local_grayscale = Pixel(local_luminance, local_luminance, local_luminance, 1.0);
+		data.pixels[i] = PixelLerp(local_grayscale, data.pixels[i], factor);
+	}
 }
 
 Image *Image::Crop(int x, int y, int w, int h)
