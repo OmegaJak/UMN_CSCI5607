@@ -105,6 +105,7 @@ void Image::Brighten(double factor)
 		{
 			Pixel p = GetPixel(x, y);
 			Pixel scaled_p = p * factor;
+			scaled_p.a = p.a;
 			GetPixel(x, y) = scaled_p;
 		}
 	}
@@ -120,10 +121,12 @@ void Image::ChangeContrast(double factor)
 	double average_luminance = total_luminance / (double)num_pixels;
 
 	Pixel luminant_pixel = Pixel(average_luminance, average_luminance, average_luminance, 1.0);
+	int alpha;
 	for (int i = 0; i < num_pixels; i++)
 	{
-		// Interpolate from the average luminant pixel and this one by factor
-		data.pixels[i] = PixelLerp(luminant_pixel, data.pixels[i], factor);
+		alpha = data.pixels[i].a;											// Save the initial alpha
+		data.pixels[i] = PixelLerp(luminant_pixel, data.pixels[i], factor); // Interpolate from the average luminant pixel and this one by factor
+		data.pixels[i].a = alpha;											// Reset the alpha to leave it unaffected by contrast change
 	}
 }
 
@@ -135,7 +138,7 @@ void Image::ChangeSaturation(double factor)
 	{
 		// Interpolate from the greyscale version of this pixel and itself by factor
 		local_luminance = data.pixels[i].Luminance();
-		local_grayscale = Pixel(local_luminance, local_luminance, local_luminance, 1.0);
+		local_grayscale = Pixel(local_luminance, local_luminance, local_luminance, data.pixels[i].a);
 		data.pixels[i] = PixelLerp(local_grayscale, data.pixels[i], factor);
 	}
 }
