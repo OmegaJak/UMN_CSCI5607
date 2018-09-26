@@ -208,7 +208,6 @@ void Image::Quantize(int nbits)
 	{
 		if (i % 4 == 3)
 		{ // Don't mess with alpha
-			//printf("(r, g, b): (%i, %i, %i)\n", data.pixels[i / 4].r, data.pixels[i / 4].g, data.pixels[i / 4].b);
 			continue;
 		}
 
@@ -220,6 +219,7 @@ void Image::Quantize(int nbits)
 	}
 }
 
+// Has a chance from 0 to 1, given by chanceToGetAOne, to return a 1. 0.4 has a 40% to return 1, 60% chance to return 0.
 int random(double chanceToGetAOne)
 {
 	double res = rand() % 1000;
@@ -273,7 +273,20 @@ const double
 
 void Image::FloydSteinbergDither(int nbits)
 {
-	/* WORK HERE */
+	Pixel oldPixel, newPixel, quantError;
+	for (int y = 0; y < Height(); y++)
+	{
+		for (int x = 0; x < Width(); x++)
+		{
+			oldPixel = GetPixel(x, y);
+			newPixel = SetPixel(x, y, PixelQuant(oldPixel, nbits));
+			quantError = oldPixel - newPixel;
+			if (ValidCoord(x + 1, y)) SetPixel(x + 1, y, GetPixel(x + 1, y) + (quantError * ALPHA)); 				// Right
+			if (ValidCoord(x + 1, y + 1)) SetPixel(x + 1, y + 1, GetPixel(x + 1, y + 1) + (quantError * DELTA)); 	// Down right
+			if (ValidCoord(x, y + 1)) SetPixel(x, y + 1, GetPixel(x, y + 1) + (quantError * GAMMA)); 				// Down
+			if (ValidCoord(x - 1, y + 1)) SetPixel(x - 1, y + 1, GetPixel(x - 1, y + 1) + (quantError * BETA)); 	// Down left
+		}
+	}
 }
 
 void Image::Blur(int n)

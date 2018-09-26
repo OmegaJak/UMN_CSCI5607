@@ -72,7 +72,7 @@ public:
     // Pixel access
     int ValidCoord (int x, int y)  const { return x>=0 && x<width && y>=0 && y<height; }
     Pixel& GetPixel (int x, int y) const { assert(ValidCoord(x,y));  return data.pixels[y*width + x]; }
-    void SetPixel (int x, int y, Pixel p) const { assert(ValidCoord(x,y));  data.pixels[y*width + x] = p; }
+    Pixel& SetPixel (int x, int y, Pixel p) const { assert(ValidCoord(x,y));  data.pixels[y*width + x] = p; return data.pixels[y*width + x]; }
 
     // Dimension access
     int Width     () const { return width; }
