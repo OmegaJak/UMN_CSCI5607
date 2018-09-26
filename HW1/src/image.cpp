@@ -317,14 +317,13 @@ void Image::Blur(int n)
 	}
 	for (int i = -n; i <= n; i++) {
 		filter[i] = filter[i] / total;
-		printf("value: %f\n", filter[i]);
 	}
 	
 
 	// First, the horizontal pass, then vertical pass
 	Pixel result;
-	Image oldImage = Image(*this);
 	for (int i = 0; i < 2; i++) {
+		Image oldImage = Image(*this);
 		for (int x = 0; x < Width(); x++) {
 			for (int y = 0; y < Height(); y++) {
 				result = Pixel(0, 0, 0, 0);
