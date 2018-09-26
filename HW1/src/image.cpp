@@ -289,14 +289,69 @@ void Image::FloydSteinbergDither(int nbits)
 	}
 }
 
+static double Gaussian[5] = { 1.0/16.0, 4.0/16.0, 6.0/16.0, 4.0/16.0, 1.0/16.0 };
+
+int reflectValue(int value, int maxValueInclusive) {
+	if (value < 0) {
+		return -1 * value;
+	} else if (value > maxValueInclusive) {
+		return maxValueInclusive + (maxValueInclusive - value);
+	} else {
+		return value;
+	}
+}
+
+double Gauss(int x, int radius) {
+	double sigma = radius < 1 ? 1 : radius;
+	return (1 / (sigma * sqrt(2 * M_PI))) * exp(-(x*x) / (2.0 * sigma * sigma));
+}
+
 void Image::Blur(int n)
 {
-	/* WORK HERE */
+	double arr[n * 2 + 1];
+	double *filter = arr + n; // This is pretty risky but makes other things nicer. It centers the array to allow negative indexing to match the loops used.
+	double total = 0;
+	for (int i = -n; i <= n; i++) {
+		filter[i] = Gauss(i, n);
+		total = total + filter[i];
+	}
+	for (int i = -n; i <= n; i++) {
+		filter[i] = filter[i] / total;
+		printf("value: %f\n", filter[i]);
+	}
+	
+
+	// First, the horizontal pass, then vertical pass
+	Pixel result;
+	Image oldImage = Image(*this);
+	for (int i = 0; i < 2; i++) {
+		for (int x = 0; x < Width(); x++) {
+			for (int y = 0; y < Height(); y++) {
+				result = Pixel(0, 0, 0, 0);
+				for (int j = -n; j <= n; j++) {
+					if (i == 0) {
+						int horizontal = reflectValue(x - j, Width() - 1);
+						result = result + filter[j] * oldImage.GetPixel(horizontal, y);
+					} else if (i == 1) {
+						int vertical = reflectValue(y - j, Height() - 1);
+						result = result + filter[j] * oldImage.GetPixel(x, vertical);
+					}
+					SetPixel(x, y, result);
+				}
+			}
+		}
+	}
 }
 
 void Image::Sharpen(int n)
 {
-	/* WORK HERE */
+	Image oldImage = Image(*this);
+	Blur(n);
+	for (int x = 0; x < Width(); x++) {
+		for (int y = 0; y < Height(); y++) {
+			SetPixel(x, y, PixelLerp(oldImage.GetPixel(x, y), GetPixel(x, y), -1));
+		}
+	}
 }
 
 void Image::EdgeDetect()
