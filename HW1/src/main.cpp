@@ -290,10 +290,10 @@ int main( int argc, char* argv[] ){
 
 	if (!did_output)
 	{
-		printf("You didn't tell me to output anything, so I'm just going to output to \"out.jpg\".\n" );
+		printf("You didn't tell me to output anything, so I'm just going to output to \"out.png\".\n" );
 		
 		if (img == NULL) ShowUsage();
-		img->Write("out.jpg");
+		img->Write("out.png");
 	}
 
 	delete img;

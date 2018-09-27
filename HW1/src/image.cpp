@@ -90,9 +90,17 @@ void Image::Write(const char *fname)
 
 void Image::AddNoise(double factor)
 {
+	int newR, newG, newB;
+	Pixel randomPixel;
 	for (int i = 0; i < num_pixels; i++)
 	{
-		data.pixels[i] = data.pixels[i] + (PixelRandom() * factor);
+		randomPixel = PixelRandom();
+		newR = data.pixels[i].r + (randomPixel.r - 128) * factor;
+		newG = data.pixels[i].g + (randomPixel.g - 128) * factor;
+		newB = data.pixels[i].b + (randomPixel.b - 128) * factor;
+		//printf("(r, g, b): (%i, %i, %i)\n", newR, newG, newB);
+		data.pixels[i].SetClamp(newR, newG, newB, data.pixels[i].a);
+		//data.pixels[i] = randomPixel;
 	}
 }
 
