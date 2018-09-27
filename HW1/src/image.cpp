@@ -98,9 +98,7 @@ void Image::AddNoise(double factor)
 		newR = data.pixels[i].r + (randomPixel.r - 128) * factor;
 		newG = data.pixels[i].g + (randomPixel.g - 128) * factor;
 		newB = data.pixels[i].b + (randomPixel.b - 128) * factor;
-		//printf("(r, g, b): (%i, %i, %i)\n", newR, newG, newB);
 		data.pixels[i].SetClamp(newR, newG, newB, data.pixels[i].a);
-		//data.pixels[i] = randomPixel;
 	}
 }
 
@@ -153,37 +151,29 @@ void Image::ChangeSaturation(double factor)
 
 Image *Image::Crop(int x, int y, int w, int h)
 {
-	if (x < Width() && y < Height())
-	{
-		if (w <= Width() - x && h <= Height() - y)
-		{
-			Image *image = new Image(w, h);
-
-			for (int i = 0; i < w; i++)
-			{
-				for (int j = 0; j < h; j++)
-				{
-					image->GetPixel(i, j).Set(GetPixel(x + i, y + j));
-				}
-			}
-
-			return image;
-		}
-		else
-		{
-			fprintf(stderr, "Invalid width or height parameter. "
-							"The input image is %ix%i pixels.\n",
-					Width(), Height());
-		}
-	}
-	else
-	{
+	if (x >= Width() || y >= Height()) {
 		fprintf(stderr, "Invalid crop corner. The corner coordinates must be within the image. "
 						"X value must be strictly less than the image width,  Y value must be less than the image height. "
 						"The top left corner of the image is (0,0). The bottom right pixel is (%i, %i).\n",
 				Width() - 1, Height() - 1);
+		return NULL;
+	} else if (w > Width() - x || h > Height() - y) {
+		fprintf(stderr, "Invalid width or height parameter. "
+						"The input image is %ix%i pixels.\n",
+				Width(), Height());
+		return NULL;
 	}
-	return NULL;
+
+	Image *image = new Image(w, h);
+	for (int i = 0; i < w; i++)
+	{
+		for (int j = 0; j < h; j++)
+		{
+			image->GetPixel(i, j).Set(GetPixel(x + i, y + j));
+		}
+	}
+
+	return image;
 }
 
 void Image::ExtractChannel(int channel)
