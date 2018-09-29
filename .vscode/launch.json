@@ -5,13 +5,16 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "(gdb) Launch HW0",
+			"name": "(gdb) Launch HW1",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${workspaceFolder}/HW0/square",
-			"args": [],
-			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}",
+			"program": "${workspaceFolder}/HW1/Image.out",
+			"args": [
+				"-i", "sample_images/cube.jpg",
+				"-FloydSteinbergDither", "1"
+			],
+			"stopAtEntry": true,
+			"cwd": "${workspaceFolder}/HW1",
 			"environment": [],
 			"externalConsole": true,
 			"MIMode": "gdb",

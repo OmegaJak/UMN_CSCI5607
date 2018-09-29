@@ -269,20 +269,68 @@ const double
 	GAMMA = 5.0 / 16.0,
 	DELTA = 1.0 / 16.0;
 
+struct PrecisePixel {
+	double r, g, b, a;
+
+	PrecisePixel(double r_=0, double g_=0, double b_=0, double a_=0) : r(r_), g(g_), b(b_), a(a_) {}
+	PrecisePixel(Pixel pixel) { r = pixel.r; g = pixel.g, b = pixel.b, a = pixel.a; }
+
+	Pixel ToPixel() { Pixel pixel = Pixel(); pixel.SetClamp(r, g, b, a); return pixel; }
+
+	void Set(const PrecisePixel& other) {
+		r = other.r;
+		g = other.g;
+		b = other.b;
+		a = other.a;
+	}
+
+	const PrecisePixel operator* (double f) const {
+		return PrecisePixel(r * f, g * f, b * f, a * f);
+	}
+
+	const PrecisePixel operator+ (PrecisePixel& other) const {
+		return PrecisePixel(r + other.r, g + other.g, b + other.b, a + other.a);
+	}
+
+	PrecisePixel &operator+= (const PrecisePixel other) {
+		r += other.r;
+		g += other.g;
+		b += other.b;
+		a += other.a;
+		return *this;
+	}
+};
+
+
 void Image::FloydSteinbergDither(int nbits)
 {
-	Pixel oldPixel, newPixel, quantError;
-	for (int y = 0; y < Height(); y++)
-	{
-		for (int x = 0; x < Width(); x++)
-		{
+	PrecisePixel error[Width()][2];
+	for (int x = 0; x < Width(); x++) {
+		for (int y = 0; y < 2; y++) {
+			error[x][y] = PrecisePixel();
+		}
+	}
+
+	Pixel oldPixel, newPixel;
+	PrecisePixel quantError;
+	for (int y = 0; y < Height(); y++) {
+		for (int x = 0; x < Width(); x++) {
 			oldPixel = GetPixel(x, y);
-			newPixel = SetPixel(x, y, PixelQuant(oldPixel, nbits));
-			quantError = oldPixel - newPixel;
-			if (ValidCoord(x + 1, y)) SetPixel(x + 1, y, GetPixel(x + 1, y) + (quantError * ALPHA)); 				// Right
-			if (ValidCoord(x + 1, y + 1)) SetPixel(x + 1, y + 1, GetPixel(x + 1, y + 1) + (quantError * DELTA)); 	// Down right
-			if (ValidCoord(x, y + 1)) SetPixel(x, y + 1, GetPixel(x, y + 1) + (quantError * GAMMA)); 				// Down
-			if (ValidCoord(x - 1, y + 1)) SetPixel(x - 1, y + 1, GetPixel(x - 1, y + 1) + (quantError * BETA)); 	// Down left
+			PrecisePixel err = error[x][0];
+			Pixel old = Pixel(oldPixel);
+			old.SetClamp(old.r + err.r, old.g + err.g, old.b + err.b);
+			newPixel = SetPixel(x, y, PixelQuant(old, nbits));
+			
+			quantError = PrecisePixel(oldPixel.r - newPixel.r, oldPixel.g - newPixel.g, oldPixel.b - newPixel.b);
+			if (ValidCoord(x + 1, y)) error[x + 1][0] += quantError * ALPHA; // Right
+			if (ValidCoord(x + 1, y + 1)) error[x + 1][1] += quantError * DELTA; // Down right
+			if (ValidCoord(x, y + 1)) error[x][1] += quantError * GAMMA; // Down
+			if (ValidCoord(x - 1, y + 1)) error[x - 1][1] += quantError * BETA; // Down left
+		}
+
+		for (int x = 0; x < Width(); x++) {
+			error[x][0].Set(error[x][1]);
+			error[x][1] = PrecisePixel();
 		}
 	}
 }
