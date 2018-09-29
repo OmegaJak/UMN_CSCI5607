@@ -106,6 +106,12 @@ Pixel operator* (double f, const Pixel& p)
 }
 
 
+std::ostream& operator<< (std::ostream& os, const Pixel& p) {
+    os << "(" << (int)p.r << ", " << (int)p.g << ", " << (int)p.b << ", " << (int)p.a << ")";
+    return os;
+}
+
+
 Pixel PixelLerp (const Pixel& p, const Pixel& q, double t)
 {
     return Pixel(

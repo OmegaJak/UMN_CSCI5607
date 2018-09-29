@@ -1,5 +1,6 @@
 project(Image.out)
 cmake_minimum_required(VERSION 3.5.1)
+set(CMAKE_BUILD_TYPE Debug)
 
 file(GLOB SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp

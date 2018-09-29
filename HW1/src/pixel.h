@@ -9,6 +9,7 @@
 #define PIXEL_INCLUDED
 
 #include <stdint.h>
+#include <iostream>
 
 /**
  * Component, fundamental type
@@ -73,6 +74,9 @@ Pixel operator* (const Pixel& p, double f);
 
 // Other direction component-wise multiplication of pixel by scalar.
 Pixel operator* (double f, const Pixel& p);
+
+// For printing the pixel
+std::ostream& operator<< (std::ostream& os, const Pixel& p);
 
 // Linear interpolation of pixels.  Returns (1 - t) * p + t * q.
 Pixel PixelLerp (const Pixel& p, const Pixel& q, double t);

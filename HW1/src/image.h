@@ -163,6 +163,13 @@ public:
 
     // An interesting effect that turns reds purple and blues green.
     void Purplify(double factor);
+
+private:
+
+    // Applies the given convolution filters to the image
+    void SeparableConvolve(int radius, double* xFilter, double* yFilter);
+
+    void Convolve(int radius, double **filter, Image &image);
 };
 
 #endif

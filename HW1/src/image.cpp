@@ -335,8 +335,6 @@ void Image::FloydSteinbergDither(int nbits)
 	}
 }
 
-static double Gaussian[5] = { 1.0/16.0, 4.0/16.0, 6.0/16.0, 4.0/16.0, 1.0/16.0 };
-
 int reflectValue(int value, int maxValueInclusive) {
 	if (value < 0) {
 		return -1 * value;
@@ -352,6 +350,49 @@ double Gauss(int x, int radius) {
 	return (1 / (sigma * sqrt(2 * M_PI))) * exp(-(x*x) / (2.0 * sigma * sigma));
 }
 
+void Image::SeparableConvolve(int radius, double* xFilter, double* yFilter) {
+	// First, the horizontal pass (i = 0), then vertical pass (i = 1)
+	PrecisePixel result;
+	for (int i = 0; i < 2; i++) {
+		Image oldImage = Image(*this);
+		for (int x = 0; x < Width(); x++) {
+			for (int y = 0; y < Height(); y++) {
+				result = Pixel(0, 0, 0);
+				for (int j = -radius; j <= radius; j++) {
+					if (i == 0) {
+						int horizontal = reflectValue(x - j, Width() - 1);
+						result += PrecisePixel(oldImage.GetPixel(horizontal, y)) * xFilter[j];
+					} else if (i == 1) {
+						int vertical = reflectValue(y - j, Height() - 1);
+						result += PrecisePixel(oldImage.GetPixel(x, vertical)) * yFilter[j];
+					}
+				}
+				SetPixel(x, y, result.ToPixel());
+			}
+		}
+	}
+}
+
+void Image::Convolve(int radius, double **filter, Image &image) {
+	PrecisePixel result;
+	Image oldImage = Image(image);
+	for (int x = 0; x < image.Width(); x++) {
+		for (int y = 0; y < image.Height(); y++) {
+			result = PrecisePixel(0, 0, 0, 1);
+			for (int i = 0; i < radius * 2 + 1; i++) {
+				for (int j = 0; j < radius * 2 + 1; j++) {
+					int reflectedX = reflectValue(x + radius - i, image.Width() - 1);
+					int reflectedY = reflectValue(y + radius - j, image.Height() - 1);
+					result += PrecisePixel(oldImage.GetPixel(reflectedX, reflectedY)) * filter[i][j];
+				}
+			}
+
+			//std::cout << result.ToPixel() << std::endl;
+			image.SetPixel(x, y, result.ToPixel());
+		}
+	}
+}
+
 void Image::Blur(int n)
 {
 	double arr[n * 2 + 1];
@@ -365,27 +406,7 @@ void Image::Blur(int n)
 		filter[i] = filter[i] / total;
 	}
 	
-
-	// First, the horizontal pass, then vertical pass
-	Pixel result;
-	for (int i = 0; i < 2; i++) {
-		Image oldImage = Image(*this);
-		for (int x = 0; x < Width(); x++) {
-			for (int y = 0; y < Height(); y++) {
-				result = Pixel(0, 0, 0, 0);
-				for (int j = -n; j <= n; j++) {
-					if (i == 0) {
-						int horizontal = reflectValue(x - j, Width() - 1);
-						result = result + filter[j] * oldImage.GetPixel(horizontal, y);
-					} else if (i == 1) {
-						int vertical = reflectValue(y - j, Height() - 1);
-						result = result + filter[j] * oldImage.GetPixel(x, vertical);
-					}
-					SetPixel(x, y, result);
-				}
-			}
-		}
-	}
+	SeparableConvolve(n, filter, filter);
 }
 
 void Image::Sharpen(int n)
@@ -399,9 +420,42 @@ void Image::Sharpen(int n)
 	}
 }
 
+double edgeDetectX[3][3] = {
+	{ -1, 0, 1 },
+	{ -2, 0, 2 },
+	{ -1, 0, 1 }
+};
+
+double edgeDetectY[3][3] = {
+	{ -1, -2, -1 },
+	{  0,  0,  0 },
+	{  1,  2,  1 }
+};
+
 void Image::EdgeDetect()
 {
-	/* WORK HERE */
+	ChangeSaturation(0.0);
+	Blur(1);
+	Brighten(0.02);
+	ChangeContrast(0.5);
+
+	double *f[3];
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectX[i];
+	Image xDetected = Image(*this);
+	Convolve(1, f, xDetected);
+
+	double *f2[3];
+	for (int i = 0; i < 3; i++) f2[i] = edgeDetectY[i];
+	Image yDetected = Image(*this);
+	Convolve(1, f2, yDetected);
+	
+	for (int x = 0; x < Width(); x++) {
+		for (int y = 0; y < Height(); y++) {
+			SetPixel(x, y, xDetected.GetPixel(x, y) + yDetected.GetPixel(x, y) + Pixel(0, 0, 0, 255));
+		}
+	}
+
+	Brighten(50);
 }
 
 Image *Image::Scale(double sx, double sy)
