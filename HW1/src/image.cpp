@@ -434,28 +434,36 @@ double edgeDetectY[3][3] = {
 
 void Image::EdgeDetect()
 {
+	double *f[3];
+	
 	ChangeSaturation(0.0);
 	Blur(1);
-	Brighten(0.02);
-	ChangeContrast(0.5);
 
-	double *f[3];
+	// Detect right edges
 	for (int i = 0; i < 3; i++) f[i] = edgeDetectX[i];
 	Image xDetected = Image(*this);
 	Convolve(1, f, xDetected);
 
-	double *f2[3];
-	for (int i = 0; i < 3; i++) f2[i] = edgeDetectY[i];
+	// Detect bottom edges
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectY[i];
 	Image yDetected = Image(*this);
-	Convolve(1, f2, yDetected);
+	Convolve(1, f, yDetected);
+
+	// Detect left edges
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectX[2 - i];
+	Image xDetected2 = Image(*this);
+	Convolve(1, f, xDetected2);
+
+	// Detect top edges
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectY[2 - i];
+	Image yDetected2 = Image(*this);
+	Convolve(1, f, yDetected2);
 	
 	for (int x = 0; x < Width(); x++) {
 		for (int y = 0; y < Height(); y++) {
-			SetPixel(x, y, xDetected.GetPixel(x, y) + yDetected.GetPixel(x, y) + Pixel(0, 0, 0, 255));
+			SetPixel(x, y, xDetected.GetPixel(x, y) + yDetected.GetPixel(x, y) + Pixel(0, 0, 0, 255) + xDetected2.GetPixel(x, y) + yDetected2.GetPixel(x, y));
 		}
 	}
-
-	Brighten(50);
 }
 
 Image *Image::Scale(double sx, double sy)
