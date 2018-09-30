@@ -301,6 +301,9 @@ struct PrecisePixel {
 	}
 };
 
+PrecisePixel operator* (double f, PrecisePixel p) {
+	return p * f;
+}
 
 void Image::FloydSteinbergDither(int nbits)
 {
@@ -407,6 +410,8 @@ void Image::Blur(int n)
 	}
 	
 	SeparableConvolve(n, filter, filter);
+
+	delete filter;
 }
 
 void Image::Sharpen(int n)
@@ -434,6 +439,7 @@ double edgeDetectY[3][3] = {
 
 void Image::EdgeDetect()
 {
+	// Method inspired by: https://www.projectrhea.org/rhea/index.php/An_Implementation_of_Sobel_Edge_Detection
 	double *f[3];
 	
 	ChangeSaturation(0.0);
@@ -468,8 +474,14 @@ void Image::EdgeDetect()
 
 Image *Image::Scale(double sx, double sy)
 {
-	/* WORK HERE */
-	return NULL;
+	Image *newImage = new Image(floor(sx * Width()), floor(sy * Height()));
+	for (int u = 0; u < newImage->Width(); u++) {
+		for (int v = 0; v < newImage->Height(); v++) {
+			newImage->SetPixel(u, v, Sample(u / sx, v / sy));
+		}
+	}
+
+	return newImage;
 }
 
 Image *Image::Rotate(double angle)
@@ -489,12 +501,52 @@ void Image::Fun()
 void Image::SetSamplingMethod(int method)
 {
 	assert((method >= 0) && (method < IMAGE_N_SAMPLING_METHODS));
+	printf("Sampling: %i\n", method);
 	sampling_method = method;
 }
 
 Pixel Image::Sample(double u, double v)
 {
-	/* WORK HERE */
+	int nearestX = fmax(fmin((int)(u + 0.5), Width() - 1), 0);
+	int nearestY = fmax(fmin((int)(v + 0.5), Height() - 1), 0);
+	if (sampling_method == IMAGE_SAMPLING_POINT) { // Nearest neighbor
+		return GetPixel(nearestX, nearestY);
+	} else if (sampling_method == IMAGE_SAMPLING_BILINEAR) {
+		// Method derived from here: http://eeweb.poly.edu/~yao/EL5123/lecture8_sampling.pdf
+		int left = floor(u);
+		int right = reflectValue(left + 1, Width() - 1);
+		int top = floor(v);
+		int bottom = reflectValue(top + 1, Height() - 1);
+		double a = u - left;
+		double b = v - top;
+
+		PrecisePixel out = PrecisePixel();
+		out += (1 - a) * (1 - b) * PrecisePixel(GetPixel(left, top));
+		out += a * (1 - b) * PrecisePixel(GetPixel(right, top));
+		out += (1 - a) * b * PrecisePixel(GetPixel(left, bottom));
+		out +=  a * b *  PrecisePixel(GetPixel(right, bottom));
+		
+		return out.ToPixel();
+	} else if (sampling_method == IMAGE_SAMPLING_GAUSSIAN) {
+		double filter[3][3] = {
+			{ 1/16.0, 2/16.0, 1/16.0 },
+			{ 2/16.0, 4/16.0, 2/16.0 },
+			{ 1/16.0, 2/16.0, 1/16.0 }
+		};
+		PrecisePixel out = PrecisePixel();
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				int x = reflectValue(round(u + (-1 + i)), Width() - 1);
+				int y = reflectValue(round(v + (-1 + j)), Height() - 1);
+				out += filter[i][j] * PrecisePixel(GetPixel(x, y));
+			}
+		}
+
+		return out.ToPixel();
+	} else {
+		printf("Invalid sampling method\n");
+		exit(-1);
+	}
 	return Pixel();
 }
 
