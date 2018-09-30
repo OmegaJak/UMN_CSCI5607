@@ -164,6 +164,9 @@ public:
     // An interesting effect that turns reds purple and blues green.
     void Purplify(double factor);
 
+    // Creates a perfect checkerboard
+    void Checkerboard();
+
 private:
 
     // Applies the given convolution filters to the image

@@ -244,13 +244,13 @@ int main( int argc, char* argv[] ){
 			else if (!strcmp(*argv, "-rotate"))
 			{
 				double angle;
-				Image *dst;
 				CheckOption(*argv, argc, 2);
 				if (img == NULL) ShowUsage();
-
+				
 				angle = atof(argv[1]);
-				dst = img->Rotate(angle);
+				Image *dst = img->Rotate(angle);
 				delete img;
+
 				img = dst;
 				dst = NULL;
 				argv += 2, argc -= 2;

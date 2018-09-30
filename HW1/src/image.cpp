@@ -410,8 +410,6 @@ void Image::Blur(int n)
 	}
 	
 	SeparableConvolve(n, filter, filter);
-
-	delete filter;
 }
 
 void Image::Sharpen(int n)
@@ -484,15 +482,40 @@ Image *Image::Scale(double sx, double sy)
 	return newImage;
 }
 
-Image *Image::Rotate(double angle)
+Image *Image::Rotate(double angle) // Assumes angle is in degrees, positive is clockwise
 {
-	/* WORK HERE */
-	return NULL;
+	double theta = (angle * M_PI) / 180.0; // Rads
+	double newWidth = Width() * fabs(cos(theta)) + Height() * fabs(sin(theta));
+	double newHeight = Width() * fabs(sin(theta)) + Height() * fabs(cos(theta));
+	Image *newImage = new Image(newWidth, newHeight);
+
+	double centerX = Width() / 2.0;
+	double centerY = Height() / 2.0;
+	for (int u = 0; u < newImage->Width(); u++) {
+		for (int v = 0; v < newImage->Height(); v++) {
+			int newU = u - (int)(newWidth / 2.0);
+			int newV = v - (int)(newHeight / 2.0);
+			double x = (newU * cos(-theta) - newV * sin(-theta)) + centerX;
+			double y = (newU * sin(-theta) + newV * cos(-theta)) + centerY;
+
+			if (y == Height()) y = y - 1; // Weird special case hack
+
+			if (ValidCoord(x, y) && x >= -0.0001 && y >= -0.0001) {
+				newImage->SetPixel(u, v, Sample(x, y));
+			} else {
+				//printf("Not showing (newU, newV) (u, v) (x, y): (%i, %i) (%i, %i) (%f, %f)\n", newU, newV, u, v, x, y);
+				newImage->SetPixel(u, v, Pixel(0, 0, 0, 0));
+			}
+		}
+	}
+	
+	//printf("CenterX, CenterY: %f, %f\n", centerX, centerY);
+	return newImage;
 }
 
 void Image::Fun()
 {
-	/* WORK HERE */
+	Checkerboard();
 }
 
 /**
@@ -513,9 +536,9 @@ Pixel Image::Sample(double u, double v)
 		return GetPixel(nearestX, nearestY);
 	} else if (sampling_method == IMAGE_SAMPLING_BILINEAR) {
 		// Method derived from here: http://eeweb.poly.edu/~yao/EL5123/lecture8_sampling.pdf
-		int left = floor(u);
+		int left = reflectValue(floor(u), Width() - 1);
 		int right = reflectValue(left + 1, Width() - 1);
-		int top = floor(v);
+		int top = reflectValue(floor(v), Height() - 1);
 		int bottom = reflectValue(top + 1, Height() - 1);
 		double a = u - left;
 		double b = v - top;
@@ -548,6 +571,27 @@ Pixel Image::Sample(double u, double v)
 		exit(-1);
 	}
 	return Pixel();
+}
+
+void Image::Checkerboard() {
+	Pixel dark, light;
+	for (int x = 0; x < Width(); x++) {
+		for (int y = 0; y < Height(); y++) {
+			if (x == 0 || y == 0 || x == Width() - 1 || y == Height() - 1) {
+				dark = Pixel(0, 0, 255, 255);
+				light = Pixel(255, 255, 0, 255);
+			} else {
+				dark = Pixel(0, 0, 0, 255);
+				light = Pixel(255, 255, 255, 255);
+			}
+
+			if ((x + y) % 2 == 0) {
+				SetPixel(x, y, dark);
+			} else {
+				SetPixel(x, y, light);
+			}
+		}
+	}
 }
 
 void Image::Purplify(double factor)
