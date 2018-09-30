@@ -515,7 +515,43 @@ Image *Image::Rotate(double angle) // Assumes angle is in degrees, positive is c
 
 void Image::Fun()
 {
-	Checkerboard();
+	// The commented-out code following does some nice recursive-looking scaling stuff
+	//Image destImage = Image(*this);
+	/* double scalingFactor = 0.9;
+	Image *scaledImage = new Image(*this);
+	Image *tmp;
+	const int max_levels = 30;
+	for (int i = 0; i < max_levels; i++) {
+		tmp = scaledImage->Scale(scalingFactor, scalingFactor);
+		delete scaledImage;
+		scaledImage = tmp;
+		scaledImage->ChangeSaturation(1 - (i / (double)max_levels));
+
+		int offsetX = (Width() - scaledImage->Width()) / 2.0;
+		int offsetY = (Height() - scaledImage->Height()) / 2.0;
+		offsetX *= 1.9;
+		offsetY *= 0.1;
+		printf("OffsetX, OffsetY: %i, %i\n", offsetX, offsetY);
+		for (int x = 0; x < scaledImage->Width(); x++) {
+			for (int y = 0; y < scaledImage->Height(); y++) {
+				SetPixel(x + offsetX, y + offsetY, scaledImage->Sample(x, y));
+			}
+		}
+	} */
+	Image oldImage = Image(*this);
+
+	double u, v;
+	for (int x = 0; x < Width(); x++) {
+		for (int y = 0; y < Height(); y++) {
+			u = (32 * sin(M_PI * (x / 128.0)) * cos(M_PI * (x / 128.0)));
+			v = (16 * sin(M_PI * (y / 128.0)));
+
+			u = fmin((int)(x + u), Width());
+			v = fmin((int)(y + v), Height());
+
+			SetPixel(x, y, oldImage.Sample(u, v));
+		}
+	}
 }
 
 /**
