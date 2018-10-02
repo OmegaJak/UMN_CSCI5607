@@ -173,6 +173,8 @@ private:
     void SeparableConvolve(int radius, double* xFilter, double* yFilter);
 
     void Convolve(int radius, double **filter, Image &image);
+
+    void DistributeError(int x, int y, double rErr, double gErr, double bErr, double factor);
 };
 
 #endif

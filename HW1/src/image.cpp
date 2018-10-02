@@ -305,35 +305,31 @@ PrecisePixel operator* (double f, PrecisePixel p) {
 	return p * f;
 }
 
+void Image::DistributeError(int x, int y, double rErr, double gErr, double bErr, double factor) {
+	if (ValidCoord(x, y)) {
+		Pixel oldPixel = GetPixel(x, y);
+		oldPixel.SetClamp(oldPixel.r + round(rErr * factor), oldPixel.g + round(gErr * factor), oldPixel.b + round(bErr * factor), 255);
+		SetPixel(x, y, oldPixel);
+	}
+}
+
 void Image::FloydSteinbergDither(int nbits)
 {
-	PrecisePixel error[Width()][2];
-	for (int x = 0; x < Width(); x++) {
-		for (int y = 0; y < 2; y++) {
-			error[x][y] = PrecisePixel();
-		}
-	}
-
 	Pixel oldPixel, newPixel;
-	PrecisePixel quantError;
+	double rErr, gErr, bErr;
 	for (int y = 0; y < Height(); y++) {
 		for (int x = 0; x < Width(); x++) {
 			oldPixel = GetPixel(x, y);
-			PrecisePixel err = error[x][0];
-			Pixel old = Pixel(oldPixel);
-			old.SetClamp(old.r + err.r, old.g + err.g, old.b + err.b);
-			newPixel = SetPixel(x, y, PixelQuant(old, nbits));
+			newPixel = PixelQuant(oldPixel, nbits);
+			SetPixel(x, y, newPixel);
+			rErr = oldPixel.r - newPixel.r;
+			gErr = oldPixel.g - newPixel.g;
+			bErr = oldPixel.b - newPixel.b;
 			
-			quantError = PrecisePixel(oldPixel.r - newPixel.r, oldPixel.g - newPixel.g, oldPixel.b - newPixel.b);
-			if (ValidCoord(x + 1, y)) error[x + 1][0] += quantError * ALPHA; // Right
-			if (ValidCoord(x + 1, y + 1)) error[x + 1][1] += quantError * DELTA; // Down right
-			if (ValidCoord(x, y + 1)) error[x][1] += quantError * GAMMA; // Down
-			if (ValidCoord(x - 1, y + 1)) error[x - 1][1] += quantError * BETA; // Down left
-		}
-
-		for (int x = 0; x < Width(); x++) {
-			error[x][0].Set(error[x][1]);
-			error[x][1] = PrecisePixel();
+			DistributeError(x + 1, y, rErr, gErr, bErr, ALPHA);
+			DistributeError(x + 1, y + 1, rErr, gErr, bErr, DELTA);
+			DistributeError(x, y + 1, rErr, gErr, bErr, GAMMA);
+			DistributeError(x - 1, y + 1, rErr, gErr, bErr, BETA);
 		}
 	}
 }
@@ -429,10 +425,22 @@ double edgeDetectX[3][3] = {
 	{ -1, 0, 1 }
 };
 
+double edgeDetectX2[3][3] = {
+	{ 1, 0, -1 },
+	{ 2, 0, -2 },
+	{ 1, 0, -1 }
+};
+
 double edgeDetectY[3][3] = {
 	{ -1, -2, -1 },
 	{  0,  0,  0 },
 	{  1,  2,  1 }
+};
+
+double edgeDetectY2[3][3] = {
+	{  1,  2,  1 },
+	{  0,  0,  0 },
+	{ -1, -2, -1 }
 };
 
 void Image::EdgeDetect()
@@ -454,12 +462,12 @@ void Image::EdgeDetect()
 	Convolve(1, f, yDetected);
 
 	// Detect left edges
-	for (int i = 0; i < 3; i++) f[i] = edgeDetectX[2 - i];
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectX2[i];
 	Image xDetected2 = Image(*this);
 	Convolve(1, f, xDetected2);
 
 	// Detect top edges
-	for (int i = 0; i < 3; i++) f[i] = edgeDetectY[2 - i];
+	for (int i = 0; i < 3; i++) f[i] = edgeDetectY2[i];
 	Image yDetected2 = Image(*this);
 	Convolve(1, f, yDetected2);
 	
