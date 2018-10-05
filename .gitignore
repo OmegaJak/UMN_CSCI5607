@@ -35,3 +35,14 @@ CMakeCache.txt
 *.exe
 *.out
 *.app
+
+# Visual Studio
+*.tlog
+*vs*
+*.pdb
+*.vcxproj*
+*.log
+*.ilk
+*.idb
+*.ipdb
+*.iobj
