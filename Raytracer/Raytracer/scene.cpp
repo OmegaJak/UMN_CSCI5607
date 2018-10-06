@@ -2,10 +2,14 @@
 #include "scene.h"
 #include <iostream>
 
-
 Scene::Scene() {}
 
-Scene::~Scene() = default;
+Scene::~Scene() {
+    for (Primitive *primitive : primitives_) {
+        delete primitive;
+    }
+    primitives_.clear();
+}  // Destroy primitives here??
 
 bool Scene::FindIntersection(Ray ray) {
     for (Primitive *primitive : primitives_) {
@@ -33,4 +37,16 @@ void Scene::SetBackground(Color background) {
     std::cout << "Background set to color " << background << "." << std::endl;
 #endif
     background_ = background;
+}
+
+void Scene::SetCamera(Camera camera) {
+    camera_ = camera;
+}
+
+const Camera Scene::GetCamera() {
+    return camera_;
+}
+
+void Scene::SetCameraAspectRatio(double aspect_ratio) {
+    camera_.SetAspectRatio(aspect_ratio);
 }

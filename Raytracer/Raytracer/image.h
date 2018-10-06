@@ -16,7 +16,6 @@ class Image {
         Pixel* pixels;
     };
 
-    Image();
     Image(int width, int height);
     ~Image();
 

@@ -1,13 +1,12 @@
 #include "scene.h"
-#include "primitive.h"
-#include "light.h"
+#include "renderer.h"
 
 class Parser {
    public:
     Parser();
     ~Parser();
 
-    Scene Parse(const std::string &filename);
+    Renderer* Parse(const std::string &filename);
 
    private:
     std::vector<std::string> Split(const std::string &str, char delimiter);

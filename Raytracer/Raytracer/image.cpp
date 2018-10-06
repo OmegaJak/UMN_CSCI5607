@@ -4,8 +4,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION  // only place once in one .cpp files
 #include "../../HW1/src/stb_image_write.h"
 
-Image::Image() {}
-
 Image::Image(int width, int height) {
     width_ = width;
     height_ = height;

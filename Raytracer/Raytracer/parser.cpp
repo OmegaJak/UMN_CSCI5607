@@ -6,6 +6,7 @@
 #include <string>
 #include <tuple>
 #include "material.h"
+#include "sphere.h"
 
 using namespace std;
 
@@ -13,8 +14,10 @@ Parser::Parser() {}
 
 Parser::~Parser() {}
 
-Scene Parser::Parse(const std::string& filename) {
-    Scene scene = Scene();
+Renderer* Parser::Parse(const std::string& filename) {
+    Scene* scene = new Scene();
+    Renderer* renderer = new Renderer();
+
     ifstream file(filename);
     if (file.fail()) {
         cout << "Failed to open file \"" << filename << "\". Exiting." << endl;
@@ -33,7 +36,16 @@ Scene Parser::Parse(const std::string& filename) {
         if (command == "") {
             cout << "Invalid command while processing scene file." << endl;
             exit(-1);
+        } else if (command == "output") {
+            if (tokens.size() != 2) {
+                printf("Invalid number of parameters for command \"output\".");
+                exit(-1);
+            }
+
+            renderer->SetOutputFilename(tokens[1]);
+            continue;
         }
+
         tokens.erase(tokens.begin());
         params = StringsToDoubles(tokens);
 
@@ -42,9 +54,9 @@ Scene Parser::Parse(const std::string& filename) {
             Vector3 position = Vector3(params[0], params[1], params[2]);
             double radius = params[3];
 
-            Sphere *sphere = new Sphere(position, lastMaterial, radius);
+            Sphere* sphere = new Sphere(position, lastMaterial, radius);
 
-            scene.AddPrimitive(sphere);
+            scene->AddPrimitive(sphere);
         } else if (command == "material") {
             VerifyCorrectNumberParameters(command, params, 14);
             Color ambient = Color(params[0], params[1], params[2]);
@@ -57,13 +69,27 @@ Scene Parser::Parse(const std::string& filename) {
             lastMaterial = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
         } else if (command == "ambient_light") {
             VerifyCorrectNumberParameters(command, params, 3);
-            scene.SetAmbientLight(Color(params[0], params[1], params[2]));
+            scene->SetAmbientLight(Color(params[0], params[1], params[2]));
         } else if (command == "background") {
             VerifyCorrectNumberParameters(command, params, 3);
-            scene.SetBackground(Color(params[0], params[1], params[2]));
+            scene->SetBackground(Color(params[0], params[1], params[2]));
+        } else if (command == "camera") {
+            VerifyCorrectNumberParameters(command, params, 10);
+            Vector3 position = Vector3(params[0], params[1], params[2]);
+            Vector3 direction = Vector3(params[3], params[4], params[5]);
+            Vector3 up = Vector3(params[6], params[7], params[8]);
+            double height_angle = params[9];
+
+            Camera camera = Camera(position, direction, up, height_angle);
+            scene->SetCamera(camera);
+        } else if (command == "film_resolution") {
+            VerifyCorrectNumberParameters(command, params, 2);
+            renderer->SetRenderDimensions(params[0], params[1]);
         }
     }
-    return scene;
+
+    renderer->SetScene(scene);
+    return renderer;
 }
 
 vector<string> Parser::Split(const string& str, const char delimiter) {
@@ -86,7 +112,7 @@ std::vector<double> Parser::StringsToDoubles(const std::vector<std::string>& str
     return vec;
 }
 
-void Parser::VerifyCorrectNumberParameters(const string &command, const vector<double>& parameters, const int num_parameters) {
+void Parser::VerifyCorrectNumberParameters(const string& command, const vector<double>& parameters, const int num_parameters) {
     if (parameters.size() != num_parameters) {
         cout << "Incorrect number of parameters for command \"" << command << "\".\n";
         exit(-1);
