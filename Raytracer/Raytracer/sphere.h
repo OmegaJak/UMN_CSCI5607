@@ -6,6 +6,8 @@ class Sphere : public Primitive {
     Sphere(const Vector3& position, const Material& material, double radius);
     ~Sphere();
 
+    double IntersectionWith(const Ray& ray) override;
+
    private:
     double radius_;
 };

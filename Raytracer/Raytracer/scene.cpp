@@ -7,7 +7,17 @@ Scene::Scene() {}
 
 Scene::~Scene() = default;
 
-void Scene::AddPrimitive(Primitive primitive) {
+bool Scene::FindIntersection(Ray ray) {
+    for (Primitive *primitive : primitives_) {
+        if (primitive->IntersectionWith(ray) >= 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Scene::AddPrimitive(Primitive *primitive) {
     primitives_.push_back(primitive);
 }
 

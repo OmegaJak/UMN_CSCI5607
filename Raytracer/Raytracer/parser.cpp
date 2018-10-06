@@ -42,7 +42,7 @@ Scene Parser::Parse(const std::string& filename) {
             Vector3 position = Vector3(params[0], params[1], params[2]);
             double radius = params[3];
 
-            Sphere sphere = Sphere(position, lastMaterial, radius);
+            Sphere *sphere = new Sphere(position, lastMaterial, radius);
 
             scene.AddPrimitive(sphere);
         } else if (command == "material") {
@@ -63,7 +63,7 @@ Scene Parser::Parse(const std::string& filename) {
             scene.SetBackground(Color(params[0], params[1], params[2]));
         }
     }
-    return Scene();
+    return scene;
 }
 
 vector<string> Parser::Split(const string& str, const char delimiter) {
