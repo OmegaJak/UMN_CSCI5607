@@ -72,7 +72,7 @@ Renderer* Parser::Parse(const std::string& filename) {
             scene->SetAmbientLight(Color(params[0], params[1], params[2]));
         } else if (command == "background") {
             VerifyCorrectNumberParameters(command, params, 3);
-            scene->SetBackground(Color(params[0], params[1], params[2]));
+            renderer->SetBackgroundColor(Color(params[0], params[1], params[2]));
         } else if (command == "camera") {
             VerifyCorrectNumberParameters(command, params, 10);
             Vector3 position = Vector3(params[0], params[1], params[2]);

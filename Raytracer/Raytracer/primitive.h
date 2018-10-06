@@ -1,16 +1,23 @@
 #pragma once
-#include "vector3.h"
 #include "Material.h"
 #include "ray.h"
+#include "vector3.h"
+
+struct Intersection {
+    double t;
+    Material material;
+    Vector3 normal;
+    Vector3 hit_point;
+};
 
 class Primitive {
    public:
     Primitive();
     Primitive(Vector3 position, Material material);
-    ~Primitive();
-    virtual double IntersectionWith(const Ray& ray) = 0;
+    virtual ~Primitive();
+    virtual bool IntersectionWith(const Ray& ray, Intersection& out_intersection) = 0;
 
-protected:
+   protected:
     Vector3 position_;
     Material material_;
 };

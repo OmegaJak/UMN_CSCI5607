@@ -4,18 +4,20 @@
 
 class Renderer {
    public:
-    Renderer(double width = 640, double height = 480, std::string filename = "raytraced.bmp");
+    Renderer(int width = 640, int height = 480, std::string filename = "raytraced.bmp");
     ~Renderer();
 
-    void SetRenderDimensions(double width, double height);
+    void SetRenderDimensions(int width, int height);
     void SetOutputFilename(std::string filename);
     void SetScene(Scene *scene);
+    void SetBackgroundColor(Color background);
 
     void Render();
 
 private:
-    double render_width_;
-    double render_height_;
+    int render_width_;
+    int render_height_;
     std::string output_filename_;
     Scene *scene_;
+    Color background_color_;
 };

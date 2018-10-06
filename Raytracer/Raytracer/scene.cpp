@@ -9,16 +9,20 @@ Scene::~Scene() {
         delete primitive;
     }
     primitives_.clear();
-}  // Destroy primitives here??
+}
 
-bool Scene::FindIntersection(Ray ray) {
+bool Scene::FindIntersection(Ray ray, Intersection &out_intersection) {
     for (Primitive *primitive : primitives_) {
-        if (primitive->IntersectionWith(ray) >= 0) {
+        if (primitive->IntersectionWith(ray, out_intersection)) {
             return true;
         }
     }
 
     return false;
+}
+
+Color Scene::GetColor(Material material, Vector3 viewing_position, Vector3 intersection_point) {
+    return material.ambient_color_ * ambient_light_;
 }
 
 void Scene::AddPrimitive(Primitive *primitive) {
@@ -27,16 +31,9 @@ void Scene::AddPrimitive(Primitive *primitive) {
 
 void Scene::SetAmbientLight(Color ambient_light) {
 #ifdef _DEBUG
-    std::cout << "Ambient light set of color " << ambient_light << "." << std::endl;
+    std::cout << "Ambient light set to color " << ambient_light << "." << std::endl;
 #endif
     ambient_light_ = ambient_light;
-}
-
-void Scene::SetBackground(Color background) {
-#ifdef _DEBUG
-    std::cout << "Background set to color " << background << "." << std::endl;
-#endif
-    background_ = background;
 }
 
 void Scene::SetCamera(Camera camera) {

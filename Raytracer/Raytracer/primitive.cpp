@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "primitive.h"
 
-
 Primitive::Primitive() {
     position_ = Vector3();
 }

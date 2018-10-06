@@ -12,11 +12,11 @@ class Scene {
     Scene();
     ~Scene();
 
-    bool FindIntersection(Ray ray);
+    bool FindIntersection(Ray ray, Intersection& out_intersection);
+    Color GetColor(Material material, Vector3 viewing_position, Vector3 intersection_point);
 
     void AddPrimitive(Primitive *primitive);
     void SetAmbientLight(Color ambient_light);
-    void SetBackground(Color background);
     void SetCamera(Camera camera);
 
     const Camera GetCamera();
@@ -27,5 +27,4 @@ class Scene {
     Camera camera_;
     std::vector<Primitive*> primitives_;
     Color ambient_light_;
-    Color background_;
 };

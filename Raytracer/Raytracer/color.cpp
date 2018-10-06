@@ -7,6 +7,10 @@ Color::Color(double r, double g, double b) : red_(r), green_(g), blue_(b) {}
 
 Color::~Color() = default;
 
+Color Color::operator*(const Color& other) const {
+    return Color(red_ * other.red_, green_ * other.green_, blue_ * other.blue_);
+}
+
 std::ostream& operator<<(std::ostream& os, const Color& color) {
     os << "(" << color.red_ << ", " << color.green_ << ", " << color.blue_ << ")";
     return os;
