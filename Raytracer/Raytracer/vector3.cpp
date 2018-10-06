@@ -7,17 +7,17 @@ Vector3::Vector3() {
     z_ = 0.0;
 }
 
-Vector3::~Vector3() {}
+Vector3::~Vector3() = default;
 
-double Vector3::GetX() {
+double Vector3::GetX() const {
     return x_;
 }
 
-double Vector3::GetY() {
+double Vector3::GetY() const {
     return y_;
 }
 
-double Vector3::GetZ() {
+double Vector3::GetZ() const {
     return z_;
 }
 

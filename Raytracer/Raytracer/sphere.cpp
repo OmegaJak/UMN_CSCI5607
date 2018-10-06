@@ -4,11 +4,11 @@
 
 Sphere::Sphere() {}
 
-Sphere::Sphere(Vector3 position, Material material, double radius) : Primitive(position, material)
+Sphere::Sphere(const Vector3& position, const Material& material, const double radius) : Primitive(position, material)
 {
 #ifdef _DEBUG
     printf("Sphere created at (%f, %f, %f) with radius %f.\n", position.GetX(), position.GetY(), position.GetZ(), radius);
 #endif
 }
 
-Sphere::~Sphere() {}
+Sphere::~Sphere() = default;

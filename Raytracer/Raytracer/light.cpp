@@ -4,4 +4,4 @@
 
 Light::Light() {}
 
-Light::~Light() {}
+Light::~Light() = default;

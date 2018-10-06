@@ -16,6 +16,9 @@ Parser::~Parser() {}
 Scene Parser::Parse(const std::string& filename) {
     Scene scene = Scene();
     ifstream file(filename);
+    if (file.fail()) {
+        cout << "Failed to open file \"" << filename << "\". Exiting." << endl;
+    }
 
     string line, command;
     vector<string> tokens;
@@ -52,6 +55,12 @@ Scene Parser::Parse(const std::string& filename) {
             double index_of_refraction = params[13];
 
             lastMaterial = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
+        } else if (command == "ambient_light") {
+            VerifyCorrectNumberParameters(command, params, 3);
+            scene.SetAmbientLight(Color(params[0], params[1], params[2]));
+        } else if (command == "background") {
+            VerifyCorrectNumberParameters(command, params, 3);
+            scene.SetBackground(Color(params[0], params[1], params[2]));
         }
     }
     return Scene();

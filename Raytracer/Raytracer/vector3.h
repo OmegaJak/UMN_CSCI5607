@@ -5,9 +5,9 @@ class Vector3 {
     Vector3(double x, double y, double z) : x_(x), y_(y), z_(z) {}
     ~Vector3();
 
-    double GetX();
-    double GetY();
-    double GetZ();
+    double GetX() const;
+    double GetY() const;
+    double GetZ() const;
 
     void Set(double x, double y, double z);
 

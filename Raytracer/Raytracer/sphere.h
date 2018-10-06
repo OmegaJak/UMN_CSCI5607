@@ -3,7 +3,7 @@
 class Sphere : public Primitive {
    public:
     Sphere();
-    Sphere(Vector3 position, Material material, double radius);
+    Sphere(const Vector3& position, const Material& material, double radius);
     ~Sphere();
 
    private:

@@ -8,4 +8,4 @@ Primitive::Primitive() {
 
 Primitive::Primitive(Vector3 position, Material material) : position_(position), material_(material) {}
 
-Primitive::~Primitive() {}
+Primitive::~Primitive() = default;

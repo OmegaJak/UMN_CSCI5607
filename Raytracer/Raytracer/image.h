@@ -13,7 +13,7 @@ class Image {
     Image();
     Image(int width, int height);
     ~Image();
-    void Write(const char* name);
+    void Write(const char* name) const;
 
    private:
     PixelData data;

@@ -19,6 +19,6 @@ Image::~Image() {
     delete[] data.raw;
 }
 
-void Image::Write(const char* filename) {
+void Image::Write(const char* filename) const {
     stbi_write_bmp(filename, width_, height_, 3, data.raw);
 }

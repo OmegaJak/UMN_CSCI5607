@@ -4,7 +4,7 @@
 class Material {
    public:
     Material();
-    Material(Color ambient, Color diffuse, Color specular, Color transmissive, int phong_factor, double index_of_refraction);
+    Material(Color &ambient, Color &diffuse, Color &specular, Color &transmissive, int phong_factor, double index_of_refraction);
     ~Material();
 
    private:
