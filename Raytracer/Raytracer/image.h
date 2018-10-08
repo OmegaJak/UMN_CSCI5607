@@ -25,7 +25,7 @@ struct Pixel {
         b = Clamp(_b);
     }
 
-    Pixel(const Color& color) : Pixel(round(color.red_ * 255), round(color.green_ * 255), round(color.blue_ * 255)) {}
+    Pixel(const Color& color) : Pixel(int(round(color.red_ * 255)), int(round(color.green_ * 255)), int(round(color.blue_ * 255))) {}
 };
 
 class Image {

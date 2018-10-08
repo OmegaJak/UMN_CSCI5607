@@ -10,7 +10,7 @@ Camera::Camera() : Camera(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0)) 
 
 Camera::Camera(Vector3 position, Vector3 direction, Vector3 up, double half_frustum_vertical,
     double viewing_plane_distance)
-    : position_(position), distance_(viewing_plane_distance) {
+    : SceneObject(position), distance_(viewing_plane_distance) {
     direction_ = direction.Normalize();
     up_ = up.Normalize();
     right_ = direction_.Cross(up_);

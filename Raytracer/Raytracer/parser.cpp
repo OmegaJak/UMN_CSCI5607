@@ -6,6 +6,7 @@
 #include <string>
 #include <tuple>
 #include "material.h"
+#include "point_light.h"
 #include "sphere.h"
 
 using namespace std;
@@ -28,7 +29,7 @@ Renderer* Parser::Parse(const std::string& filename) {
     vector<double> params;
     Material lastMaterial;
     while (getline(file, line)) {
-        if (line.at(0) == '#') continue;
+        if (line.length() == 0 || line.at(0) == '#') continue;
 
         tokens = Split(line, ' ');
         command = tokens[0];
@@ -69,7 +70,8 @@ Renderer* Parser::Parse(const std::string& filename) {
             lastMaterial = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
         } else if (command == "ambient_light") {
             VerifyCorrectNumberParameters(command, params, 3);
-            scene->SetAmbientLight(Color(params[0], params[1], params[2]));
+            AmbientLight ambient_light = AmbientLight(Color(params[0], params[1], params[2]));
+            scene->SetAmbientLight(ambient_light);
         } else if (command == "background") {
             VerifyCorrectNumberParameters(command, params, 3);
             renderer->SetBackgroundColor(Color(params[0], params[1], params[2]));
@@ -84,7 +86,14 @@ Renderer* Parser::Parse(const std::string& filename) {
             scene->SetCamera(camera);
         } else if (command == "film_resolution") {
             VerifyCorrectNumberParameters(command, params, 2);
-            renderer->SetRenderDimensions(params[0], params[1]);
+            renderer->SetRenderDimensions(int(params[0]), int(params[1]));
+        } else if (command == "point_light") {
+            VerifyCorrectNumberParameters(command, params, 6);
+            Color color(params[0], params[1], params[2]);
+            Vector3 position(params[3], params[4], params[5]);
+
+            PointLight* point_light = new PointLight(color, position);
+            scene->AddLight(point_light);
         }
     }
 

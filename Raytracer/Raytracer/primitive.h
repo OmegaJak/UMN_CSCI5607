@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "ray.h"
 #include "vector3.h"
+#include "scene_object.h"
 
 struct Intersection {
     double t;
@@ -10,7 +11,7 @@ struct Intersection {
     Vector3 hit_point;
 };
 
-class Primitive {
+class Primitive : public SceneObject {
    public:
     Primitive();
     Primitive(Vector3 position, Material material);
@@ -18,6 +19,5 @@ class Primitive {
     virtual bool IntersectionWith(const Ray& ray, Intersection& out_intersection) = 0;
 
    protected:
-    Vector3 position_;
     Material material_;
 };

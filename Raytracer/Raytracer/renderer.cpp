@@ -38,7 +38,7 @@ void Renderer::Render() {
             Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);
             if (scene_->FindIntersection(ray, intersection)) {
                 //std::cout << "X: " << i << ", Y: " << j << ", Ray: " << ray << std::endl;
-                image.SetPixel(i, j, Pixel(scene_->GetColor(intersection.material, ray.start_point_, intersection.hit_point)));
+                image.SetPixel(i, j, Pixel(scene_->GetColor(intersection, ray.start_point_)));
             } else {
                 image.SetPixel(i, j, Pixel(background_color_));
             }
