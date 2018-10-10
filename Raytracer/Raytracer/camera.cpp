@@ -30,7 +30,7 @@ Ray Camera::ConstructRayThroughPixel(int i, int j, int pixel_width, int pixel_he
     Vector3 pixel_point = top_left + horizontal + vertical;
     Vector3 ray_direction = (pixel_point - position_).Normalize();
 
-    return Ray(pixel_point, ray_direction);
+    return Ray(position_, ray_direction);
 }
 
 void Camera::SetAspectRatio(double aspect_ratio) {

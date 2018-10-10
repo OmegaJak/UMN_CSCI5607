@@ -27,19 +27,34 @@ bool Scene::FindIntersection(Ray ray, Intersection &out_intersection) {
 }
 
 Color Scene::GetColor(Intersection intersection, Vector3 viewing_position) {
-    Color ambient_contribution = ambient_light_.GetColor();
 
     Color diffuse_contribution(0, 0, 0);
-    Vector3* normal = &intersection.normal;
-    Color* diffusion_constant = &intersection.material.diffuse_color_;
+    Color specular_contribution(0, 0, 0);
+    Vector3& intersection_point = intersection.hit_point;
+    Vector3& normal = intersection.normal;
+    Material& material = intersection.material;
+    Color light_illuminance;
+
+    Color ambient_contribution = ambient_light_.GetColor() * material.ambient_color_;
     for (Light* light : lights_) {
-        if (PointIsAffectedByLight(intersection.hit_point, light)) {
-            Vector3 to_light = light->GetPosition() - intersection.hit_point;
-            diffuse_contribution += (*diffusion_constant) * (to_light.Dot(*normal)) * light->GetIlluminanceAt(intersection.hit_point);
+        if (PointIsAffectedByLight(intersection_point, light)) {
+            light_illuminance = light->GetIlluminanceAt(intersection_point);
+
+            Vector3 to_light = (light->GetPosition() - intersection_point).Normalize();
+            double light_dot_normal = to_light.Dot(normal);
+            diffuse_contribution += material.diffuse_color_ * light_dot_normal * light_illuminance;
+
+            Vector3 perfect_reflection = ((2 * light_dot_normal * normal) - to_light).Normalize();
+            Vector3 to_viewer = (viewing_position - intersection_point).Normalize();
+            Color toAdd = material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
+            if (toAdd.red_ < 0 || toAdd.blue_ < 0 || toAdd.green_ < 0) {
+                //std::cout << toAdd << std::endl;
+            }
+            specular_contribution += toAdd;
         }
     }
 
-    Color total_color = ambient_contribution + diffuse_contribution;
+    Color total_color = ambient_contribution + diffuse_contribution.Clamp() + specular_contribution.Clamp();
 
     return total_color.Clamp();
 }

@@ -21,16 +21,16 @@ bool Sphere::IntersectionWith(const Ray& ray, Intersection& out_intersection) {
     double c = (ray.start_point_ - position_).SqrMagnitude() - (radius_ * radius_);
 
     double discriminant = (b * b) - 4 * a * c;
-    double t1 = (-b + sqrt(discriminant)) / (2 * a);
-    double t2 = (-b - sqrt(discriminant)) / (2 * a);
+    double t1 = std::max((-b + sqrt(discriminant)) / (2 * a), 0.0);
+    double t2 = std::max((-b - sqrt(discriminant)) / (2 * a), 0.0);
 
-    double t = std::max(t1, t2);
+    double t = std::min(t1, t2);
 
-    if (t >= 0) {
+    if (t > 0) {
         Vector3 hit_point = ray.Evaluate(t);
         Vector3 normal = (hit_point - position_).Normalize();
 
-        Intersection intersection = {std::max(t1, t2), material_, normal, hit_point};
+        Intersection intersection = {t, material_, normal, hit_point};
         out_intersection = intersection;
         return true;
     }
