@@ -5,29 +5,31 @@
 Scene::Scene() {}
 
 Scene::~Scene() {
-    for (Primitive *primitive : primitives_) {
+    for (Primitive* primitive : primitives_) {
         delete primitive;
     }
     primitives_.clear();
 
-    for (Light *light : lights_) {
+    for (Light* light : lights_) {
         delete light;
     }
     lights_.clear();
 }
 
-bool Scene::FindIntersection(Ray ray, Intersection &out_intersection) {
-    for (Primitive *primitive : primitives_) {
-        if (primitive->IntersectionWith(ray, out_intersection)) {
-            return true;
+bool Scene::FindIntersection(Ray ray, Intersection& out_intersection) {
+    Intersection current_intersection;
+    Intersection closest_intersection;
+    closest_intersection.t = INFINITY;
+    for (Primitive* primitive : primitives_) {
+        if (primitive->IntersectionWith(ray, current_intersection) && current_intersection.t < closest_intersection.t) {
+            out_intersection = closest_intersection = current_intersection;
         }
     }
 
-    return false;
+    return closest_intersection.t < INFINITY;
 }
 
 Color Scene::GetColor(Intersection intersection, Vector3 viewing_position) {
-
     Color diffuse_contribution(0, 0, 0);
     Color specular_contribution(0, 0, 0);
     Vector3& intersection_point = intersection.hit_point;
@@ -48,7 +50,7 @@ Color Scene::GetColor(Intersection intersection, Vector3 viewing_position) {
             Vector3 to_viewer = (viewing_position - intersection_point).Normalize();
             Color toAdd = material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
             if (toAdd.red_ < 0 || toAdd.blue_ < 0 || toAdd.green_ < 0) {
-                //std::cout << toAdd << std::endl;
+                // std::cout << toAdd << std::endl;
             }
             specular_contribution += toAdd;
         }
@@ -59,7 +61,7 @@ Color Scene::GetColor(Intersection intersection, Vector3 viewing_position) {
     return total_color.Clamp();
 }
 
-void Scene::AddPrimitive(Primitive *primitive) {
+void Scene::AddPrimitive(Primitive* primitive) {
     primitives_.push_back(primitive);
 }
 
