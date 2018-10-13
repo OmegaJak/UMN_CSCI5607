@@ -10,4 +10,5 @@ class Sphere : public Primitive {
 
    private:
     double radius_;
+    double r_squared_;
 };

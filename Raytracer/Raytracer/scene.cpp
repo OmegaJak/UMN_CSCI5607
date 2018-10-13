@@ -17,8 +17,8 @@ Scene::~Scene() {
 }
 
 bool Scene::FindIntersection(Ray ray, Intersection& out_intersection) {
-    Intersection current_intersection;
-    Intersection closest_intersection;
+    static Intersection current_intersection;
+    static Intersection closest_intersection;
     closest_intersection.t = INFINITY;
     for (Primitive* primitive : primitives_) {
         if (primitive->IntersectionWith(ray, current_intersection) && current_intersection.t < closest_intersection.t) {

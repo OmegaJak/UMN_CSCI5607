@@ -26,11 +26,12 @@ Ray Camera::ConstructRayThroughPixel(int i, int j, double pixel_width, double pi
     static Vector3 viewing_plane_top_to_bottom = vertical_half_height * camera_up_ * -2;
     static Vector3 viewing_plane_left_to_right = vertical_half_height * aspect_ratio_ * right_ * -2; // This should not be negative... but has to be to match expected outputs. This suggests something else is wrong...
     static Vector3 top_left = viewing_plane_center - (viewing_plane_left_to_right * 0.5) - (viewing_plane_top_to_bottom * 0.5);
+    static Vector3 horizontal, vertical, pixel_point, ray_direction;
 
-    Vector3 horizontal = viewing_plane_left_to_right * ((i + 0.5) / pixel_width);
-    Vector3 vertical = viewing_plane_top_to_bottom * ((j + 0.5) / pixel_height);
-    Vector3 pixel_point = top_left + horizontal + vertical;
-    Vector3 ray_direction = (pixel_point - position_).Normalize();
+    horizontal = viewing_plane_left_to_right * ((i + 0.5) / pixel_width);
+    vertical = viewing_plane_top_to_bottom * ((j + 0.5) / pixel_height);
+    pixel_point = top_left + horizontal + vertical;
+    ray_direction = (pixel_point - position_).Normalize();
 
     return Ray(position_, ray_direction);
 }
