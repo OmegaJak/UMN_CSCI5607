@@ -115,7 +115,10 @@ vector<string> Parser::Split(const string& str, const char delimiter) {
 std::vector<double> Parser::StringsToDoubles(const std::vector<std::string>& string_vector) {
     vector<double> vec;
     for (const string str : string_vector) {
-        vec.push_back(stod(str));
+        try {
+            vec.push_back(stod(str));
+        } catch (std::exception& e) {
+        }
     }
 
     return vec;
