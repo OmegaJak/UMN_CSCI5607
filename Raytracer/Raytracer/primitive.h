@@ -16,7 +16,7 @@ class Primitive : public SceneObject {
     Primitive();
     Primitive(Vector3 position, Material material);
     virtual ~Primitive();
-    virtual bool IntersectionWith(const Ray& ray, Intersection& out_intersection) = 0;
+    virtual bool IntersectionWith(const Ray& ray, Intersection* out_intersection) = 0;
 
    protected:
     Material material_;

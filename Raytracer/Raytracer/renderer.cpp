@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "renderer.h"
 #include <iostream>
+#include "image.h"
 
 Renderer::Renderer(int width, int height, std::string filename)
     : render_width_(width), render_height_(height), output_filename_(filename) {}
@@ -37,7 +38,6 @@ void Renderer::Render() {
         for (int i = 0; i < render_width_; i++) {
             Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);
             if (scene_->FindIntersection(ray, intersection)) {
-                //std::cout << "X: " << i << ", Y: " << j << ", Ray: " << ray << std::endl;
                 image.SetPixel(i, j, Pixel(scene_->GetColor(intersection, ray.start_point_)));
             } else {
                 image.SetPixel(i, j, Pixel(background_color_));

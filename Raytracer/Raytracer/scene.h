@@ -5,7 +5,6 @@
 #include "primitive.h"
 #include "ray.h"
 #include "camera.h"
-#include "image.h"
 #include "ambient_light.h"
 
 class Scene {
@@ -14,7 +13,8 @@ class Scene {
     ~Scene();
 
     bool FindIntersection(Ray ray, Intersection& out_intersection);
-    Color GetColor(Intersection intersection, Vector3 viewing_position);
+    bool DoesIntersectWith(const Ray& ray) const;
+    Color GetColor(const Intersection& intersection, const Vector3& viewing_position);
 
     void AddPrimitive(Primitive *primitive);
     void SetAmbientLight(AmbientLight ambient_light);
@@ -31,5 +31,5 @@ class Scene {
     std::vector<Light*> lights_;
     AmbientLight ambient_light_;
 
-    bool PointIsAffectedByLight(Vector3 point, Light* light);
+    bool IntersectionIsAffectedByLight(const Intersection &intersection, Light* light) const;
 };

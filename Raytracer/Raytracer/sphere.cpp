@@ -1,12 +1,11 @@
 #include "pch.h"
 #include "sphere.h"
-#include <cstdio>
 #include <algorithm>
+#include <cstdio>
 
 Sphere::Sphere() {}
 
-Sphere::Sphere(const Vector3& position, const Material& material, const double radius) : Primitive(position, material)
-{
+Sphere::Sphere(const Vector3& position, const Material& material, const double radius) : Primitive(position, material) {
     radius_ = radius;
     r_squared_ = radius * radius;
 #ifdef _DEBUG
@@ -16,7 +15,7 @@ Sphere::Sphere(const Vector3& position, const Material& material, const double r
 
 Sphere::~Sphere() = default;
 
-bool Sphere::IntersectionWith(const Ray& ray, Intersection& out_intersection) {
+bool Sphere::IntersectionWith(const Ray& ray, Intersection* out_intersection) {
     double a = ray.direction_.SqrMagnitude();
     double b = (2 * ray.direction_).Dot(ray.start_point_ - position_);
     double c = (ray.start_point_ - position_).SqrMagnitude() - r_squared_;
@@ -29,12 +28,14 @@ bool Sphere::IntersectionWith(const Ray& ray, Intersection& out_intersection) {
     double t = std::min(t1, t2);
 
     if (t > 0) {
-        Vector3 hit_point = ray.Evaluate(t);
+        if (out_intersection != nullptr) {
+            Vector3 hit_point = ray.Evaluate(t);
 
-        out_intersection.t = t;
-        out_intersection.material = material_;
-        out_intersection.normal = (hit_point - position_).Normalize();
-        out_intersection.hit_point = hit_point;
+            out_intersection->t = t;
+            out_intersection->material = material_;
+            out_intersection->normal = (hit_point - position_).Normalize();
+            out_intersection->hit_point = hit_point;
+        }
         return true;
     }
 
