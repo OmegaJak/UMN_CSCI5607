@@ -3,21 +3,18 @@
 #include "ray.h"
 #include "vector3.h"
 #include "scene_object.h"
-
-struct Intersection {
-    double t;
-    Material material;
-    Vector3 normal;
-    Vector3 hit_point;
-    Vector3 viewing_position;
-};
+#include "intersection.h"
 
 class Primitive : public SceneObject {
    public:
     Primitive();
     Primitive(Vector3 position, Material material);
     virtual ~Primitive();
-    virtual bool IntersectionWith(const Ray& ray, Intersection* out_intersection) = 0;
+    virtual bool IntersectionWith(const Ray* ray, Intersection* out_intersection) = 0;
+
+    Material GetMaterial() const {
+        return material_;
+    }
 
    protected:
     Material material_;

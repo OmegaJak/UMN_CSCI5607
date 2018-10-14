@@ -11,15 +11,16 @@ class Vector3 {
     double GetY() const;
     double GetZ() const;
     void Set(double x, double y, double z);
+    void Set(const Vector3 &other);
 
     Vector3 operator+(const Vector3 &other) const;
     Vector3 operator-(const Vector3 &other) const;
     Vector3 operator*(const double &f) const;
     friend Vector3 operator*(const double &f, const Vector3 &vec);
-    friend std::ostream& operator<<(std::ostream &os, const Vector3 &vec);
+    friend std::ostream &operator<<(std::ostream &os, const Vector3 &vec);
 
     double Dot(const Vector3 &other) const;
-    Vector3 Cross(const Vector3& other) const;
+    Vector3 Cross(const Vector3 &other) const;
     Vector3 ReflectAbout(const Vector3 &normal) const;
 
     Vector3 Normalize() const;

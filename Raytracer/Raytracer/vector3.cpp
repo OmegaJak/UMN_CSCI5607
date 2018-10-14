@@ -27,6 +27,10 @@ void Vector3::Set(double x, double y, double z) {
     z_ = z;
 }
 
+void Vector3::Set(const Vector3& other) {
+    Set(other.x_, other.y_, other.z_);
+}
+
 Vector3 Vector3::operator+(const Vector3& other) const {
     return Vector3(x_ + other.GetX(), y_ + other.GetY(), z_ + other.GetZ());
 }
