@@ -20,7 +20,7 @@ Camera::Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up
 
 Camera::~Camera() = default;
 
-Ray Camera::ConstructRayThroughPixel(int i, int j, double pixel_width, double pixel_height) const {
+Ray Camera::ConstructRayThroughPixel(const int& i, const int& j, const double& pixel_width, const double& pixel_height) const {
     static Vector3 viewing_plane_center = position_ + distance_ * forward_;
     static double vertical_half_height = distance_ * tan(half_frustum_vertical_);
     static Vector3 viewing_plane_top_to_bottom = vertical_half_height * camera_up_ * -2;

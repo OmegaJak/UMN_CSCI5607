@@ -16,7 +16,7 @@ Scene::~Scene() {
     lights_.clear();
 }
 
-bool Scene::FindIntersection(Ray ray, Intersection& out_intersection) {
+bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) const {
     static Intersection current_intersection;
     static Intersection closest_intersection;
     closest_intersection.t = INFINITY;
@@ -39,7 +39,7 @@ bool Scene::DoesIntersectWith(const Ray& ray) const {
     return false;
 }
 
-Color Scene::GetColor(const Intersection& intersection, const Vector3& viewing_position) {
+Color Scene::GetColor(const Intersection& intersection, const Vector3& viewing_position) const {
     Color diffuse_contribution(0, 0, 0);
     Color specular_contribution(0, 0, 0);
     const Vector3& intersection_point = intersection.hit_point;

@@ -17,8 +17,9 @@ Sphere::~Sphere() = default;
 
 bool Sphere::IntersectionWith(const Ray& ray, Intersection* out_intersection) {
     double a = ray.direction_.SqrMagnitude();
-    double b = (2 * ray.direction_).Dot(ray.start_point_ - position_);
-    double c = (ray.start_point_ - position_).SqrMagnitude() - r_squared_;
+    Vector3 to_ray = ray.start_point_ - position_;
+    double b = (2 * ray.direction_).Dot(to_ray);
+    double c = to_ray.SqrMagnitude() - r_squared_;
 
     double sqrt_discriminant = sqrt((b * b) - 4 * a * c);
     double two_a = 2 * a;

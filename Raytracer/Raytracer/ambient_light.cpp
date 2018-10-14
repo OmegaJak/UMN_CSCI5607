@@ -7,6 +7,6 @@ AmbientLight::~AmbientLight() = default;
 
 AmbientLight::AmbientLight(Color color) : color_(color) {}
 
-Color AmbientLight::GetColor() {
+Color AmbientLight::GetColor() const {
     return color_;
 }

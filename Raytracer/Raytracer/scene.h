@@ -12,9 +12,9 @@ class Scene {
     Scene();
     ~Scene();
 
-    bool FindIntersection(Ray ray, Intersection& out_intersection);
+    bool FindIntersection(const Ray& ray, Intersection& out_intersection) const;
     bool DoesIntersectWith(const Ray& ray) const;
-    Color GetColor(const Intersection& intersection, const Vector3& viewing_position);
+    Color GetColor(const Intersection& intersection, const Vector3& viewing_position) const;
 
     void AddPrimitive(Primitive *primitive);
     void SetAmbientLight(AmbientLight ambient_light);

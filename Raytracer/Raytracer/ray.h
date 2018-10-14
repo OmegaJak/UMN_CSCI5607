@@ -10,7 +10,7 @@ class Ray {
 
     friend std::ostream& operator<<(std::ostream& os, const Ray& color);
 
-    Vector3 Evaluate(double t) const;
+    Vector3 Evaluate(const double& t) const;
 
     Vector3 start_point_;
     Vector3 direction_;

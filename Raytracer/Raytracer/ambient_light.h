@@ -8,7 +8,7 @@ class AmbientLight {
     ~AmbientLight();
     explicit AmbientLight(Color color);
 
-    Color GetColor();
+    Color GetColor() const;
 
    private:
     Color color_;

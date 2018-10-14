@@ -34,7 +34,7 @@ Color& Color::Clamp() {
     return *this;
 }
 
-double Color::ComponentClamp(double value) {
+double Color::ComponentClamp(double value) const {
     return std::max(std::min(value, 1.0), 0.0);
 }
 

@@ -7,7 +7,7 @@ Ray::Ray(Vector3 start_point, Vector3 direction) : start_point_(start_point), di
 
 Ray::~Ray() = default;
 
-Vector3 Ray::Evaluate(double t) const {
+Vector3 Ray::Evaluate(const double& t) const {
     return start_point_ + t * direction_;
 }
 

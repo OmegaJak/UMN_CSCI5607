@@ -9,7 +9,7 @@ class Light : public SceneObject{
     explicit Light(Color color, Vector3 position) : color_(color), SceneObject(position) {}
     virtual ~Light() = default;
 
-    virtual Color GetIlluminanceAt(Vector3 position) = 0;
+    virtual Color GetIlluminanceAt(const Vector3& position) = 0;
     const Color& GetColor() const {
         return color_;
     }

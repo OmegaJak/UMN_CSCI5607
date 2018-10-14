@@ -18,5 +18,5 @@ class Color {
     double red_, green_, blue_;
 
    private:
-    double ComponentClamp(double value);
+    double ComponentClamp(double value) const;
 };

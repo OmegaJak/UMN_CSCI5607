@@ -7,5 +7,5 @@ class PointLight : public Light {
     PointLight(Color color, Vector3 position);
     ~PointLight();
 
-    Color GetIlluminanceAt(Vector3 position) override;
+    Color GetIlluminanceAt(const Vector3& position) override;
 };
