@@ -20,6 +20,7 @@ class Vector3 {
 
     double Dot(const Vector3 &other) const;
     Vector3 Cross(const Vector3& other) const;
+    Vector3 ReflectAbout(const Vector3 &normal) const;
 
     Vector3 Normalize() const;
     double Magnitude() const;

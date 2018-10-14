@@ -3,8 +3,8 @@
 #include <iostream>
 #include "image.h"
 
-Renderer::Renderer(int width, int height, std::string filename)
-    : render_width_(width), render_height_(height), output_filename_(filename) {}
+Renderer::Renderer(int width, int height, int max_recursive_depth, std::string filename)
+    : render_width_(width), render_height_(height), max_recursive_depth_(max_recursive_depth), output_filename_(filename) {}
 
 Renderer::~Renderer() {
     delete scene_;
@@ -24,11 +24,8 @@ void Renderer::SetScene(Scene *scene) {
     scene->SetCameraAspectRatio(render_width_ / double(render_height_));
 }
 
-void Renderer::SetBackgroundColor(Color background) {
-#ifdef _DEBUG
-    std::cout << "Background color set to " << background << "." << std::endl;
-#endif
-    background_color_ = background;
+void Renderer::SetRecursiveDepth(int recursive_depth) {
+    max_recursive_depth_ = recursive_depth;
 }
 
 void Renderer::Render() {
@@ -37,11 +34,7 @@ void Renderer::Render() {
     for (int j = 0; j < render_height_; j++) {
         for (int i = 0; i < render_width_; i++) {
             Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);
-            if (scene_->FindIntersection(ray, intersection)) {
-                image.SetPixel(i, j, Pixel(scene_->GetColor(intersection, ray.start_point_)));
-            } else {
-                image.SetPixel(i, j, Pixel(background_color_));
-            }
+            image.SetPixel(i, j, scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp());
         }
     }
 

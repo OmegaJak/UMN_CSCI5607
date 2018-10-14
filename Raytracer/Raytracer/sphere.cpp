@@ -36,6 +36,7 @@ bool Sphere::IntersectionWith(const Ray& ray, Intersection* out_intersection) {
             out_intersection->material = material_;
             out_intersection->normal = (hit_point - position_).Normalize();
             out_intersection->hit_point = hit_point;
+            out_intersection->viewing_position = ray.start_point_;
         }
         return true;
     }

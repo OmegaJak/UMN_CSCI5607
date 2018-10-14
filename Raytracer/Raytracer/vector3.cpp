@@ -59,6 +59,10 @@ Vector3 Vector3::Cross(const Vector3& other) const {
     return Vector3(x, y, z);
 }
 
+Vector3 Vector3::ReflectAbout(const Vector3& normal) const {
+    return (-2 * Dot(normal) * normal) + *this;
+}
+
 Vector3 Vector3::Normalize() const {
     double magnitude = Magnitude();
     if (magnitude == 0) {

@@ -9,6 +9,7 @@ struct Intersection {
     Material material;
     Vector3 normal;
     Vector3 hit_point;
+    Vector3 viewing_position;
 };
 
 class Primitive : public SceneObject {

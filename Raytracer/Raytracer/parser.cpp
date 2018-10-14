@@ -74,7 +74,7 @@ Renderer* Parser::Parse(const std::string& filename) {
             scene->SetAmbientLight(ambient_light);
         } else if (command == "background") {
             VerifyCorrectNumberParameters(command, params, 3);
-            renderer->SetBackgroundColor(Color(params[0], params[1], params[2]));
+            scene->SetBackgroundColor(Color(params[0], params[1], params[2]));
         } else if (command == "camera") {
             VerifyCorrectNumberParameters(command, params, 10);
             Vector3 position = Vector3(params[0], params[1], params[2]);
@@ -94,6 +94,9 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             PointLight* point_light = new PointLight(color, position);
             scene->AddLight(point_light);
+        } else if (command == "max_depth") {
+            VerifyCorrectNumberParameters(command, params, 1);
+            renderer->SetRecursiveDepth(params[0]);
         }
     }
 
