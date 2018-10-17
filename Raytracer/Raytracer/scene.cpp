@@ -61,8 +61,7 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 
             Vector3 perfect_reflection = ((2 * to_light_dot_normal * intersection.normal_) - to_light).Normalize();
             Vector3 to_viewer = (intersection.GetViewingPosition() - intersection.hit_point_).Normalize();
-            specular_contribution +=
-                material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
+            specular_contribution += material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
         }
     }
 
@@ -73,7 +72,7 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 
     Color ambient_contribution = ambient_light_.GetColor() * material.ambient_color_;
 
-    return ambient_contribution + diffuse_contribution + specular_contribution + reflective_contribution;
+    return ambient_contribution + diffuse_contribution.Clamp() + specular_contribution.Clamp() + reflective_contribution;
 }
 
 void Scene::AddPrimitive(Primitive* primitive) {
