@@ -6,7 +6,7 @@ class Primitive;
 class Intersection {
    public:
     Intersection();
-    Intersection(Ray* ray, Primitive* object, double minimum_t = 0);
+    Intersection(Ray* ray, Primitive* object, double minimum_t = 0.001);
     ~Intersection();
 
     bool ConsiderT(const double& t);

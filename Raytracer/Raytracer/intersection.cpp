@@ -5,9 +5,6 @@
 Intersection::Intersection() : Intersection(nullptr, nullptr) {}
 
 Intersection::Intersection(Ray* ray, Primitive* object, double minimum_t) : minimum_t_(minimum_t) {
-    assert(ray);
-    assert(object);
-
     ray_ = ray;
     object_ = object;
     t_ = INFINITY;
