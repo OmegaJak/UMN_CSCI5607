@@ -10,7 +10,7 @@ Material::Material(Color &ambient, Color &diffuse, Color &specular, Color &trans
       specular_color_(specular),
       transmissive_color_(transmissive),
       phong_factor_(phong_factor),
-      index_of_refaction_(index_of_refraction) {
+      index_of_refraction_(index_of_refraction) {
 #ifdef _DEBUG
     std::cout << "Material created with ambient " << ambient << ", diffuse " << diffuse << ", specular " << specular
               << ", and transmissive " << transmissive << ",\n\twith a Phong factor of " << phong_factor

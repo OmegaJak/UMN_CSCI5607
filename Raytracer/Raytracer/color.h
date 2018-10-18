@@ -14,6 +14,7 @@ class Color {
     friend std::ostream& operator<<(std::ostream& os, const Color& color);
 
     Color& Clamp();
+    bool IsNotBlack() const;
 
     double red_, green_, blue_;
 

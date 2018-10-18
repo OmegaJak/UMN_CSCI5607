@@ -34,6 +34,10 @@ Color& Color::Clamp() {
     return *this;
 }
 
+bool Color::IsNotBlack() const {
+    return red_ > 0 || green_ > 0 || blue_ > 0;
+}
+
 double Color::ComponentClamp(double value) const {
     return std::max(std::min(value, 1.0), 0.0);
 }

@@ -12,5 +12,5 @@ class Material {
     Color specular_color_;
     Color transmissive_color_;
     int phong_factor_;
-    double index_of_refaction_;
+    double index_of_refraction_;
 };

@@ -1,2 +1,3 @@
 *.bmp
 *.sln.DotSettings.user
+/Outputs/*

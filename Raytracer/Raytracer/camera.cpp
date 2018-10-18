@@ -24,7 +24,7 @@ Ray Camera::ConstructRayThroughPixel(const int& i, const int& j, const double& p
     static Vector3 viewing_plane_center = position_ + distance_ * forward_;
     static double vertical_half_height = distance_ * tan(half_frustum_vertical_);
     static Vector3 viewing_plane_top_to_bottom = vertical_half_height * camera_up_ * -2;
-    static Vector3 viewing_plane_left_to_right = vertical_half_height * aspect_ratio_ * right_ * -2; // This should not be negative... but has to be to match expected outputs. This suggests something else is wrong...
+    static Vector3 viewing_plane_left_to_right = vertical_half_height * aspect_ratio_ * right_ * -2;
     static Vector3 top_left = viewing_plane_center - (viewing_plane_left_to_right * 0.5) - (viewing_plane_top_to_bottom * 0.5);
     static Vector3 horizontal, vertical, pixel_point, ray_direction;
 
