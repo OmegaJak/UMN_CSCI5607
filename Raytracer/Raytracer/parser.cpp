@@ -8,12 +8,20 @@
 #include "material.h"
 #include "point_light.h"
 #include "sphere.h"
+#include "spot_light.h"
+
+#define _USE_MATH_DEFINES
+#include "math.h"
 
 using namespace std;
 
 Parser::Parser() {}
 
 Parser::~Parser() {}
+
+double ToRadians(double angleDegrees) {
+    return (angleDegrees / double(180)) * M_PI;
+}
 
 Renderer* Parser::Parse(const std::string& filename) {
     Scene* scene = new Scene();
@@ -80,7 +88,7 @@ Renderer* Parser::Parse(const std::string& filename) {
             Vector3 position = Vector3(params[0], params[1], params[2]);
             Vector3 direction = Vector3(params[3], params[4], params[5]);
             Vector3 up = Vector3(params[6], params[7], params[8]);
-            double height_angle = params[9];
+            double height_angle = ToRadians(params[9]);
 
             Camera camera = Camera(position, direction, up, height_angle);
             scene->SetCamera(camera);
@@ -94,9 +102,22 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             PointLight* point_light = new PointLight(color, position);
             scene->AddLight(point_light);
+        } else if (command == "spot_light") {
+            VerifyCorrectNumberParameters(command, params, 11);
+            Color color(params[0], params[1], params[2]);
+            Vector3 position(params[3], params[4], params[5]);  // Should maybe do something about this
+                                                                // duplication with point_light (static parse function?)
+            Vector3 direction(params[6], params[7], params[8]);
+            double angle1 = ToRadians(params[9]);
+            double angle2 = ToRadians(params[10]);
+
+            SpotLight* spot_light = new SpotLight(color, position, direction, angle1, angle2);
+            scene->AddLight(spot_light);
         } else if (command == "max_depth") {
             VerifyCorrectNumberParameters(command, params, 1);
             renderer->SetRecursiveDepth(params[0]);
+        } else {
+            printf("Unrecognized command %s\n", command.c_str());
         }
     }
 

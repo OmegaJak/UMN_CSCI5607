@@ -18,12 +18,24 @@ Color Color::operator+(const Color& other) const {
     return Color(red_ + other.red_, green_ + other.green_, blue_ + other.blue_);
 }
 
+Color Color::operator-(const Color& other) const {
+    return Color(red_ - other.red_, green_ - other.green_, blue_ - other.blue_);
+}
+
 Color& Color::operator+=(const Color& other) {
     red_ += other.red_;
     green_ += other.green_;
     blue_ += other.blue_;
 
     return *this;
+}
+
+Color Color::Lerp(const Color& a, const Color& b, double amount) {
+    return a.Lerp(b, amount);
+}
+
+Color Color::Lerp(const Color& other, double amount) const {
+    return *this + (other - *this) * amount;
 }
 
 Color& Color::Clamp() {

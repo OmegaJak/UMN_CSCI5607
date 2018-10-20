@@ -9,9 +9,13 @@ class Color {
     Color operator*(const Color& other) const;
     Color operator*(const double& f) const;
     Color operator+(const Color& other) const;
+    Color operator-(const Color& other) const;
     Color& operator+=(const Color& other);
     friend Color operator*(const double& f, const Color& color);
     friend std::ostream& operator<<(std::ostream& os, const Color& color);
+
+    static Color Lerp(const Color& a, const Color& b, double amount);
+    Color Lerp(const Color& other, double amount) const;
 
     Color& Clamp();
     bool IsNotBlack() const;
