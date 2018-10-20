@@ -37,7 +37,7 @@ Renderer* Parser::Parse(const std::string& filename) {
         if (command == "") {
             cout << "Invalid command while processing scene file." << endl;
             exit(-1);
-        } else if (command == "output") {
+        } else if (command == "output_image") {
             if (tokens.size() != 2) {
                 printf("Invalid number of parameters for command \"output\".");
                 exit(-1);
