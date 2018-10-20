@@ -4,7 +4,7 @@
 
 Intersection::Intersection() : Intersection(nullptr, nullptr) {}
 
-Intersection::Intersection(Ray* ray, Primitive* object, double minimum_t) : minimum_t_(minimum_t) {
+Intersection::Intersection(Ray* ray, Primitive* object) {
     ray_ = ray;
     object_ = object;
     t_ = INFINITY;
@@ -13,8 +13,7 @@ Intersection::Intersection(Ray* ray, Primitive* object, double minimum_t) : mini
 Intersection::~Intersection() = default;
 
 bool Intersection::ConsiderT(const double& t) {
-    if (t > minimum_t_ && t < t_)
-    {
+    if (t > ray_->minimum_t_ && t < ray_->maximum_t_ && t < t_) {
         t_ = t;
         return true;
     }

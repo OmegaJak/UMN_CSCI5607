@@ -158,5 +158,6 @@ void Scene::SetCameraAspectRatio(double aspect_ratio) {
 
 bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) const {
     Ray shadow_ray = Ray(intersection.hit_point_, light->GetPosition() - intersection.hit_point_);
+    shadow_ray.maximum_t_ = 1;
     return !DoesIntersectWith(shadow_ray);
 }

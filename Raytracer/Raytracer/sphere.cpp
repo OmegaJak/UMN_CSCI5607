@@ -16,7 +16,7 @@ Sphere::Sphere(const Vector3& position, const Material& material, const double r
 Sphere::~Sphere() = default;
 
 bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
-    static Intersection dummy_intersection; // This is used for t logic in case out_intersection is null. Might be a better way to do this
+    static Intersection dummy_intersection;  // This is used for t logic in case out_intersection is null. Might be a better way to do this
     double a = ray->direction_.SqrMagnitude();
     Vector3 to_ray = ray->start_point_ - position_;
     double b = (2 * ray->direction_).Dot(to_ray);
@@ -27,10 +27,12 @@ bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
     double t1 = (-b + sqrt_discriminant) / two_a;
     double t2 = (-b - sqrt_discriminant) / two_a;
     if (out_intersection == nullptr) {
+        dummy_intersection.ray_ = ray;
         dummy_intersection.ResetT();
         return dummy_intersection.ConsiderT(t1) || dummy_intersection.ConsiderT(t2);
     }
 
+    out_intersection->ray_ = ray; // This is a bit sketchy but currently necessary for ConsiderT() to work if ray is null
     bool t1_valid = out_intersection->ConsiderT(t1);
     bool t2_valid = out_intersection->ConsiderT(t2);
 
@@ -39,7 +41,6 @@ bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
         Vector3 hit_point = ray->Evaluate(out_intersection->GetT());
 
         out_intersection->object_ = this;
-        out_intersection->ray_ = ray;
         out_intersection->hit_point_ = hit_point;
         out_intersection->normal_.Set((hit_point - position_).Normalize());
     }

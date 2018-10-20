@@ -3,7 +3,8 @@
 
 Ray::Ray() {}
 
-Ray::Ray(Vector3 start_point, Vector3 direction) : start_point_(start_point), direction_(direction) {}
+Ray::Ray(Vector3 start_point, Vector3 direction, double minimum_t, double maximum_t)
+    : start_point_(start_point), direction_(direction), minimum_t_(minimum_t), maximum_t_(maximum_t) {}
 
 Ray::~Ray() = default;
 
