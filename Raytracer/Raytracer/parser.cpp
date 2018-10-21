@@ -5,14 +5,15 @@
 #include <sstream>
 #include <string>
 #include <tuple>
+#include <vector>
 #include "material.h"
 #include "point_light.h"
 #include "sphere.h"
 #include "spot_light.h"
 
 #define _USE_MATH_DEFINES
-#include "math.h"
 #include "directional_light.h"
+#include "math.h"
 
 using namespace std;
 
@@ -27,6 +28,10 @@ double ToRadians(double angleDegrees) {
 Renderer* Parser::Parse(const std::string& filename) {
     Scene* scene = new Scene();
     Renderer* renderer = new Renderer();
+    vector<Vector3> vertices;
+    vector<Vector3> normals;
+    int max_vertices = -1;
+    int max_normals = -1;
 
     ifstream file(filename);
     if (file.fail()) {
@@ -59,8 +64,13 @@ Renderer* Parser::Parse(const std::string& filename) {
         tokens.erase(tokens.begin());
         params = StringsToDoubles(tokens);
 
+        if (expected_num_params.count(command) != 1) {
+            printf("Unrecognized command %s\n", command.c_str());
+            break;
+        }
+
+        VerifyCorrectNumberParameters(command, params, expected_num_params[command]);
         if (command == "sphere") {
-            VerifyCorrectNumberParameters(command, params, 4);
             Vector3 position = Vector3(params[0], params[1], params[2]);
             double radius = params[3];
 
@@ -68,64 +78,54 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             scene->AddPrimitive(sphere);
         } else if (command == "material") {
-            VerifyCorrectNumberParameters(command, params, 14);
-            Color ambient = Color(params[0], params[1], params[2]);
-            Color diffuse = Color(params[3], params[4], params[5]);
-            Color specular = Color(params[6], params[7], params[8]);
+            Color ambient = GetColor(params, 0);
+            Color diffuse = GetColor(params, 3);
+            Color specular = GetColor(params, 6);
             int phong_factor = int(params[9]);
-            Color transmissive = Color(params[10], params[11], params[12]);
+            Color transmissive = GetColor(params, 10);
             double index_of_refraction = params[13];
 
             lastMaterial = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
         } else if (command == "ambient_light") {
-            VerifyCorrectNumberParameters(command, params, 3);
-            AmbientLight ambient_light = AmbientLight(Color(params[0], params[1], params[2]));
+            AmbientLight ambient_light = AmbientLight(GetColor(params, 0));
             scene->SetAmbientLight(ambient_light);
         } else if (command == "background") {
-            VerifyCorrectNumberParameters(command, params, 3);
-            scene->SetBackgroundColor(Color(params[0], params[1], params[2]));
+            scene->SetBackgroundColor(GetColor(params, 0));
         } else if (command == "camera") {
-            VerifyCorrectNumberParameters(command, params, 10);
-            Vector3 position = Vector3(params[0], params[1], params[2]);
-            Vector3 direction = Vector3(params[3], params[4], params[5]);
-            Vector3 up = Vector3(params[6], params[7], params[8]);
+            Vector3 position = GetVector3(params, 0);
+            Vector3 direction = GetVector3(params, 3);
+            Vector3 up = GetVector3(params, 6);
             double height_angle = ToRadians(params[9]);
 
             Camera camera = Camera(position, direction, up, height_angle);
             scene->SetCamera(camera);
         } else if (command == "film_resolution") {
-            VerifyCorrectNumberParameters(command, params, 2);
             renderer->SetRenderDimensions(int(params[0]), int(params[1]));
         } else if (command == "point_light") {
-            VerifyCorrectNumberParameters(command, params, 6);
-            Color color(params[0], params[1], params[2]);
-            Vector3 position(params[3], params[4], params[5]);
+            Color color = GetColor(params, 0);
+            Vector3 position = GetVector3(params, 3);
 
             PointLight* point_light = new PointLight(color, position);
             scene->AddLight(point_light);
         } else if (command == "spot_light") {
-            VerifyCorrectNumberParameters(command, params, 11);
-            Color color(params[0], params[1], params[2]);
-            Vector3 position(params[3], params[4], params[5]);  // Should maybe do something about this
-                                                                // duplication with point_light (static parse function?)
-            Vector3 direction(params[6], params[7], params[8]);
+            Color color = GetColor(params, 0);
+            Vector3 position = GetVector3(params, 3);
+            Vector3 direction = GetVector3(params, 6);
             double angle1 = ToRadians(params[9]);
             double angle2 = ToRadians(params[10]);
 
             SpotLight* spot_light = new SpotLight(color, position, direction, angle1, angle2);
             scene->AddLight(spot_light);
         } else if (command == "directional_light") {
-            VerifyCorrectNumberParameters(command, params, 6);
-            Color color(params[0], params[1], params[2]);
-            Vector3 direction(params[3], params[4], params[5]);
+            Color color = GetColor(params, 0);
+            Vector3 direction = GetVector3(params, 3);
 
             DirectionalLight* directional_light = new DirectionalLight(color, direction);
             scene->AddLight(directional_light);
         } else if (command == "max_depth") {
-            VerifyCorrectNumberParameters(command, params, 1);
             renderer->SetRecursiveDepth(params[0]);
         } else {
-            printf("Unrecognized command %s\n", command.c_str());
+            printf("The command \"%s\" was in the num params map but is still unknown\n", command);
         }
     }
 
@@ -162,3 +162,16 @@ void Parser::VerifyCorrectNumberParameters(const string& command, const vector<d
         exit(-1);
     }
 }
+
+Vector3 Parser::GetVector3(const std::vector<double>& params, int startIndex) {
+    return Vector3(params[startIndex], params[startIndex + 1], params[startIndex + 2]);
+}
+
+Color Parser::GetColor(const std::vector<double>& params, int startIndex) {
+    return Color(params[startIndex], params[startIndex + 1], params[startIndex + 2]);
+}
+
+map<string, int> Parser::expected_num_params = {{"camera", 10},     {"film_resolution", 2}, {"max_vertices", 1},  {"max_normals", 1},
+                                                {"vertex", 3},      {"normal", 3},          {"triangle", 3},      {"normal_triangle", 6},
+                                                {"sphere", 4},      {"background", 3},      {"material", 14},     {"directional_light", 6},
+                                                {"point_light", 6}, {"spot_light", 11},     {"ambient_light", 3}, {"max_depth", 1}};
