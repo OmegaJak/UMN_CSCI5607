@@ -63,19 +63,19 @@ Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection
     const Material& material = intersection.object_->GetMaterial();
     // This uses the variable name and methodology found in Fundamental of Computer Graphics, 4th edition
     if (material.transmissive_color_.IsNotBlack()) {
-        double d_dot_n = ray.direction_.Dot(intersection.normal_);
+        double d_dot_n = ray.GetDirection().Dot(intersection.normal_);
         double cos;
         Ray refracted_ray;
         if (d_dot_n < 0) {
-            Refract(ray.direction_, intersection.normal_, 1 / material.index_of_refraction_, refracted_ray, intersection.hit_point_);
+            Refract(ray.GetDirection(), intersection.normal_, 1 / material.index_of_refraction_, refracted_ray, intersection.hit_point_);
             cos = -d_dot_n;
             transmissive_color = Color(1, 1, 1);
         } else {
             double t = intersection.GetT();
             Color A = Color(log(1.1), log(1.05), log(1.1));
             transmissive_color = Color(exp(-t * A.red_), exp(-t * A.green_), exp(-t * A.blue_));
-            if (Refract(ray.direction_, -1 * intersection.normal_, material.index_of_refraction_, refracted_ray, intersection.hit_point_)) {
-                cos = refracted_ray.direction_.Dot(intersection.normal_);
+            if (Refract(ray.GetDirection(), -1 * intersection.normal_, material.index_of_refraction_, refracted_ray, intersection.hit_point_)) {
+                cos = refracted_ray.GetDirection().Dot(intersection.normal_);
             } else {
                 return transmissive_color * EvaluateRayTree(refracted_ray, recursive_depth - 1);
             }
@@ -93,9 +93,9 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
     Color diffuse_contribution(0, 0, 0), specular_contribution(0, 0, 0);
     const Material& material = intersection.object_->GetMaterial();
     Color light_illuminance;
-    bool isInside = ray.direction_.Dot(intersection.normal_) >= 0;
+    bool isInside = ray.GetDirection().Dot(intersection.normal_) >= 0;
 
-    Ray perfect_reflection = Ray(intersection.hit_point_, ray.direction_.ReflectAbout(intersection.normal_));
+    Ray perfect_reflection = Ray(intersection.hit_point_, ray.GetDirection().ReflectAbout(intersection.normal_));
     Color reflective_contribution = material.specular_color_ * EvaluateRayTree(perfect_reflection, recursive_depth - 1);
 
     Color refractive_contribution =

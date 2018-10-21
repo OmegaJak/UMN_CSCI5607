@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "sphere.h"
-#include <algorithm>
-#include <cstdio>
 
 Sphere::Sphere() {}
 
@@ -17,9 +15,9 @@ Sphere::~Sphere() = default;
 
 bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
     static Intersection dummy_intersection;  // This is used for t logic in case out_intersection is null. Might be a better way to do this
-    double a = ray->direction_.SqrMagnitude();
+    double a = ray->GetDirection().SqrMagnitude();
     Vector3 to_ray = ray->start_point_ - position_;
-    double b = (2 * ray->direction_).Dot(to_ray);
+    double b = (2 * ray->GetDirection()).Dot(to_ray);
     double c = to_ray.SqrMagnitude() - r_squared_;
 
     double sqrt_discriminant = sqrt((b * b) - 4 * a * c);

@@ -1,8 +1,9 @@
 #pragma once
 #include "vector3.h"
 #include <ostream>
+#include "directionable.h"
 
-class Ray {
+class Ray : public Directionable {
    public:
     Ray();
     Ray(Vector3 start_point, Vector3 direction, double minimum_t = 0.001, double maximum_t = INFINITY);
@@ -13,7 +14,6 @@ class Ray {
     Vector3 Evaluate(const double& t) const;
 
     Vector3 start_point_;
-    Vector3 direction_;
     double minimum_t_;
     double maximum_t_;
 };
