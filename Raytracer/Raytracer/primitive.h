@@ -5,16 +5,15 @@
 #include "positionable.h"
 #include "intersection.h"
 
-class Primitive : public Positionable {
+class Primitive {
    public:
     Primitive();
-    Primitive(Vector3 position, Material material);
+    Primitive(Material material);
     virtual ~Primitive();
     virtual bool IntersectionWith(const Ray* ray, Intersection* out_intersection) = 0;
 
-    Material GetMaterial() const {
-        return material_;
-    }
+    void SetMaterial(const Material& material);
+    const Material& GetMaterial() const;
 
    protected:
     Material material_;

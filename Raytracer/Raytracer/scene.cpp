@@ -28,8 +28,11 @@ bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) con
 }
 
 bool Scene::DoesIntersectWith(const Ray& ray) const {
+    static Intersection dummy_intersection;  // This is used for t logic in case out_intersection is null. Might be a better way to do this
     for (Primitive* primitive : primitives_) {
-        if (primitive->IntersectionWith(&ray, nullptr)) {
+        dummy_intersection.ray_ = &ray;
+        dummy_intersection.ResetT();
+        if (primitive->IntersectionWith(&ray, &dummy_intersection)) {
             return true;
         }
     }
@@ -92,7 +95,6 @@ Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection
 Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection, const int& recursive_depth) const {
     Color diffuse_contribution(0, 0, 0), specular_contribution(0, 0, 0);
     const Material& material = intersection.object_->GetMaterial();
-    Color light_illuminance;
     bool isInside = ray.GetDirection().Dot(intersection.normal_) >= 0;
 
     Ray perfect_reflection = Ray(intersection.hit_point_, ray.GetDirection().ReflectAbout(intersection.normal_));
@@ -104,16 +106,15 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
     for (Light* light : lights_) {
         if (IntersectionIsAffectedByLight(intersection, light)) {
             auto light_record = light->GetLightRecordAt(intersection.hit_point_);
-            light_illuminance = light_record.illuminance;
 
             Vector3 to_light_normalized = light_record.to_light.Normalize();
             double to_light_dot_normal = to_light_normalized.Dot(intersection.normal_);
-            diffuse_contribution += material.diffuse_color_ * to_light_dot_normal * light_illuminance;
+            diffuse_contribution += material.diffuse_color_ * to_light_dot_normal * light_record.illuminance;
 
             Vector3 perfect_reflection = ((2 * to_light_dot_normal * intersection.normal_) - to_light_normalized).Normalize();
             Vector3 to_viewer = (intersection.GetViewingPosition() - intersection.hit_point_).Normalize();
             specular_contribution +=
-                material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
+                material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_record.illuminance;
         }
     }
 

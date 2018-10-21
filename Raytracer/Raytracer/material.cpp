@@ -2,9 +2,9 @@
 #include "material.h"
 #include <iostream>
 
-Material::Material() {}
+Material::Material() : Material(Color(1, 0, 1), Color(1, 0, 1), Color(), Color(), 0, 1) {}
 
-Material::Material(Color &ambient, Color &diffuse, Color &specular, Color &transmissive, int phong_factor, double index_of_refraction)
+Material::Material(const Color &ambient, const Color &diffuse, const Color &specular, const Color &transmissive, int phong_factor, double index_of_refraction)
     : ambient_color_(ambient),
       diffuse_color_(diffuse),
       specular_color_(specular),

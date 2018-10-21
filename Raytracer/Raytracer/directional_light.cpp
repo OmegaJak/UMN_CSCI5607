@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "directional_light.h"
 
-DirectionalLight::DirectionalLight(Color color, Vector3 direction) : Light(color), Directionable(direction) {}
+DirectionalLight::DirectionalLight(Color color, Vector3 direction) : Light(color), Directionable(direction.Normalize()) {}
 
 DirectionalLight::~DirectionalLight() {}
 

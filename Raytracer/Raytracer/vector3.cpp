@@ -70,8 +70,7 @@ Vector3 Vector3::ReflectAbout(const Vector3& normal) const {
 Vector3 Vector3::Normalize() const {
     double magnitude = Magnitude();
     if (magnitude == 0) {
-        printf("Cannot normalize vector of length 0");
-        exit(-1);
+        printf("Tried to normalize vector of length 0. Bad things will probably happen. \n");
     }
     return Vector3(x_ / magnitude, y_ / magnitude, z_ / magnitude);
 }

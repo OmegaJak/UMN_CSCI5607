@@ -1,7 +1,7 @@
 #pragma once
 #include "primitive.h"
 
-class Sphere : public Primitive {
+class Sphere : public Primitive, public Positionable {
    public:
     Sphere();
     Sphere(const Vector3& position, const Material& material, double radius);

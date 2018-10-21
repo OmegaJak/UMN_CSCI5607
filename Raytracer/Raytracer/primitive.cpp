@@ -1,8 +1,17 @@
 #include "pch.h"
 #include "primitive.h"
 
-Primitive::Primitive() : Positionable(Vector3()) {}
+Primitive::Primitive() {}
 
-Primitive::Primitive(Vector3 position, Material material) : Positionable(position), material_(material) {}
+Primitive::Primitive(Material material) : material_(material) {}
 
 Primitive::~Primitive() = default;
+
+void Primitive::SetMaterial(const Material& material) {
+    material_ = material;
+}
+
+const Material& Primitive::GetMaterial() const {
+    return material_;
+}
+

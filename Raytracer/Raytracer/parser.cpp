@@ -14,6 +14,7 @@
 #define _USE_MATH_DEFINES
 #include "directional_light.h"
 #include "math.h"
+#include "triangle.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ Renderer* Parser::Parse(const std::string& filename) {
     string line, command;
     vector<string> tokens;
     vector<double> params;
-    Material lastMaterial;
+    Material last_material;
     while (getline(file, line)) {
         if (line.length() == 0 || line.at(0) == '#') continue;
 
@@ -74,7 +75,7 @@ Renderer* Parser::Parse(const std::string& filename) {
             Vector3 position = Vector3(params[0], params[1], params[2]);
             double radius = params[3];
 
-            Sphere* sphere = new Sphere(position, lastMaterial, radius);
+            Sphere* sphere = new Sphere(position, last_material, radius);
 
             scene->AddPrimitive(sphere);
         } else if (command == "material") {
@@ -85,7 +86,7 @@ Renderer* Parser::Parse(const std::string& filename) {
             Color transmissive = GetColor(params, 10);
             double index_of_refraction = params[13];
 
-            lastMaterial = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
+            last_material = Material(ambient, diffuse, specular, transmissive, phong_factor, index_of_refraction);
         } else if (command == "ambient_light") {
             AmbientLight ambient_light = AmbientLight(GetColor(params, 0));
             scene->SetAmbientLight(ambient_light);
@@ -123,9 +124,25 @@ Renderer* Parser::Parse(const std::string& filename) {
             DirectionalLight* directional_light = new DirectionalLight(color, direction);
             scene->AddLight(directional_light);
         } else if (command == "max_depth") {
-            renderer->SetRecursiveDepth(params[0]);
+            renderer->SetRecursiveDepth(int(params[0]));
+        } else if (command == "max_vertices") {
+            max_vertices = int(params[0]);
+        } else if (command == "max_normals") {
+            max_normals = int(params[0]);
+        } else if (command == "vertex") {
+            vertices.push_back(GetVector3(params, 0));
+        } else if (command == "normal") {
+            normals.push_back(GetVector3(params, 0));
+        } else if (command == "triangle") {
+            Triangle* triangle = new Triangle(vertices[int(params[0])], vertices[int(params[1])], vertices[int(params[2])], last_material);
+            scene->AddPrimitive(triangle);
+        } else if (command == "normal_triangle") {
+            Triangle* triangle = new Triangle(vertices[int(params[0])], vertices[int(params[1])], vertices[int(params[2])], last_material,
+                                              normals[int(params[3])], normals[int(params[4])], normals[int(params[5])]);
+
+            scene->AddPrimitive(triangle);
         } else {
-            printf("The command \"%s\" was in the num params map but is still unknown\n", command);
+            printf("The command \"%s\" was in the num params map but is still unknown\n", command.c_str());
         }
     }
 
@@ -149,7 +166,7 @@ std::vector<double> Parser::StringsToDoubles(const std::vector<std::string>& str
     for (const string str : string_vector) {
         try {
             vec.push_back(stod(str));
-        } catch (std::exception& e) {
+        } catch (std::exception&) {
         }
     }
 
