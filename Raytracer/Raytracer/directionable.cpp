@@ -3,7 +3,7 @@
 
 Directionable::Directionable() : Directionable(Vector3(0, 0, -1)) {}
 
-Directionable::Directionable(const Vector3& direction) : direction_(direction.Normalize()) {}
+Directionable::Directionable(const Vector3& direction) : direction_(direction) {}
 
 Directionable::~Directionable() = default;
 
