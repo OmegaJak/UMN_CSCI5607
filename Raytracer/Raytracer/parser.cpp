@@ -12,6 +12,7 @@
 
 #define _USE_MATH_DEFINES
 #include "math.h"
+#include "directional_light.h"
 
 using namespace std;
 
@@ -113,6 +114,13 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             SpotLight* spot_light = new SpotLight(color, position, direction, angle1, angle2);
             scene->AddLight(spot_light);
+        } else if (command == "directional_light") {
+            VerifyCorrectNumberParameters(command, params, 6);
+            Color color(params[0], params[1], params[2]);
+            Vector3 direction(params[3], params[4], params[5]);
+
+            DirectionalLight* directional_light = new DirectionalLight(color, direction);
+            scene->AddLight(directional_light);
         } else if (command == "max_depth") {
             VerifyCorrectNumberParameters(command, params, 1);
             renderer->SetRecursiveDepth(params[0]);

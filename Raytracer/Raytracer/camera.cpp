@@ -6,7 +6,7 @@ Camera::Camera() : Camera(Vector3(0, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0)) 
 
 Camera::Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up, double half_frustum_vertical,
     double viewing_plane_distance)
-    : SceneObject(position), distance_(viewing_plane_distance) {
+    : Positionable(position), distance_(viewing_plane_distance) {
     forward_ = direction_to_plane.Normalize();
     absolute_up_ = absolute_up.Normalize();
 

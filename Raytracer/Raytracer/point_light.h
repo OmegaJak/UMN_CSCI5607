@@ -1,11 +1,11 @@
 #pragma once
+#include "positionable.h"
 #include "light.h"
-#include "scene_object.h"
 
-class PointLight : public Light {
+class PointLight : public Light, public Positionable {
    public:
     PointLight(Color color, Vector3 position);
     ~PointLight();
 
-    Color GetIlluminanceAt(const Vector3& position) override;
+    LightRecord GetLightRecordAt(const Vector3& position) override;
 };

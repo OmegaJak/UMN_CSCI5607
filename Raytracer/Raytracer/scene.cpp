@@ -58,7 +58,7 @@ bool Refract(const Vector3& d, const Vector3& n, const double& ior, Ray& refract
 }
 
 Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection, const Color& reflective_contribution,
-                         const int& recursive_depth) const {
+                                const int& recursive_depth) const {
     Color transmissive_color;
     const Material& material = intersection.object_->GetMaterial();
     // This uses the variable name and methodology found in Fundamental of Computer Graphics, 4th edition
@@ -103,13 +103,14 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 
     for (Light* light : lights_) {
         if (IntersectionIsAffectedByLight(intersection, light)) {
-            light_illuminance = light->GetIlluminanceAt(intersection.hit_point_);
+            auto light_record = light->GetLightRecordAt(intersection.hit_point_);
+            light_illuminance = light_record.illuminance;
 
-            Vector3 to_light = (light->GetPosition() - intersection.hit_point_).Normalize();
-            double to_light_dot_normal = to_light.Dot(intersection.normal_);
+            Vector3 to_light_normalized = light_record.to_light.Normalize();
+            double to_light_dot_normal = to_light_normalized.Dot(intersection.normal_);
             diffuse_contribution += material.diffuse_color_ * to_light_dot_normal * light_illuminance;
 
-            Vector3 perfect_reflection = ((2 * to_light_dot_normal * intersection.normal_) - to_light).Normalize();
+            Vector3 perfect_reflection = ((2 * to_light_dot_normal * intersection.normal_) - to_light_normalized).Normalize();
             Vector3 to_viewer = (intersection.GetViewingPosition() - intersection.hit_point_).Normalize();
             specular_contribution +=
                 material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_illuminance;
@@ -157,7 +158,10 @@ void Scene::SetCameraAspectRatio(double aspect_ratio) {
 }
 
 bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) const {
-    Ray shadow_ray = Ray(intersection.hit_point_, light->GetPosition() - intersection.hit_point_);
-    shadow_ray.maximum_t_ = 1;
+    Ray shadow_ray = Ray(intersection.hit_point_, light->GetLightRecordAt(intersection.hit_point_).to_light);
+    if (dynamic_cast<Positionable*>(light)) // If the light has a position, then the direction vector of the ray is not normalized. So t = 1 is at light
+        shadow_ray.maximum_t_ = 1;
+    else // If the light does not have a position (probably directional), it's infinitely far away
+        shadow_ray.maximum_t_ = INFINITY;
     return !DoesIntersectWith(shadow_ray);
 }

@@ -2,10 +2,10 @@
 #include "Material.h"
 #include "ray.h"
 #include "vector3.h"
-#include "scene_object.h"
+#include "positionable.h"
 #include "intersection.h"
 
-class Primitive : public SceneObject {
+class Primitive : public Positionable {
    public:
     Primitive();
     Primitive(Vector3 position, Material material);

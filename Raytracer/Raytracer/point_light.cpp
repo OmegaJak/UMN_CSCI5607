@@ -1,11 +1,13 @@
 #include "pch.h"
 #include "point_light.h"
 
-PointLight::PointLight(Color color, Vector3 position) : Light(color, position) {}
+PointLight::PointLight(Color color, Vector3 position) : Light(color), Positionable(position) {}
 
-PointLight::~PointLight() {}
+PointLight::~PointLight() = default;
 
-Color PointLight::GetIlluminanceAt(const Vector3& position) {
-    double sqr_distance = (position_ - position).SqrMagnitude();
-    return (color_ * (1 / sqr_distance)).Clamp();
+LightRecord PointLight::GetLightRecordAt(const Vector3& position) {
+    Vector3 to_light = position_ - position;
+    double sqr_distance = to_light.SqrMagnitude();
+    Color color = (color_ * (1 / sqr_distance)).Clamp();
+    return LightRecord{to_light, color};
 }

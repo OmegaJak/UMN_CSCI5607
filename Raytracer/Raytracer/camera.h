@@ -1,9 +1,9 @@
 #pragma once
 #include "ray.h"
 #include "vector3.h"
-#include "scene_object.h"
+#include "positionable.h"
 
-class Camera : public SceneObject {
+class Camera : public Positionable {
    public:
     Camera();
     Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up, double half_frustum_vertical = 45, double viewing_plane_distance = 1);
