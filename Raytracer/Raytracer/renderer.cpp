@@ -36,7 +36,7 @@ void Renderer::Render() {
     Intersection intersection;
     for (int j = 0; j < render_height_; j++) {
         for (int i = 0; i < render_width_; i++) {
-            if (i == 199 && j == 262) {
+            if (i == 442 && j == 326) {
                 printf("asdfoijasfdijofdas");
             }
             Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);

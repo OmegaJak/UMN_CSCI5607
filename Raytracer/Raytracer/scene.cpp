@@ -6,42 +6,21 @@
 Scene::Scene() {}
 
 Scene::~Scene() {
-    for (Primitive* primitive : primitives_) {
-        delete primitive;
-    }
-    primitives_.clear();
-
     for (Light* light : lights_) {
         delete light;
     }
     lights_.clear();
 }
 
-bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) const {
-    bool found_intersection = false;
-    for (Primitive* primitive : primitives_) {
-        if (primitive->IntersectionWith(&ray, &out_intersection)) {
-            found_intersection = true;
-        }
-    }
-
-    return found_intersection;
+bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) {
+    return primitives_.IntersectionWith(&ray, &out_intersection);
 }
 
-bool Scene::DoesIntersectWith(const Ray& ray) const {
-    static Intersection dummy_intersection;  // This is used for t logic in case out_intersection is null. Might be a better way to do this
-    for (Primitive* primitive : primitives_) {
-        dummy_intersection.ray_ = &ray;
-        dummy_intersection.ResetT();
-        if (primitive->IntersectionWith(&ray, &dummy_intersection)) {
-            return true;
-        }
-    }
-
-    return false;
+bool Scene::DoesIntersectWith(const Ray& ray) {
+    return primitives_.DoesIntersectWith(ray);
 }
 
-Color Scene::EvaluateRayTree(const Ray& ray, const int& max_recursive_depth) const {
+Color Scene::EvaluateRayTree(const Ray& ray, const int& max_recursive_depth) {
     Intersection intersection;
     if (max_recursive_depth >= 0 && FindIntersection(ray, intersection)) {
         return ApplyLightingModel(ray, intersection, max_recursive_depth);
@@ -62,7 +41,7 @@ bool Refract(const Vector3& d, const Vector3& n, const double& ior, Ray& refract
 }
 
 Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection, const Color& reflective_contribution,
-                                const int& recursive_depth) const {
+                                const int& recursive_depth) {
     Color transmissive_color;
     const Material& material = intersection.object_->GetMaterial();
     // This uses the variable name and methodology found in Fundamental of Computer Graphics, 4th edition
@@ -94,7 +73,7 @@ Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection
     return Color(0, 0, 0);
 }
 
-Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection, const int& recursive_depth) const {
+Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection, const int& recursive_depth) {
     Color diffuse_contribution(0, 0, 0), specular_contribution(0, 0, 0);
     const Material& material = intersection.object_->GetMaterial();
 
@@ -132,7 +111,7 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 }
 
 void Scene::AddPrimitive(Primitive* primitive) {
-    primitives_.push_back(primitive);
+    primitives_.AddPrimitive(primitive);
 }
 
 void Scene::SetAmbientLight(AmbientLight ambient_light) {
@@ -165,7 +144,7 @@ void Scene::SetCameraAspectRatio(double aspect_ratio) {
     camera_.SetAspectRatio(aspect_ratio);
 }
 
-bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) const {
+bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) {
     Ray shadow_ray = Ray(intersection.hit_point_, light->GetLightRecordAt(intersection.hit_point_).to_light);
     if (dynamic_cast<Positionable*>(
             light))  // If the light has a position, then the direction vector of the ray is not normalized. So t = 1 is at light

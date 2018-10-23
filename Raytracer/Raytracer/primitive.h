@@ -1,8 +1,6 @@
 #pragma once
 #include "Material.h"
 #include "ray.h"
-#include "vector3.h"
-#include "positionable.h"
 #include "intersection.h"
 
 class Primitive {

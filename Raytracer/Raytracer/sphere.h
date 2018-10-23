@@ -1,5 +1,6 @@
 #pragma once
 #include "primitive.h"
+#include "positionable.h"
 
 class Sphere : public Primitive, public Positionable {
    public:

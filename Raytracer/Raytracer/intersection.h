@@ -10,11 +10,10 @@ class Intersection {
     ~Intersection();
 
     bool ConsiderT(const double& t);
+    bool ConsiderIntersection(const Intersection& other);
     void ResetT();
     double GetT() const;
     Vector3 GetViewingPosition() const;
-
-    void Set(const Intersection& other);
 
     const Ray* ray_;
     Primitive* object_;

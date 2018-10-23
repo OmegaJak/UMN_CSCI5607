@@ -3,7 +3,7 @@
 
 Plane::Plane() : Plane(Vector3(0, 0, 1), Vector3()) {}
 
-Plane::Plane(const Vector3& normal, const Vector3& point) : normal_(normal), point_(point) {}
+Plane::Plane(const Vector3& normal, const Vector3& point, bool two_sided) : normal_(normal.Normalize()), point_(point), two_sided_(two_sided) {}
 
 Plane::~Plane() = default;
 
@@ -16,7 +16,7 @@ bool Plane::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
         out_intersection->ray_ = ray;
         out_intersection->hit_point_ = ray->Evaluate(intersection_t);
         out_intersection->object_ = this;
-        out_intersection->normal_ = normal_ * normal_factor;
+        out_intersection->normal_ = two_sided_ ? normal_ * normal_factor : normal_;
 
         return true;
     }

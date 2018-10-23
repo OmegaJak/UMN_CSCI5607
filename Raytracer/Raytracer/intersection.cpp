@@ -13,7 +13,7 @@ Intersection::Intersection(Ray* ray, Primitive* object) {
 Intersection::~Intersection() = default;
 
 bool Intersection::ConsiderT(const double& t) {
-    if (t > ray_->minimum_t_ && t < ray_->maximum_t_ && t < t_) {
+    if (ray_ == nullptr || (t > ray_->minimum_t_ && t < ray_->maximum_t_ && t < t_)) {
         t_ = t;
         return true;
     }
@@ -33,10 +33,13 @@ Vector3 Intersection::GetViewingPosition() const {
     return ray_->start_point_;
 }
 
-void Intersection::Set(const Intersection& other) {
+bool Intersection::ConsiderIntersection(const Intersection& other) {
+    bool betterT = ConsiderT(other.t_);
+    if (!betterT) return false;
+
     ray_ = other.ray_;
     hit_point_ = other.hit_point_;
     object_ = other.object_;
     normal_ = other.normal_;
-    t_ = other.t_;
+    return true;
 }

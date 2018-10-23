@@ -3,7 +3,7 @@ camera 6 0 2 -1 0 0 0 0 1 35
 
 #ground
 material .75 .75 .75 .75 .75 .75 .3 .3 .3 32 .2 .2 .2 1.5
-plane 0 0 1 0 0 0
+plane 0 0 0 0 0 1
 
 #blue sphere behind triangle
 material 0 0 1 0 0 1 0 0 0 16 0 0 0 1.0

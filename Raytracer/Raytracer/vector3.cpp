@@ -40,6 +40,8 @@ Vector3 Vector3::operator-(const Vector3& other) const {
 }
 
 Vector3 Vector3::operator*(const double& f) const {
+    if (f == 1) return *this;
+
     return Vector3(x_ * f, y_ * f, z_ * f);
 }
 
@@ -80,5 +82,5 @@ double Vector3::Magnitude() const {
 }
 
 double Vector3::SqrMagnitude() const {
-    return pow(Magnitude(), 2);
+    return this->Dot(*this);
 }

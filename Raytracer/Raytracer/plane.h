@@ -3,7 +3,7 @@
 class Plane : public Primitive {
    public:
     Plane();
-    Plane(const Vector3& normal, const Vector3& point);
+    Plane(const Vector3& normal, const Vector3& point, bool two_sided = true);
     ~Plane();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
@@ -15,6 +15,7 @@ class Plane : public Primitive {
         return normal_;
     }
 
-   private:
+   protected:
     Vector3 normal_, point_;
+    bool two_sided_;
 };

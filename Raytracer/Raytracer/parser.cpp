@@ -12,10 +12,12 @@
 #include "spot_light.h"
 
 #define _USE_MATH_DEFINES
+#include "Rectangle.h"
 #include "directional_light.h"
 #include "math.h"
-#include "triangle.h"
 #include "plane.h"
+#include "triangle.h"
+#include "rectangular_prism.h"
 
 using namespace std;
 
@@ -78,8 +80,6 @@ Renderer* Parser::Parse(const std::string& filename) {
             double radius = params[3];
 
             just_initialized_primitive = new Sphere(position, radius);
-
-            scene->AddPrimitive(just_initialized_primitive);
         } else if (command == "material") {
             Color ambient = GetColor(params, 0);
             Color diffuse = GetColor(params, 3);
@@ -137,23 +137,33 @@ Renderer* Parser::Parse(const std::string& filename) {
             normals.push_back(GetVector3(params, 0));
         } else if (command == "triangle") {
             just_initialized_primitive = new Triangle(vertices[int(params[0])], vertices[int(params[1])], vertices[int(params[2])]);
-            scene->AddPrimitive(just_initialized_primitive);
         } else if (command == "normal_triangle") {
             just_initialized_primitive = new Triangle(vertices[int(params[0])], vertices[int(params[1])], vertices[int(params[2])],
                                                       normals[int(params[3])], normals[int(params[4])], normals[int(params[5])]);
-
-            scene->AddPrimitive(just_initialized_primitive);
         } else if (command == "plane") {
-            Vector3 normal = GetVector3(params, 0);
-            Vector3 point = GetVector3(params, 3);
-            just_initialized_primitive = new Plane(normal, point);
+            Vector3 point = GetVector3(params, 0);
+            Vector3 normal = GetVector3(params, 3);
 
-            scene->AddPrimitive(just_initialized_primitive);
+            just_initialized_primitive = new Plane(normal, point);
+        } else if (command == "quad") {
+            Vector3 point = GetVector3(params, 0);
+            Vector3 right = GetVector3(params, 3);
+            Vector3 up = GetVector3(params, 6);
+
+            just_initialized_primitive = new Rectangle(point, right, up);
+        } else if (command == "rectangular_prism") {
+            Vector3 point = GetVector3(params, 0);
+            Vector3 right = GetVector3(params, 3);
+            Vector3 up = GetVector3(params, 6);
+            Vector3 forward = GetVector3(params, 9);
+
+            just_initialized_primitive = new RectangularPrism(point, right, up, forward);
         } else {
             printf("The command \"%s\" was in the num params map but is still unknown\n", command.c_str());
         }
 
         if (just_initialized_primitive != nullptr) {
+            scene->AddPrimitive(just_initialized_primitive);
             just_initialized_primitive->SetMaterial(last_material);
             just_initialized_primitive = nullptr;
         }
@@ -202,6 +212,7 @@ Color Parser::GetColor(const std::vector<double>& params, int startIndex) {
 }
 
 map<string, int> Parser::expected_num_params = {
-    {"camera", 10},     {"film_resolution", 2}, {"max_vertices", 1},  {"max_normals", 1}, {"vertex", 3},    {"normal", 3},
-    {"triangle", 3},    {"normal_triangle", 6}, {"sphere", 4},        {"background", 3},  {"material", 14}, {"directional_light", 6},
-    {"point_light", 6}, {"spot_light", 11},     {"ambient_light", 3}, {"max_depth", 1},   {"plane", 6}};
+    {"camera", 10},           {"film_resolution", 2}, {"max_vertices", 1},  {"max_normals", 1}, {"vertex", 3},    {"normal", 3},
+    {"triangle", 3},          {"normal_triangle", 6}, {"sphere", 4},        {"background", 3},  {"material", 14}, {"directional_light", 6},
+    {"point_light", 6},       {"spot_light", 11},     {"ambient_light", 3}, {"max_depth", 1},   {"plane", 6},     {"quad", 9},
+    {"rectangular_prism", 12}};
