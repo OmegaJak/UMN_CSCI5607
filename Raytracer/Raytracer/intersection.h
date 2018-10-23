@@ -14,6 +14,8 @@ class Intersection {
     double GetT() const;
     Vector3 GetViewingPosition() const;
 
+    void Set(const Intersection& other);
+
     const Ray* ray_;
     Primitive* object_;
     Vector3 hit_point_;

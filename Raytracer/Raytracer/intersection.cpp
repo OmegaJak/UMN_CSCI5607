@@ -32,3 +32,11 @@ double Intersection::GetT() const {
 Vector3 Intersection::GetViewingPosition() const {
     return ray_->start_point_;
 }
+
+void Intersection::Set(const Intersection& other) {
+    ray_ = other.ray_;
+    hit_point_ = other.hit_point_;
+    object_ = other.object_;
+    normal_ = other.normal_;
+    t_ = other.t_;
+}

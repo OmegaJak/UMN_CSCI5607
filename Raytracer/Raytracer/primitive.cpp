@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "primitive.h"
 
-Primitive::Primitive() {}
+Primitive::Primitive() : Primitive(Material()) {}
 
 Primitive::Primitive(Material material) : material_(material) {}
 
@@ -14,4 +14,3 @@ void Primitive::SetMaterial(const Material& material) {
 const Material& Primitive::GetMaterial() const {
     return material_;
 }
-

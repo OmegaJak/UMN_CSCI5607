@@ -4,7 +4,7 @@
 class Sphere : public Primitive, public Positionable {
    public:
     Sphere();
-    Sphere(const Vector3& position, const Material& material, double radius);
+    Sphere(const Vector3& position, double radius);
     ~Sphere();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;

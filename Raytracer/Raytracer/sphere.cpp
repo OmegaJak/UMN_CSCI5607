@@ -3,7 +3,7 @@
 
 Sphere::Sphere() {}
 
-Sphere::Sphere(const Vector3& position, const Material& material, const double radius) : Primitive(material), Positionable(position) {
+Sphere::Sphere(const Vector3& position, const double radius) : Positionable(position) {
     radius_ = radius;
     r_squared_ = radius * radius;
 #ifdef _DEBUG

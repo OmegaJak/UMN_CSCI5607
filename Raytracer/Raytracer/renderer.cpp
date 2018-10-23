@@ -36,6 +36,9 @@ void Renderer::Render() {
     Intersection intersection;
     for (int j = 0; j < render_height_; j++) {
         for (int i = 0; i < render_width_; i++) {
+            if (i == 199 && j == 262) {
+                printf("asdfoijasfdijofdas");
+            }
             Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);
             image.SetPixel(i, j, scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp());
             intersection.ResetT();
