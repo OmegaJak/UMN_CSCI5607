@@ -1,6 +1,7 @@
 # Cmake things
 CMakeCache.txt
 */CMakeFiles/*
+*/Release/*
 *.cmake
 
 # Prerequisites

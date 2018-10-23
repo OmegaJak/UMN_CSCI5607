@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include <iostream>
 #include "image.h"
+#include <chrono>
 
 Renderer::Renderer(int width, int height, int max_recursive_depth, std::string filename)
     : render_width_(width), render_height_(height), max_recursive_depth_(max_recursive_depth), output_filename_(filename) {}
@@ -29,6 +30,8 @@ void Renderer::SetRecursiveDepth(int recursive_depth) {
 }
 
 void Renderer::Render() {
+    auto start = std::chrono::high_resolution_clock::now();
+
     Image image = Image(render_width_, render_height_);
     Intersection intersection;
     for (int j = 0; j < render_height_; j++) {
@@ -38,6 +41,12 @@ void Renderer::Render() {
             intersection.ResetT();
         }
     }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "-----------------------------" << std::endl;
+    std::cout << "Runtime : " << run_time.count() << "ms" << std::endl;
 
     image.Write(output_filename_.c_str());
 }
