@@ -8,6 +8,6 @@ PointLight::~PointLight() = default;
 LightRecord PointLight::GetLightRecordAt(const Vector3& position) {
     Vector3 to_light = position_ - position;
     double sqr_distance = to_light.SqrMagnitude();
-    Color color = (color_ * (1 / sqr_distance)).Clamp();
+    Color color = color_ * (1 / sqr_distance);
     return LightRecord{to_light, color};
 }
