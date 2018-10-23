@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "scene.h"
+#include <algorithm>
 #include <iostream>
 
 Scene::Scene() {}
@@ -69,15 +70,16 @@ Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection
         double d_dot_n = ray.GetDirection().Dot(intersection.normal_);
         double cos;
         Ray refracted_ray;
-        if (d_dot_n < 0) {
+        if (d_dot_n < 0) {  // Outside object entering
             Refract(ray.GetDirection(), intersection.normal_, 1 / material.index_of_refraction_, refracted_ray, intersection.hit_point_);
             cos = -d_dot_n;
             transmissive_color = Color(1, 1, 1);
-        } else {
+        } else {  // Inside object leaving
             double t = intersection.GetT();
             Color A = Color(log(1.1), log(1.05), log(1.1));
             transmissive_color = Color(exp(-t * A.red_), exp(-t * A.green_), exp(-t * A.blue_));
-            if (Refract(ray.GetDirection(), -1 * intersection.normal_, material.index_of_refraction_, refracted_ray, intersection.hit_point_)) {
+            if (Refract(ray.GetDirection(), -1 * intersection.normal_, material.index_of_refraction_, refracted_ray,
+                        intersection.hit_point_)) {
                 cos = refracted_ray.GetDirection().Dot(intersection.normal_);
             } else {
                 return transmissive_color * EvaluateRayTree(refracted_ray, recursive_depth - 1);
@@ -95,9 +97,8 @@ Color Scene::GetRefractiveColor(const Ray& ray, const Intersection& intersection
 Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection, const int& recursive_depth) const {
     Color diffuse_contribution(0, 0, 0), specular_contribution(0, 0, 0);
     const Material& material = intersection.object_->GetMaterial();
-    bool isInside = ray.GetDirection().Dot(intersection.normal_) >= 0;
 
-    Ray perfect_reflection = Ray(intersection.hit_point_, ray.GetDirection().ReflectAbout(intersection.normal_));
+    Ray perfect_reflection = Ray(intersection.hit_point_, ray.GetDirection().ReflectAbout(intersection.normal_).Normalize());
     Color reflective_contribution = material.specular_color_ * EvaluateRayTree(perfect_reflection, recursive_depth - 1);
 
     Color refractive_contribution =
@@ -109,19 +110,25 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 
             Vector3 to_light_normalized = light_record.to_light.Normalize();
             double to_light_dot_normal = to_light_normalized.Dot(intersection.normal_);
-            diffuse_contribution += material.diffuse_color_ * to_light_dot_normal * light_record.illuminance;
+            diffuse_contribution += material.diffuse_color_ * std::max(0.0, to_light_dot_normal) * light_record.illuminance;
 
-            Vector3 perfect_reflection = ((2 * to_light_dot_normal * intersection.normal_) - to_light_normalized).Normalize();
+            // Blinn Phong
+            /*Vector3 to_viewer = (intersection.GetViewingPosition() - intersection.hit_point_).Normalize();
+            Vector3 to_viewer_plus_to_light = to_viewer + to_light_normalized;
+            Vector3 h = to_viewer_plus_to_light.Normalize();
+            specular_contribution += material.specular_color_ *
+                                     pow(std::max(0.0, intersection.normal_.Dot(h)), material.phong_factor_) * light_record.illuminance;*/
+            Vector3 light_reflected = (-1 * to_light_normalized).ReflectAbout(intersection.normal_).Normalize();
             Vector3 to_viewer = (intersection.GetViewingPosition() - intersection.hit_point_).Normalize();
-            specular_contribution +=
-                material.specular_color_ * pow(perfect_reflection.Dot(to_viewer), material.phong_factor_) * light_record.illuminance;
+            specular_contribution += material.specular_color_ * pow(std::max(0.0, to_viewer.Dot(light_reflected)), material.phong_factor_) *
+                                     light_record.illuminance;
         }
     }
 
     Color ambient_contribution = ambient_light_.GetColor() * material.ambient_color_;
 
-    return ambient_contribution + diffuse_contribution.Clamp() + specular_contribution.Clamp() + reflective_contribution +
-           refractive_contribution.Clamp();
+    return (ambient_contribution + diffuse_contribution + specular_contribution + reflective_contribution + refractive_contribution)
+        .Clamp();
 }
 
 void Scene::AddPrimitive(Primitive* primitive) {
@@ -160,9 +167,10 @@ void Scene::SetCameraAspectRatio(double aspect_ratio) {
 
 bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) const {
     Ray shadow_ray = Ray(intersection.hit_point_, light->GetLightRecordAt(intersection.hit_point_).to_light);
-    if (dynamic_cast<Positionable*>(light)) // If the light has a position, then the direction vector of the ray is not normalized. So t = 1 is at light
+    if (dynamic_cast<Positionable*>(
+            light))  // If the light has a position, then the direction vector of the ray is not normalized. So t = 1 is at light
         shadow_ray.maximum_t_ = 1;
-    else // If the light does not have a position (probably directional), it's infinitely far away
+    else  // If the light does not have a position (probably directional), it's infinitely far away
         shadow_ray.maximum_t_ = INFINITY;
     return !DoesIntersectWith(shadow_ray);
 }

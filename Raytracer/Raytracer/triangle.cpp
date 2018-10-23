@@ -11,7 +11,7 @@ Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c, const M
 }
 
 Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c, const Material& material) : Primitive(material), a_(a), b_(b), c_(c) {
-    normal_ = a.Cross(b).Normalize();
+    normal_ = (b - a).Cross(c - a).Normalize();
 }
 
 Triangle::~Triangle() = default;
