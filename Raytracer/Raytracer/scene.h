@@ -6,7 +6,7 @@
 #include "light.h"
 #include "primitive.h"
 #include "ray.h"
-#include "primitive_collection.h"
+#include "intersectable_group.h"
 
 class Scene {
    public:
@@ -32,7 +32,7 @@ class Scene {
 
    private:
     Camera camera_;
-    PrimitiveCollection primitives_;
+    IntersectableGroup objects_;
     std::vector<Light*> lights_{};
     AmbientLight ambient_light_;
     Color background_color_;

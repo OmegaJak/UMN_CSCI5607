@@ -3,14 +3,6 @@
 
 Primitive::Primitive() : Primitive(Material()) {}
 
-Primitive::Primitive(Material material) : material_(material) {}
+Primitive::Primitive(const Material& material) : Materialed(material) {}
 
 Primitive::~Primitive() = default;
-
-void Primitive::SetMaterial(const Material& material) {
-    material_ = material;
-}
-
-const Material& Primitive::GetMaterial() const {
-    return material_;
-}

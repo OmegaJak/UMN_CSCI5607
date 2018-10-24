@@ -13,11 +13,11 @@ Scene::~Scene() {
 }
 
 bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) {
-    return primitives_.IntersectionWith(&ray, &out_intersection);
+    return objects_.IntersectionWith(&ray, &out_intersection);
 }
 
 bool Scene::DoesIntersectWith(const Ray& ray) {
-    return primitives_.DoesIntersectWith(ray);
+    return objects_.DoesIntersectWith(ray);
 }
 
 Color Scene::EvaluateRayTree(const Ray& ray, const int& max_recursive_depth) {
@@ -111,7 +111,7 @@ Color Scene::ApplyLightingModel(const Ray& ray, const Intersection& intersection
 }
 
 void Scene::AddPrimitive(Primitive* primitive) {
-    primitives_.AddPrimitive(primitive);
+    objects_.AddChild(primitive);
 }
 
 void Scene::SetAmbientLight(AmbientLight ambient_light) {

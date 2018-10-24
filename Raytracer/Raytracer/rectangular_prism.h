@@ -1,6 +1,6 @@
 #pragma once
 #include "primitive.h"
-#include "primitive_collection.h"
+#include "intersectable_group.h"
 
 class RectangularPrism : public Primitive {
    public:
@@ -11,5 +11,5 @@ class RectangularPrism : public Primitive {
 
    private:
     Vector3 point_, right_, up_, forward_;
-    PrimitiveCollection faces_;
+    IntersectableGroup faces_;
 };

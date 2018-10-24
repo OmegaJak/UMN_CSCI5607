@@ -15,12 +15,12 @@ RectangularPrism::RectangularPrism(const Vector3& point, const Vector3& right, c
     auto top = new Rectangle(point + up_, right_, forward_, false);
     auto back = new Rectangle(point + right_ + forward_, -1 * right_, up_, false);
 
-    faces_.AddPrimitive(front);
-    faces_.AddPrimitive(left);
-    faces_.AddPrimitive(bottom);
-    faces_.AddPrimitive(right_face);
-    faces_.AddPrimitive(top);
-    faces_.AddPrimitive(back);
+    faces_.AddChild(front);
+    faces_.AddChild(left);
+    faces_.AddChild(bottom);
+    faces_.AddChild(right_face);
+    faces_.AddChild(top);
+    faces_.AddChild(back);
 }
 
 RectangularPrism::~RectangularPrism() = default;
