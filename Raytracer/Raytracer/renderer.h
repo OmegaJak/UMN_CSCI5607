@@ -1,5 +1,7 @@
 #pragma once
+#include <chrono>
 #include <string>
+#include "image.h"
 #include "scene.h"
 
 class Renderer {
@@ -12,12 +14,14 @@ class Renderer {
     void SetScene(Scene *scene);
     void SetRecursiveDepth(int recursive_depth);
 
-    void Render();
+    std::chrono::milliseconds Render(const double num_status_updates);
+    void OutputImage() const;
 
-private:
+   private:
     int render_width_;
     int render_height_;
     int max_recursive_depth_;
     std::string output_filename_;
+    Image *image_ = nullptr;
     Scene *scene_;
 };

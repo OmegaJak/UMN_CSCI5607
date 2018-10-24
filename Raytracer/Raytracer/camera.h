@@ -13,6 +13,8 @@ class Camera : public Positionable {
     void SetAspectRatio(double aspect_ratio);
 
    private:
+    void DoInitialMath();
+
     Vector3 forward_;
     Vector3 absolute_up_;
     Vector3 camera_up_;
@@ -21,4 +23,6 @@ class Camera : public Positionable {
     double distance_ = 0.1;
 
     Vector3 right_;
+
+    Vector3 viewing_plane_top_to_bottom_, viewing_plane_left_to_right_, top_left_;
 };

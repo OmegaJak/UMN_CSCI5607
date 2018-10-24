@@ -1,3 +1,4 @@
 *.bmp
 *.sln.DotSettings.user
 /Outputs/*
+/Debug/*
