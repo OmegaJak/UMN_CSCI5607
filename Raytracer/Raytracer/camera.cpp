@@ -19,11 +19,11 @@ Camera::Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up
 
 Camera::~Camera() = default;
 
-Ray Camera::ConstructRayThroughPixel(const int& i, const int& j, const double& pixel_width, const double& pixel_height) const {
+Ray Camera::ConstructRayThroughPixel(const double& i, const double& j, const double& pixel_width, const double& pixel_height) const {
     static Vector3 horizontal, vertical, pixel_point, ray_direction;
 
-    horizontal = viewing_plane_left_to_right_ * ((i + 0.5) / pixel_width);
-    vertical = viewing_plane_top_to_bottom_ * ((j + 0.5) / pixel_height);
+    horizontal = viewing_plane_left_to_right_ * (i / pixel_width);
+    vertical = viewing_plane_top_to_bottom_ * (j / pixel_height);
     pixel_point = top_left_ + horizontal + vertical;
     ray_direction = (pixel_point - position_).Normalize();
 

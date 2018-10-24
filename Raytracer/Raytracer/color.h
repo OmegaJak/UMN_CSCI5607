@@ -8,6 +8,7 @@ class Color {
 
     Color operator*(const Color& other) const;
     Color operator*(const double& f) const;
+    Color operator/(const double& f) const;
     Color operator+(const Color& other) const;
     Color operator-(const Color& other) const;
     Color& operator+=(const Color& other);

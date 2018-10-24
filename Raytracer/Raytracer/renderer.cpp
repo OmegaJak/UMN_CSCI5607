@@ -1,15 +1,14 @@
 #include "pch.h"
 #include "renderer.h"
+#include <stdlib.h>
 #include <chrono>
 #include <iostream>
 #include "image.h"
-#include <chrono>
 
 Renderer::Renderer(int width, int height, int max_recursive_depth, std::string filename)
-    : render_width_(width),
-      render_height_(height),
-      max_recursive_depth_(max_recursive_depth),
-      output_filename_(filename) {}
+    : render_width_(width), render_height_(height), max_recursive_depth_(max_recursive_depth), output_filename_(filename) {
+    srand(time(NULL));
+}
 
 Renderer::~Renderer() {
     delete image_;
@@ -34,7 +33,7 @@ void Renderer::SetRecursiveDepth(int recursive_depth) {
     max_recursive_depth_ = recursive_depth;
 }
 
-std::chrono::milliseconds Renderer::Render(const double num_status_updates) {
+std::chrono::milliseconds Renderer::Render(const double num_status_updates, const int supersample_radius, bool jittered) {
     delete image_;
     image_ = new Image(render_width_, render_height_);
 
@@ -49,9 +48,18 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates) {
                 std::cout << (current_status / num_status_updates) * 100 << "%" << std::endl;
                 current_status += 1;
             }
-            Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i, j, render_width_, render_height_);
-            image_->SetPixel(i, j, scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp());
-            intersection.ResetT();
+
+            Color color = Color(0, 0, 0);
+            for (int p = 0; p < supersample_radius; p++) {
+                for (int q = 0; q < supersample_radius; q++) {
+                    double r = jittered ? (rand() / double(RAND_MAX)) : 0.5;  // 0 to 1
+                    Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i + (p + r) / supersample_radius,
+                                                                           j + (q + r) / supersample_radius, render_width_, render_height_);
+                    color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+                    intersection.ResetT();
+                }
+            }
+            image_->SetPixel(i, j, (color / (supersample_radius * supersample_radius)).Clamp());
         }
     }
 

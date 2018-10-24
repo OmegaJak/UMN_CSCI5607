@@ -14,7 +14,7 @@ class Renderer {
     void SetScene(Scene *scene);
     void SetRecursiveDepth(int recursive_depth);
 
-    std::chrono::milliseconds Render(const double num_status_updates);
+    std::chrono::milliseconds Render(const double num_status_updates, const int supersample_radius, bool jittered = false);
     void OutputImage() const;
 
    private:

@@ -9,7 +9,7 @@ class Camera : public Positionable {
     Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up, double half_frustum_vertical = 45, double viewing_plane_distance = 1);
     ~Camera();
 
-    Ray ConstructRayThroughPixel(const int& i, const int& j, const double& pixel_width, const double& pixel_height) const;
+    Ray ConstructRayThroughPixel(const double& i, const double& j, const double& pixel_width, const double& pixel_height) const;
     void SetAspectRatio(double aspect_ratio);
 
    private:

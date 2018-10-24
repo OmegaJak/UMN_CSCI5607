@@ -14,6 +14,10 @@ Color Color::operator*(const double& f) const {
     return Color(red_ * f, green_ * f, blue_ * f);
 }
 
+Color Color::operator/(const double& f) const {
+    return Color(red_ / f, green_ / f, blue_ / f);
+}
+
 Color Color::operator+(const Color& other) const {
     return Color(red_ + other.red_, green_ + other.green_, blue_ + other.blue_);
 }
