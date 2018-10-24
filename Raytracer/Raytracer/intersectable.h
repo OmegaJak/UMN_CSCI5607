@@ -4,8 +4,8 @@
 
 class Intersectable {
    public:
-    Intersectable();
-    virtual ~Intersectable();
+    Intersectable() = default;
+    virtual ~Intersectable() = default;
 
     virtual bool IntersectionWith(const Ray* ray, Intersection* out_intersection) = 0;
 };
