@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include "image.h"
+#include "time_keeper.h"
 
 Renderer::Renderer(int width, int height, int max_recursive_depth, std::string filename)
     : render_width_(width), render_height_(height), max_recursive_depth_(max_recursive_depth), output_filename_(filename) {
@@ -53,9 +54,16 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates, cons
             for (int p = 0; p < supersample_radius; p++) {
                 for (int q = 0; q < supersample_radius; q++) {
                     double r = jittered ? (rand() / double(RAND_MAX)) : 0.5;  // 0 to 1
-                    Ray ray = scene_->GetCamera().ConstructRayThroughPixel(i + (p + r) / supersample_radius,
+                    Ray ray = scene_->GetCamera()->ConstructRayThroughPixel(i + (p + r) / supersample_radius,
                                                                            j + (q + r) / supersample_radius, render_width_, render_height_);
                     color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+                    /*int num_time_samples = 1;
+                    Color tempColor = Color(0, 0, 0);
+                    for (int time = 0; time < num_time_samples; time++) {
+                        TimeKeeper::SetTime(rand() / double(RAND_MAX));
+                        tempColor += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+                    }
+                    color += tempColor / double(num_time_samples);*/
                     intersection.ResetT();
                 }
             }

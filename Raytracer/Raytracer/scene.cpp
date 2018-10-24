@@ -10,6 +10,8 @@ Scene::~Scene() {
         delete light;
     }
     lights_.clear();
+
+    delete camera_;
 }
 
 bool Scene::FindIntersection(const Ray& ray, Intersection& out_intersection) {
@@ -125,7 +127,7 @@ void Scene::AddLight(Light* light) {
     lights_.push_back(light);
 }
 
-void Scene::SetCamera(Camera camera) {
+void Scene::SetCamera(Camera* camera) {
     camera_ = camera;
 }
 
@@ -136,12 +138,12 @@ void Scene::SetBackgroundColor(Color background) {
     background_color_ = background;
 }
 
-const Camera Scene::GetCamera() {
+Camera* Scene::GetCamera() {
     return camera_;
 }
 
 void Scene::SetCameraAspectRatio(double aspect_ratio) {
-    camera_.SetAspectRatio(aspect_ratio);
+    camera_->SetAspectRatio(aspect_ratio);
 }
 
 bool Scene::IntersectionIsAffectedByLight(const Intersection& intersection, Light* light) {

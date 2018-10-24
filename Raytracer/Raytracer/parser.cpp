@@ -37,6 +37,7 @@ Renderer* Parser::Parse(const std::string& filename) {
     int max_vertices = -1;
     int max_normals = -1;
     Primitive* just_initialized_primitive = nullptr;
+    Positionable* last_initialized_positionable = nullptr;
 
     ifstream file(filename);
     if (file.fail()) {
@@ -79,7 +80,9 @@ Renderer* Parser::Parse(const std::string& filename) {
             Vector3 position = Vector3(params[0], params[1], params[2]);
             double radius = params[3];
 
-            just_initialized_primitive = new Sphere(position, radius);
+            Sphere* sphere = new Sphere(position, radius);
+            just_initialized_primitive = sphere;
+            last_initialized_positionable = sphere;
         } else if (command == "material") {
             Color ambient = GetColor(params, 0);
             Color diffuse = GetColor(params, 3);
@@ -100,7 +103,8 @@ Renderer* Parser::Parse(const std::string& filename) {
             Vector3 up = GetVector3(params, 6);
             double height_angle = ToRadians(params[9]);
 
-            Camera camera = Camera(position, direction, up, height_angle);
+            Camera* camera = new Camera(position, direction, up, height_angle);
+            last_initialized_positionable = camera;
             scene->SetCamera(camera);
         } else if (command == "film_resolution") {
             renderer->SetRenderDimensions(int(params[0]), int(params[1]));
@@ -110,6 +114,8 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             PointLight* point_light = new PointLight(color, position);
             scene->AddLight(point_light);
+
+            last_initialized_positionable = point_light;
         } else if (command == "spot_light") {
             Color color = GetColor(params, 0);
             Vector3 position = GetVector3(params, 3);
@@ -119,6 +125,8 @@ Renderer* Parser::Parse(const std::string& filename) {
 
             SpotLight* spot_light = new SpotLight(color, position, direction, angle1, angle2);
             scene->AddLight(spot_light);
+
+            last_initialized_positionable = spot_light;
         } else if (command == "directional_light") {
             Color color = GetColor(params, 0);
             Vector3 direction = GetVector3(params, 3);
@@ -158,6 +166,14 @@ Renderer* Parser::Parse(const std::string& filename) {
             Vector3 forward = GetVector3(params, 9);
 
             just_initialized_primitive = new RectangularPrism(point, right, up, forward);
+        } else if (command == "end_position") {
+            if (last_initialized_positionable != nullptr) {
+                Vector3 end_position = GetVector3(params, 0);
+                last_initialized_positionable->SetEndPosition(end_position);
+                last_initialized_positionable = nullptr;
+            } else {
+                printf("Cannot set end_position because a positionable has not been initialized since the last call to end_position.\n");
+            }
         } else {
             printf("The command \"%s\" was in the num params map but is still unknown\n", command.c_str());
         }
@@ -215,4 +231,4 @@ map<string, int> Parser::expected_num_params = {
     {"camera", 10},           {"film_resolution", 2}, {"max_vertices", 1},  {"max_normals", 1}, {"vertex", 3},    {"normal", 3},
     {"triangle", 3},          {"normal_triangle", 6}, {"sphere", 4},        {"background", 3},  {"material", 14}, {"directional_light", 6},
     {"point_light", 6},       {"spot_light", 11},     {"ambient_light", 3}, {"max_depth", 1},   {"plane", 6},     {"quad", 9},
-    {"rectangular_prism", 12}};
+    {"rectangular_prism", 12}, {"end_position", 3}};

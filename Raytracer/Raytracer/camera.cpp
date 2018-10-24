@@ -19,15 +19,16 @@ Camera::Camera(Vector3 position, Vector3 direction_to_plane, Vector3 absolute_up
 
 Camera::~Camera() = default;
 
-Ray Camera::ConstructRayThroughPixel(const double& i, const double& j, const double& pixel_width, const double& pixel_height) const {
+Ray Camera::ConstructRayThroughPixel(const double& i, const double& j, const double& pixel_width, const double& pixel_height) {
     static Vector3 horizontal, vertical, pixel_point, ray_direction;
+    if (IsMoving()) DoInitialMath();
 
     horizontal = viewing_plane_left_to_right_ * (i / pixel_width);
     vertical = viewing_plane_top_to_bottom_ * (j / pixel_height);
     pixel_point = top_left_ + horizontal + vertical;
-    ray_direction = (pixel_point - position_).Normalize();
+    ray_direction = (pixel_point - GetPosition()).Normalize();
 
-    return Ray(position_, ray_direction);
+    return Ray(GetPosition(), ray_direction);
 }
 
 void Camera::SetAspectRatio(double aspect_ratio) {
@@ -36,7 +37,7 @@ void Camera::SetAspectRatio(double aspect_ratio) {
 }
 
 void Camera::DoInitialMath() {
-    Vector3 viewing_plane_center = position_ + distance_ * forward_;
+    Vector3 viewing_plane_center = GetPosition() + distance_ * forward_;
     double vertical_half_height = distance_ * tan(half_frustum_vertical_);
     viewing_plane_top_to_bottom_ = vertical_half_height * camera_up_ * -2;
     viewing_plane_left_to_right_ = vertical_half_height * aspect_ratio_ * right_ * 2;

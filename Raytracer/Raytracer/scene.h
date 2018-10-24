@@ -23,15 +23,15 @@ class Scene {
     void AddPrimitive(Primitive* primitive);
     void SetAmbientLight(AmbientLight ambient_light);
     void AddLight(Light* light);
-    void SetCamera(Camera camera);
+    void SetCamera(Camera* camera);
     void SetBackgroundColor(Color background);
 
-    const Camera GetCamera();
+    Camera* GetCamera();
 
     void SetCameraAspectRatio(double aspect_ratio);
 
    private:
-    Camera camera_;
+    Camera* camera_;
     IntersectableGroup objects_;
     std::vector<Light*> lights_{};
     AmbientLight ambient_light_;

@@ -6,7 +6,7 @@ PointLight::PointLight(Color color, Vector3 position) : Light(color), Positionab
 PointLight::~PointLight() = default;
 
 LightRecord PointLight::GetLightRecordAt(const Vector3& position) {
-    Vector3 to_light = position_ - position;
+    Vector3 to_light = GetPosition() - position;
     double sqr_distance = to_light.SqrMagnitude();
     Color color = color_ * (1 / sqr_distance);
     return LightRecord{to_light, color};

@@ -15,7 +15,7 @@ Sphere::~Sphere() = default;
 
 bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
     double a = ray->GetDirection().SqrMagnitude();
-    Vector3 to_ray = ray->start_point_ - position_;
+    Vector3 to_ray = ray->start_point_ - GetPosition();
     double b = (2 * ray->GetDirection()).Dot(to_ray);
     double c = to_ray.SqrMagnitude() - r_squared_;
 
@@ -34,7 +34,7 @@ bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
 
         out_intersection->object_ = this;
         out_intersection->hit_point_ = hit_point;
-        out_intersection->normal_.Set((hit_point - position_).Normalize());
+        out_intersection->normal_.Set((hit_point - GetPosition()).Normalize());
     }
 
     return did_intersect;
