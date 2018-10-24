@@ -5,6 +5,7 @@
 class IntersectableGroup : public Intersectable {
    public:
     IntersectableGroup();
+    explicit IntersectableGroup(const BoundingBox& initial_bound);
     ~IntersectableGroup();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
@@ -13,6 +14,7 @@ class IntersectableGroup : public Intersectable {
 
     void InitializeBVH();
     void GenerateBoundingBox() override;
+    bool ShouldCheckBoundingBoxBeforeIntersecting() override;
    private:
     std::vector<Intersectable*> children_{};
 };

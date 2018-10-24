@@ -4,7 +4,11 @@
 Ray::Ray() {}
 
 Ray::Ray(Vector3 start_point, Vector3 direction, double minimum_t, double maximum_t)
-    : Directionable(direction), start_point_(start_point), minimum_t_(minimum_t), maximum_t_(maximum_t) {}
+    : Directionable(direction),
+      start_point_(start_point),
+      minimum_t_(minimum_t), maximum_t_(maximum_t) {
+    inverse_dir_.Set(1 / direction_.GetX(), 1 / direction_.GetY(), 1 / direction_.GetZ()); // Precompute
+}
 
 Ray::~Ray() = default;
 

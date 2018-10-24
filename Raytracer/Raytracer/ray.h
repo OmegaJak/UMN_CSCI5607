@@ -16,4 +16,5 @@ class Ray : public Directionable {
     Vector3 start_point_;
     double minimum_t_;
     double maximum_t_;
+    Vector3 inverse_dir_; // This is for fast bounding-box intersection
 };

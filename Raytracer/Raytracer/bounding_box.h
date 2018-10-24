@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "vector3.h"
+#include "ray.h"
 
 class BoundingBox {
    public:
@@ -17,7 +18,10 @@ class BoundingBox {
     void ExpandToBound(const std::vector<BoundingBox> bounding_boxes);
 
     std::pair<BoundingBox, BoundingBox> Bisect() const;
+    std::vector<BoundingBox> Octsect() const;
     bool ContainsOrIntersects(const BoundingBox& other) const;
+
+    bool IntersectsWith(const Ray& ray) const;
 
     double minX_, maxX_, minY_, maxY_, minZ_, maxZ_;
 

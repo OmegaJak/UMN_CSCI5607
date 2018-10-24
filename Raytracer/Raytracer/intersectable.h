@@ -14,12 +14,17 @@ class Intersectable {
     const BoundingBox& GetBoundingBox() {
         if (!is_bounding_box_initialized_) {
             GenerateBoundingBox();
+            is_bounding_box_initialized_ = true;
         }
 
         return bounding_box_;
     }
 
     virtual bool IsInfinite() {
+        return false;
+    }
+
+    virtual bool ShouldCheckBoundingBoxBeforeIntersecting() {
         return false;
     }
 
