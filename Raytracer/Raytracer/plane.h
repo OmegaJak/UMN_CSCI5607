@@ -10,6 +10,7 @@ class Plane : public Primitive {
     int GetNormalFactorToFaceRay(const Ray& ray) const;
 
     static bool IntersectionWithPlane(const Ray* ray, const Vector3& normal, const Vector3& point_on_plane, double& out_t);
+    void GenerateBoundingBox() override;
 
     const Vector3& GetNormal() const {
         return normal_;

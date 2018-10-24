@@ -8,6 +8,7 @@ class RectangularPrism : public Primitive {
     ~RectangularPrism();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
+    void GenerateBoundingBox() override;
 
    private:
     Vector3 point_, right_, up_, forward_;

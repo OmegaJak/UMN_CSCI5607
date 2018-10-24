@@ -33,3 +33,7 @@ bool RectangularPrism::IntersectionWith(const Ray* ray, Intersection* out_inters
 
     return intersected;
 }
+
+void RectangularPrism::GenerateBoundingBox() {
+    bounding_box_ = faces_.GetBoundingBox();
+}

@@ -11,6 +11,7 @@ class IntersectableGroup : public Intersectable {
     bool DoesIntersectWith(const Ray& ray);
     void AddChild(Intersectable* child);
 
+    void GenerateBoundingBox() override;
    private:
     std::vector<Intersectable*> children_{};
 };

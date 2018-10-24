@@ -9,6 +9,7 @@ class Sphere : public Primitive, public Positionable {
     ~Sphere();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
+    void GenerateBoundingBox() override;
 
    private:
     double radius_;

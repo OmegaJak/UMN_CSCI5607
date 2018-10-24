@@ -6,6 +6,7 @@ class Rectangle : public Plane {
     ~Rectangle();
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
+    void GenerateBoundingBox() override;
 
    private:
     Vector3 right_, up_, normed_right_, normed_up_;

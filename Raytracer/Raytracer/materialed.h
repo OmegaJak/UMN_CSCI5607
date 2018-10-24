@@ -5,7 +5,7 @@ class Materialed {
    public:
     Materialed();
     explicit Materialed(const Material& material);
-    ~Materialed();
+    virtual ~Materialed();
 
     void SetMaterial(const Material& material);
     const Material& GetMaterial() const;

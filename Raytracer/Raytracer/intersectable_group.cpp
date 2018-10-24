@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "intersectable_group.h"
+#include <algorithm>
 
 IntersectableGroup::IntersectableGroup() = default;
 
@@ -36,4 +37,11 @@ bool IntersectableGroup::DoesIntersectWith(const Ray& ray) {
 
 void IntersectableGroup::AddChild(Intersectable* child) {
     children_.push_back(child);
+}
+
+void IntersectableGroup::GenerateBoundingBox() {
+    bounding_box_ = BoundingBox();
+    for (Intersectable* child : children_) {
+        bounding_box_.ExpandToBound(child->GetBoundingBox());
+    }
 }

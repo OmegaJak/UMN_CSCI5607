@@ -39,3 +39,12 @@ bool Sphere::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
 
     return did_intersect;
 }
+
+void Sphere::GenerateBoundingBox() {
+    bounding_box_.minX_ = position_.GetX() - radius_;
+    bounding_box_.maxX_ = position_.GetX() + radius_;
+    bounding_box_.minY_ = position_.GetY() - radius_;
+    bounding_box_.maxY_ = position_.GetY() + radius_;
+    bounding_box_.minZ_ = position_.GetZ() - radius_;
+    bounding_box_.maxZ_ = position_.GetZ() + radius_;
+}

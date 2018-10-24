@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "Rectangle.h"
 
-Rectangle::Rectangle(const Vector3& point, const Vector3& right, const Vector3& up, bool two_sided)
-    : right_(right), up_(up) {
+Rectangle::Rectangle(const Vector3& point, const Vector3& right, const Vector3& up, bool two_sided) : right_(right), up_(up) {
     if (right.Dot(up) != 0) {
         throw "Rectangle must have perpendicular sides!";
     }
@@ -39,4 +38,9 @@ bool Rectangle::IntersectionWith(const Ray* ray, Intersection* out_intersection)
     }
 
     return false;
+}
+
+void Rectangle::GenerateBoundingBox() {
+    std::vector<Vector3> points = {point_, point_ + right_, point_ + up_, point_ + up_ + right_};
+    bounding_box_ = BoundingBox(points);
 }

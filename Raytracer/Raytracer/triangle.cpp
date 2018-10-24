@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "triangle.h"
+#include <vector>
 
 Triangle::Triangle(const Vector3& a, const Vector3& b, const Vector3& c, const Vector3& a_norm, const Vector3& b_norm,
                                        const Vector3& c_norm)
@@ -37,6 +38,11 @@ bool Triangle::IntersectionWith(const Ray* ray, Intersection* out_intersection) 
     }
 
     return false;
+}
+
+void Triangle::GenerateBoundingBox() {
+    std::vector<Vector3> points = {a_, b_, c_};
+    bounding_box_ = BoundingBox(points);
 }
 
 // This method came from here:

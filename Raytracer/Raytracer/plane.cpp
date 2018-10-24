@@ -38,3 +38,7 @@ bool Plane::IntersectionWithPlane(const Ray* ray, const Vector3& normal, const V
     out_t = (point_on_plane - ray->start_point_).Dot(normal) / denominator;
     return out_t >= 0;
 }
+
+void Plane::GenerateBoundingBox() {
+    bounding_box_ = BoundingBox(0); // Planes are infinite, therefore, bounding them doesn't really make sense. An implementation could be imagined that did bound them, but that would be more difficult.
+}
