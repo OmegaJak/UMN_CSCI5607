@@ -21,6 +21,8 @@ class Scene {
     Color ApplyLightingModel(const Ray& ray, const Intersection& intersection, const int& recursive_depth);
 
     void AddPrimitive(Primitive* primitive);
+    void InitializeBVH();
+
     void SetAmbientLight(AmbientLight ambient_light);
     void AddLight(Light* light);
     void SetCamera(Camera camera);

@@ -8,6 +8,7 @@ class Rectangle : public Plane {
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
     void GenerateBoundingBox() override;
 
+    bool IsInfinite() override;
    private:
     Vector3 right_, up_, normed_right_, normed_up_;
     double right_length_, up_length_;

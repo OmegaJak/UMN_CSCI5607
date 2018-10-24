@@ -114,6 +114,10 @@ void Scene::AddPrimitive(Primitive* primitive) {
     objects_.AddChild(primitive);
 }
 
+void Scene::InitializeBVH() {
+    objects_.InitializeBVH();
+}
+
 void Scene::SetAmbientLight(AmbientLight ambient_light) {
 #ifdef _DEBUG
     std::cout << "Ambient light set to color " << ambient_light.GetColor() << "." << std::endl;

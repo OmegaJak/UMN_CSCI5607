@@ -16,6 +16,8 @@ class Plane : public Primitive {
         return normal_;
     }
 
+    bool IsInfinite() override;
+
    protected:
     Vector3 normal_, point_;
     bool two_sided_;

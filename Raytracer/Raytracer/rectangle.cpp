@@ -44,3 +44,7 @@ void Rectangle::GenerateBoundingBox() {
     std::vector<Vector3> points = {point_, point_ + right_, point_ + up_, point_ + up_ + right_};
     bounding_box_ = BoundingBox(points);
 }
+
+bool Rectangle::IsInfinite() {
+    return false;
+}

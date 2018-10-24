@@ -14,7 +14,6 @@ class Triangle : public Primitive {
 
     bool IntersectionWith(const Ray* ray, Intersection* out_intersection) override;
     void GenerateBoundingBox() override;
-
    private:
     BarycentricCoords ToBarycentricCoordinates(const Vector3& p) const;
 

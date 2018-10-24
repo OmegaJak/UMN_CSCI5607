@@ -40,5 +40,9 @@ bool Plane::IntersectionWithPlane(const Ray* ray, const Vector3& normal, const V
 }
 
 void Plane::GenerateBoundingBox() {
-    bounding_box_ = BoundingBox(0); // Planes are infinite, therefore, bounding them doesn't really make sense. An implementation could be imagined that did bound them, but that would be more difficult.
+    bounding_box_ = BoundingBox(INFINITY); // This should break things obviously if something tries to use this bounding box, which they shouldn't, because they're infinite
+}
+
+bool Plane::IsInfinite() {
+    return true;
 }

@@ -169,6 +169,7 @@ Renderer* Parser::Parse(const std::string& filename) {
         }
     }
 
+    scene->InitializeBVH();
     renderer->SetScene(scene);
     return renderer;
 }
