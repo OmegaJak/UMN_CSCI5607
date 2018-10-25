@@ -29,7 +29,8 @@ bool Triangle::IntersectionWith(const Ray* ray, Intersection* out_intersection) 
             if (has_normalized_verts_) {
                 weighted_normal = (bary.gamma * a_norm_);
                 weighted_normal += (bary.alpha * b_norm_);
-                weighted_normal += (bary.beta * c_norm_).Normalize();
+                weighted_normal += (bary.beta * c_norm_);
+                weighted_normal = weighted_normal.Normalize();
                 weighted_normal *= plane_.GetNormalFactorToFaceRay(*ray);
                 out_intersection->normal_ = weighted_normal;
             }

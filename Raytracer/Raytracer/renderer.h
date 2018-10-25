@@ -16,6 +16,7 @@ class Renderer {
     void SetDOF(double focal_distance, double lens_radius, int num_samples);
     void SetSuperSampleRadius(int radius);
     void SetJitteredSupersampling(bool jittered);
+    void SetMotionWarp(bool motion_warp);
 
     std::chrono::milliseconds Render(const double num_status_updates);
     void OutputImage() const;
@@ -26,7 +27,7 @@ class Renderer {
     int max_recursive_depth_;
     double focal_distance_, lens_radius_, sqr_supersample_rad_ = 1;
     int dof_samples_ = 1, supersample_radius_ = 1;
-    bool jittered_ = false;
+    bool jittered_ = false, motion_warp_ = false;
     std::string output_filename_;
     Image *image_ = nullptr;
     Scene *scene_;

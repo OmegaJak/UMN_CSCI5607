@@ -31,7 +31,7 @@ class Scene {
     void SetCameraAspectRatio(double aspect_ratio);
 
    private:
-    Camera* camera_;
+    Camera* camera_ = nullptr;
     IntersectableGroup objects_;
     std::vector<Light*> lights_{};
     AmbientLight ambient_light_;

@@ -49,6 +49,10 @@ void Renderer::SetJitteredSupersampling(bool jittered) {
     jittered_ = jittered;
 }
 
+void Renderer::SetMotionWarp(bool motion_warp) {
+    motion_warp_ = motion_warp;
+}
+
 std::chrono::milliseconds Renderer::Render(const double num_status_updates) {
     delete image_;
     image_ = new Image(render_width_, render_height_);
@@ -62,6 +66,9 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates) {
     for (int j = 0; j < render_height_; j++) {
         for (int i = 0; i < render_width_; i++) {
             int current_pixel = j * render_width_ + i;
+            if (motion_warp_) {
+                TimeKeeper::SetTime(current_pixel / double(total_pixels));
+            }
             if (num_status_updates != 0 && round((current_status / num_status_updates) * total_pixels) == current_pixel) {
                 std::cout << (current_status / num_status_updates) * 100 << "%" << std::endl;
                 current_status += 1;
