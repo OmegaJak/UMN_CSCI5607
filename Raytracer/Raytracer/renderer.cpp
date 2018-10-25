@@ -34,7 +34,22 @@ void Renderer::SetRecursiveDepth(int recursive_depth) {
     max_recursive_depth_ = recursive_depth;
 }
 
-std::chrono::milliseconds Renderer::Render(const double num_status_updates, const int supersample_radius, bool jittered) {
+void Renderer::SetDOF(double focal_distance, double lens_radius, int num_samples) {
+    focal_distance_ = focal_distance;
+    lens_radius_ = lens_radius;
+    dof_samples_ = num_samples;
+}
+
+void Renderer::SetSuperSampleRadius(int radius) {
+    supersample_radius_ = radius;
+    sqr_supersample_rad_ = supersample_radius_ * supersample_radius_;
+}
+
+void Renderer::SetJitteredSupersampling(bool jittered) {
+    jittered_ = jittered;
+}
+
+std::chrono::milliseconds Renderer::Render(const double num_status_updates) {
     delete image_;
     image_ = new Image(render_width_, render_height_);
 
@@ -42,6 +57,8 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates, cons
     Intersection intersection;
     int total_pixels = render_width_ * render_height_;
     int current_status = 0;
+    double ray_i, ray_j;
+    std::vector<Ray> rays;
     for (int j = 0; j < render_height_; j++) {
         for (int i = 0; i < render_width_; i++) {
             int current_pixel = j * render_width_ + i;
@@ -51,12 +68,30 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates, cons
             }
 
             Color color = Color(0, 0, 0);
-            for (int p = 0; p < supersample_radius; p++) {
-                for (int q = 0; q < supersample_radius; q++) {
-                    double r = jittered ? (rand() / double(RAND_MAX)) : 0.5;  // 0 to 1
-                    Ray ray = scene_->GetCamera()->ConstructRayThroughPixel(i + (p + r) / supersample_radius,
-                                                                           j + (q + r) / supersample_radius, render_width_, render_height_);
-                    color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+            for (int p = 0; p < supersample_radius_; p++) {
+                for (int q = 0; q < supersample_radius_; q++) {
+                    if (supersample_radius_ > 1) {
+                        double r = jittered_ ? (rand() / double(RAND_MAX)) : 0.5;  // 0 to 1
+                        ray_i = i + (p + r) / supersample_radius_;
+                        ray_j = j + (q + r) / supersample_radius_;
+                    } else {
+                        ray_i = i + 0.5;
+                        ray_j = j + 0.5;
+                    }
+
+                    if (dof_samples_ == 1) {
+                        Ray ray = scene_->GetCamera()->ConstructRayThroughPixel(ray_i, ray_j, render_width_, render_height_);
+                        color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+                    } else {
+                        Color temp_color = Color(0, 0, 0);
+                        rays = scene_->GetCamera()->ConstructRaysThroughPixel(ray_i, ray_j, render_width_, render_height_, focal_distance_, lens_radius_, dof_samples_);
+                        for (Ray ray : rays) {
+                            temp_color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
+                        }
+                        color += temp_color / dof_samples_;
+                    }
+
+                    //color += scene_->EvaluateRayTree(ray, max_recursive_depth_).Clamp();
                     /*int num_time_samples = 1;
                     Color tempColor = Color(0, 0, 0);
                     for (int time = 0; time < num_time_samples; time++) {
@@ -67,7 +102,7 @@ std::chrono::milliseconds Renderer::Render(const double num_status_updates, cons
                     intersection.ResetT();
                 }
             }
-            image_->SetPixel(i, j, (color / (supersample_radius * supersample_radius)).Clamp());
+            image_->SetPixel(i, j, (color / double(sqr_supersample_rad_)).Clamp());
         }
     }
 

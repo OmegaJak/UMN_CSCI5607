@@ -174,6 +174,12 @@ Renderer* Parser::Parse(const std::string& filename) {
             } else {
                 printf("Cannot set end_position because a positionable has not been initialized since the last call to end_position.\n");
             }
+        } else if (command == "DOF") {
+            renderer->SetDOF(params[0], params[1], int(params[2]));
+        } else if (command == "supersampling") {
+            renderer->SetSuperSampleRadius(int(params[0]));
+        } else if (command == "jittered_supersampling") {
+            renderer->SetJitteredSupersampling(params[0]);
         } else {
             printf("The command \"%s\" was in the num params map but is still unknown\n", command.c_str());
         }
@@ -231,4 +237,4 @@ map<string, int> Parser::expected_num_params = {
     {"camera", 10},           {"film_resolution", 2}, {"max_vertices", 1},  {"max_normals", 1}, {"vertex", 3},    {"normal", 3},
     {"triangle", 3},          {"normal_triangle", 6}, {"sphere", 4},        {"background", 3},  {"material", 14}, {"directional_light", 6},
     {"point_light", 6},       {"spot_light", 11},     {"ambient_light", 3}, {"max_depth", 1},   {"plane", 6},     {"quad", 9},
-    {"rectangular_prism", 12}, {"end_position", 3}};
+    {"rectangular_prism", 12}, {"end_position", 3}, {"DOF", 3}, {"supersampling", 1}, {"jittered_supersampling", 1}};

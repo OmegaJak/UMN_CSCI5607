@@ -14,6 +14,7 @@ class Vector3 {
     void Set(const Vector3 &other);
 
     Vector3 operator+(const Vector3 &other) const;
+    Vector3 &operator+=(const Vector3 &other);
     Vector3 operator-(const Vector3 &other) const;
     Vector3 operator*(const double &f) const;
     friend Vector3 operator*(const double &f, const Vector3 &vec);

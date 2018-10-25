@@ -35,6 +35,14 @@ Vector3 Vector3::operator+(const Vector3& other) const {
     return Vector3(x_ + other.GetX(), y_ + other.GetY(), z_ + other.GetZ());
 }
 
+Vector3& Vector3::operator+=(const Vector3& other) {
+    x_ += other.x_;
+    y_ += other.y_;
+    z_ += other.z_;
+
+    return *this;
+}
+
 Vector3 Vector3::operator-(const Vector3& other) const {
     return Vector3(x_ - other.x_, y_ - other.y_, z_ - other.z_);
 }

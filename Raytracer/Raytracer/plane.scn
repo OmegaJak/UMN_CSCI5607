@@ -8,6 +8,7 @@ quad -0.5 0.3 0.5 0 1 0 0 0 1
 #green sphere
 material 0 1 0 0 1 0 0 0 0 16 0 0 0 1.0
 sphere 2 2.5 1 1
+end_position 2 2.5 3
 
 #red rectangular prism
 material 1 0 0 1 0 0 0.3 0.3 0.3 30 0 0 0 1.2
@@ -26,3 +27,6 @@ ambient_light .25 .25 .25
 background .05 .05 .05
 
 max_depth 5
+supersampling 4
+jittered_supersampling 1
+DOF 4 0.1 20

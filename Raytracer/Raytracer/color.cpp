@@ -15,6 +15,8 @@ Color Color::operator*(const double& f) const {
 }
 
 Color Color::operator/(const double& f) const {
+    if (f == 1) return *this;
+
     return Color(red_ / f, green_ / f, blue_ / f);
 }
 

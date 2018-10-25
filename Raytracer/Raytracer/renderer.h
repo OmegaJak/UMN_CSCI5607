@@ -13,14 +13,20 @@ class Renderer {
     void SetOutputFilename(std::string filename);
     void SetScene(Scene *scene);
     void SetRecursiveDepth(int recursive_depth);
+    void SetDOF(double focal_distance, double lens_radius, int num_samples);
+    void SetSuperSampleRadius(int radius);
+    void SetJitteredSupersampling(bool jittered);
 
-    std::chrono::milliseconds Render(const double num_status_updates, const int supersample_radius, bool jittered = false);
+    std::chrono::milliseconds Render(const double num_status_updates);
     void OutputImage() const;
 
    private:
     int render_width_;
     int render_height_;
     int max_recursive_depth_;
+    double focal_distance_, lens_radius_, sqr_supersample_rad_ = 1;
+    int dof_samples_ = 1, supersample_radius_ = 1;
+    bool jittered_ = false;
     std::string output_filename_;
     Image *image_ = nullptr;
     Scene *scene_;
