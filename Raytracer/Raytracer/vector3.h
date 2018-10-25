@@ -15,6 +15,7 @@ class Vector3 {
 
     Vector3 operator+(const Vector3 &other) const;
     Vector3 &operator+=(const Vector3 &other);
+    Vector3 &operator*=(const int v);
     Vector3 operator-(const Vector3 &other) const;
     Vector3 operator*(const double &f) const;
     friend Vector3 operator*(const double &f, const Vector3 &vec);

@@ -43,6 +43,14 @@ Vector3& Vector3::operator+=(const Vector3& other) {
     return *this;
 }
 
+Vector3& Vector3::operator*=(const int v) {
+    x_ = x_ * v;
+    y_ = y_ * v;
+    z_ = z_ * v;
+
+    return *this;
+}
+
 Vector3 Vector3::operator-(const Vector3& other) const {
     return Vector3(x_ - other.x_, y_ - other.y_, z_ - other.z_);
 }

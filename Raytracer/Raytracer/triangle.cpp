@@ -19,6 +19,7 @@ Triangle::~Triangle() = default;
 
 bool Triangle::IntersectionWith(const Ray* ray, Intersection* out_intersection) {
     static Intersection plane_intersection; // Can't work in out_intersection in case the point isn't in the triangle
+    static Vector3 weighted_normal;
     plane_intersection.ResetT();
     if (plane_.IntersectionWith(ray, &plane_intersection)) {
         BarycentricCoords bary = ToBarycentricCoordinates(plane_intersection.hit_point_);
@@ -26,8 +27,10 @@ bool Triangle::IntersectionWith(const Ray* ray, Intersection* out_intersection) 
 
         if (inside_triangle && out_intersection->ConsiderIntersection(plane_intersection)) {
             if (has_normalized_verts_) {
-                Vector3 weighted_normal = ((bary.gamma * a_norm_) + (bary.alpha * b_norm_) + (bary.beta * c_norm_)).Normalize() *
-                                          plane_.GetNormalFactorToFaceRay(*ray);
+                weighted_normal = (bary.gamma * a_norm_);
+                weighted_normal += (bary.alpha * b_norm_);
+                weighted_normal += (bary.beta * c_norm_).Normalize();
+                weighted_normal *= plane_.GetNormalFactorToFaceRay(*ray);
                 out_intersection->normal_ = weighted_normal;
             }
             out_intersection->object_ = this;
