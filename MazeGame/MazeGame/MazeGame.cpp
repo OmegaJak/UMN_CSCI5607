@@ -14,6 +14,7 @@
 
 #include "constants.h"
 #include "shader_manager.h"
+#include "texture_manager.h"
 const char* INSTRUCTIONS =
     "***************\n"
     "This demo shows multiple objects being draw at once along with user interaction.\n"
@@ -98,56 +99,7 @@ int main(int argc, char* argv[]) {
     Model* knot = new Model("models/knot.txt");
     Model* teapot = new Model("models/teapot.txt");
 
-    //// Allocate Texture 0 (Wood) ///////
-    SDL_Surface* surface = SDL_LoadBMP("wood.bmp");
-    if (surface == NULL) {  // If it failed, print the error
-        printf("Error: \"%s\"\n", SDL_GetError());
-        return 1;
-    }
-    GLuint tex0;
-    glGenTextures(1, &tex0);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex0);
-
-    // What to do outside 0-1 range
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Load the texture into memory
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surface->pixels);
-    glGenerateMipmap(GL_TEXTURE_2D);  // Mip maps the texture
-
-    SDL_FreeSurface(surface);
-    //// End Allocate Texture ///////
-
-    //// Allocate Texture 1 (Brick) ///////
-    SDL_Surface* surface1 = SDL_LoadBMP("brick.bmp");
-    if (surface == NULL) {  // If it failed, print the error
-        printf("Error: \"%s\"\n", SDL_GetError());
-        return 1;
-    }
-    GLuint tex1;
-    glGenTextures(1, &tex1);
-
-    // Load the texture into memory
-    glActiveTexture(GL_TEXTURE1);
-
-    glBindTexture(GL_TEXTURE_2D, tex1);
-    // What to do outside 0-1 range
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // How to filter
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface1->w, surface1->h, 0, GL_BGR, GL_UNSIGNED_BYTE, surface1->pixels);
-    glGenerateMipmap(GL_TEXTURE_2D);  // Mip maps the texture
-
-    SDL_FreeSurface(surface1);
-    //// End Allocate Texture ///////
+    TextureManager::InitTextures();
 
     // Build a Vertex Array Object (VAO) to store mapping of shader attributes to VBO
     GLuint vao;
@@ -158,28 +110,11 @@ int main(int argc, char* argv[]) {
 
     int texturedShader = ShaderManager::InitShader("textured-Vertex.glsl", "textured-Fragment.glsl");
 
-    // Tell OpenGL how to set fragment shader input
-    GLint posAttrib = glGetAttribLocation(texturedShader, "position");
-    glVertexAttribPointer(posAttrib, VALUES_PER_POSITION, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float), POSITION_OFFSET);
-    // Attribute, vals/attrib., type, isNormalized, stride, offset
-    glEnableVertexAttribArray(posAttrib);
+    TextureManager::InitTextures();
 
     // GLint colAttrib = glGetAttribLocation(phongShader, "inColor");
     // glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
     // glEnableVertexAttribArray(colAttrib);
-
-    GLint normAttrib = glGetAttribLocation(texturedShader, "inNormal");
-    glVertexAttribPointer(normAttrib, VALUES_PER_NORMAL, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float),
-                          (void*)(NORMAL_OFFSET * sizeof(float)));
-    glEnableVertexAttribArray(normAttrib);
-
-    GLint texAttrib = glGetAttribLocation(texturedShader, "inTexcoord");
-    glEnableVertexAttribArray(texAttrib);
-    glVertexAttribPointer(texAttrib, VALUES_PER_TEXCOORD, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float),
-                          (void*)(TEXCOORD_OFFSET * sizeof(float)));
-
-    GLint uniView = glGetUniformLocation(texturedShader, "view");
-    GLint uniProj = glGetUniformLocation(texturedShader, "proj");
 
     glBindVertexArray(0);  // Unbind the VAO in case we want to create a new one
 
@@ -267,18 +202,12 @@ int main(int argc, char* argv[]) {
         glm::mat4 view = glm::lookAt(glm::vec3(camx, camy, camz),           // Cam Position
                                      glm::vec3(lookatx, lookaty, lookatz),  // Look at point
                                      glm::vec3(0.0f, 0.0f, 1.0f));          // Up
-        glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(ShaderManager::Attributes.view, 1, GL_FALSE, glm::value_ptr(view));
 
         glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 1.0f, 10.0f);  // FOV, aspect, near, far
-        glUniformMatrix4fv(uniProj, 1, GL_FALSE, glm::value_ptr(proj));
+        glUniformMatrix4fv(ShaderManager::Attributes.projection, 1, GL_FALSE, glm::value_ptr(proj));
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tex0);
-        glUniform1i(glGetUniformLocation(texturedShader, "tex0"), 0);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, tex1);
-        glUniform1i(glGetUniformLocation(texturedShader, "tex1"), 1);
+        TextureManager::Update();
 
         glBindVertexArray(vao);
         drawGeometry(texturedShader, teapot->vbo_vertex_start_index_, teapot->NumVerts(), knot->vbo_vertex_start_index_, knot->NumVerts());
@@ -287,7 +216,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Clean Up
-    glDeleteProgram(texturedShader);
+    ShaderManager::Cleanup();
     ModelManager::Cleanup();
     glDeleteVertexArrays(1, &vao);
 
@@ -297,11 +226,8 @@ int main(int argc, char* argv[]) {
 }
 
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts) {
-    GLint uniColor = glGetUniformLocation(shaderProgram, "inColor");
     glm::vec3 colVec(colR, colG, colB);
-    glUniform3fv(uniColor, 1, glm::value_ptr(colVec));
-
-    GLint uniTexID = glGetUniformLocation(shaderProgram, "texID");
+    glUniform3fv(ShaderManager::Attributes.color, 1, glm::value_ptr(colVec));
 
     //************
     // Draw model #1 the first time
@@ -313,11 +239,10 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     model = glm::rotate(model, timePassed * 3.14f / 2, glm::vec3(0.0f, 1.0f, 1.0f));
     model = glm::rotate(model, timePassed * 3.14f / 4, glm::vec3(1.0f, 0.0f, 0.0f));
     // model = glm::scale(model,glm::vec3(.2f,.2f,.2f)); //An example of scale
-    GLint uniModel = glGetUniformLocation(shaderProgram, "model");
-    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));  // pass model matrix to shader
+    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));  // pass model matrix to shader
 
     // Set which texture to use (-1 = no texture)
-    glUniform1i(uniTexID, -1);
+    glUniform1i(ShaderManager::Attributes.texID, UNTEXTURED);
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
     glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
@@ -331,10 +256,10 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     model = glm::mat4();  // Load intensity
     model = glm::translate(model, glm::vec3(-2, -1, -.4));
     // model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
-    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));
 
     // Set which texture to use (0 = wood texture ... bound to GL_TEXTURE0)
-    glUniform1i(uniTexID, 0);
+    glUniform1i(ShaderManager::Attributes.texID, TEX0);
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
     glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
@@ -351,8 +276,8 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     model = glm::translate(model, glm::vec3(objx, objy, objz));
 
     // Set which texture to use (1 = brick texture ... bound to GL_TEXTURE1)
-    glUniform1i(uniTexID, 1);
-    glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+    glUniform1i(ShaderManager::Attributes.texID, TEX1);
+    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
     glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)

@@ -2,9 +2,47 @@
 #include "shader_manager.h"
 
 int ShaderManager::InitShader(const std::string& vertex_shader_file, const std::string& fragment_shader_file) {
-    textured_shader_ = CompileShaderProgram(vertex_shader_file, fragment_shader_file);
+    Textured_Shader = CompileShaderProgram(vertex_shader_file, fragment_shader_file);
+    InitShaderAttributes();
 
-    return textured_shader_;
+    return Textured_Shader;
+}
+
+void ShaderManager::Cleanup() {
+    glDeleteProgram(Textured_Shader);
+}
+
+// Tell OpenGL how to set fragment shader input
+void ShaderManager::InitShaderAttributes() {
+    GLint posAttrib = glGetAttribLocation(Textured_Shader, "position");
+    glVertexAttribPointer(posAttrib, VALUES_PER_POSITION, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float), POSITION_OFFSET);
+    // Attribute, vals/attrib., type, isNormalized, stride, offset
+    glEnableVertexAttribArray(posAttrib);
+
+    GLint normAttrib = glGetAttribLocation(Textured_Shader, "inNormal");
+    glVertexAttribPointer(normAttrib, VALUES_PER_NORMAL, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float),
+                          (void*)(NORMAL_OFFSET * sizeof(float)));
+    glEnableVertexAttribArray(normAttrib);
+
+    GLint texAttrib = glGetAttribLocation(Textured_Shader, "inTexcoord");
+    glEnableVertexAttribArray(texAttrib);
+    glVertexAttribPointer(texAttrib, VALUES_PER_TEXCOORD, GL_FLOAT, GL_FALSE, ATTRIBUTE_STRIDE * sizeof(float),
+                          (void*)(TEXCOORD_OFFSET * sizeof(float)));
+
+    GLint uniColor = glGetUniformLocation(Textured_Shader, "inColor");
+    GLint uniTexID = glGetUniformLocation(Textured_Shader, "texID");
+    GLint uniView = glGetUniformLocation(Textured_Shader, "view");
+    GLint uniProj = glGetUniformLocation(Textured_Shader, "proj");
+    GLint uniModel = glGetUniformLocation(Textured_Shader, "model");
+
+    Attributes.position = posAttrib;
+    Attributes.normals = normAttrib;
+    Attributes.texCoord = texAttrib;
+    Attributes.color = uniColor;
+    Attributes.texID = uniTexID;
+    Attributes.view = uniView;
+    Attributes.projection = uniProj;
+    Attributes.model = uniModel;
 }
 
 GLuint ShaderManager::CompileShaderProgram(const std::string& vertex_shader_file, const std::string& fragment_shader_file) {
@@ -121,4 +159,6 @@ void ShaderManager::VerifyShaderCompiled(GLuint shader) {
     }
 }
 
-GLuint ShaderManager::textured_shader_;
+GLuint ShaderManager::Textured_Shader;
+
+ShaderAttributes ShaderManager::Attributes;
