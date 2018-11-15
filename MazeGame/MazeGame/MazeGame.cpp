@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "constants.h"
 #include "game_object.h"
+#include "map_loader.h"
 #include "shader_manager.h"
 #include "texture_manager.h"
 const char* INSTRUCTIONS =
@@ -91,26 +92,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    // Here we will load two different model files
-    Model* knot_model = new Model("models/knot.txt");
-    Model* teapot_model = new Model("models/teapot.txt");
-
-    // Initialize GameObjects
-    GameObject* knot = new GameObject(knot_model);
-    knot->Scale(glm::vec3(0.8, 0.8, 0.8));
-    knot->SetTextureIndex(TEX1);
-
-    GameObject* untextured_teapot = new GameObject(teapot_model);
-    untextured_teapot->SetColor(glm::vec3(1.f, 0.f, 0.f));
-
-    GameObject* textured_teapot = new GameObject(teapot_model);
-    textured_teapot->Translate(glm::vec3(-2, -1, -.4));
-    textured_teapot->SetTextureIndex(TEX0);
-
-    std::vector<Updatable*> updatables;
-    updatables.push_back(knot);
-    updatables.push_back(untextured_teapot);
-    updatables.push_back(textured_teapot);
+    MapLoader map_loader;
+    std::vector<GameObject> map_elements = map_loader.LoadMap("map1.txt");
 
     // Load the textures
     TextureManager::InitTextures();
@@ -152,7 +135,6 @@ int main(int argc, char* argv[]) {
             //     We can use the ".mod" flag to see if modifiers such as shift are pressed
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP) {  // If "up key" is pressed
                 if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                    knot->Translate(glm::vec3(-0.1, 0, 0));
                 } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
                     if (windowEvent.key.keysym.mod & KMOD_ALT) {
                         camx -= 0.1;
@@ -162,12 +144,10 @@ int main(int argc, char* argv[]) {
                         lookatz += 0.1;
                     }
                 } else {
-                    knot->Translate(glm::vec3(0, 0, 0.1));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN) {  // If "down key" is pressed
                 if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                    knot->Translate(glm::vec3(0.1, 0, 0));
                 } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
                     if (windowEvent.key.keysym.mod & KMOD_ALT) {
                         camx += 0.1;
@@ -177,7 +157,6 @@ int main(int argc, char* argv[]) {
                         lookatz -= 0.1;
                     }
                 } else {
-                    knot->Translate(glm::vec3(0, 0, -0.1));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT) {  // If "left key" is pressed
@@ -185,7 +164,6 @@ int main(int argc, char* argv[]) {
                     camy -= 0.1;
                     lookaty -= 0.1;
                 } else {
-                    knot->Translate(glm::vec3(0, -0.1, 0));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT) {  // If "right key" is pressed
@@ -193,11 +171,9 @@ int main(int argc, char* argv[]) {
                     camy += 0.1;
                     lookaty += 0.1;
                 } else {
-                    knot->Translate(glm::vec3(0.f, 0.1f, 0.f));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_c) {  // If "c" is pressed
-                untextured_teapot->SetColor(glm::vec3(rand01(), rand01(), rand01()));
             }
         }
 
@@ -220,14 +196,9 @@ int main(int argc, char* argv[]) {
 
         glBindVertexArray(vao);
 
-        // Rotate the teapot
-        untextured_teapot->Reset();
-        untextured_teapot->Rotate(timePassed * 3.14f / 2, glm::vec3(0.0f, 1.0f, 1.0f));
-        untextured_teapot->Rotate(timePassed * 3.14f / 4, glm::vec3(1.0f, 0.0f, 0.0f));
-
         // Update each updatable (render gameobjects, etc)
-        for (Updatable* updatable : updatables) {
-            updatable->Update();
+        for (GameObject game_object : map_elements) {
+            game_object.Update();
         }
 
         SDL_GL_SwapWindow(window);  // Double buffering

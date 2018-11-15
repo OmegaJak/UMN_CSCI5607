@@ -1,4 +1,5 @@
 #pragma once
+#include "material.h"
 #include "model.h"
 #include "texture_manager.h"
 #include "transformable.h"
@@ -11,12 +12,12 @@ class GameObject : public Transformable, public Updatable {
     virtual ~GameObject();
 
     void SetTextureIndex(TEXTURE texture_index);
-    void SetColor(const glm::vec3& color);
 
     void Update() override;
+
+    Material material_;
 
    private:
     Model* model_;
     TEXTURE texture_index_;
-    glm::vec3 default_color_;
 };
