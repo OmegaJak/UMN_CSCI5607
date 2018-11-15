@@ -12,6 +12,7 @@
 // Phong lighting
 // Binding multiple textures to one shader
 
+#include "camera.h"
 #include "constants.h"
 #include "game_object.h"
 #include "shader_manager.h"
@@ -53,16 +54,10 @@ int screenWidth = 800;
 int screenHeight = 600;
 float timePassed = 0;
 
-// SJG: Store the object coordinates
-// You should have a representation for the state of each object
-float objx = 0, objy = 0, objz = 0;
-float colR = 1, colG = 1, colB = 1;
 float camx = 3, camy = 0, camz = 0;
 float lookatx = 0, lookaty = 0, lookatz = 0;
 
-GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName);
 bool fullscreen = false;
-void Win2PPM(int width, int height);
 
 // srand(time(NULL));
 float rand01() {
@@ -131,9 +126,7 @@ int main(int argc, char* argv[]) {
 
     TextureManager::InitTextures();
 
-    // GLint colAttrib = glGetAttribLocation(phongShader, "inColor");
-    // glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
-    // glEnableVertexAttribArray(colAttrib);
+    Camera camera = Camera();
 
     glBindVertexArray(0);  // Unbind the VAO in case we want to create a new one
 
@@ -159,7 +152,7 @@ int main(int argc, char* argv[]) {
             //     We can use the ".mod" flag to see if modifiers such as shift are pressed
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP) {  // If "up key" is pressed
                 if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                    objx -= .1;  // Is shift pressed?
+                    knot->Translate(glm::vec3(-0.1, 0, 0));
                 } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
                     if (windowEvent.key.keysym.mod & KMOD_ALT) {
                         camx -= 0.1;
@@ -169,12 +162,12 @@ int main(int argc, char* argv[]) {
                         lookatz += 0.1;
                     }
                 } else {
-                    knot->Translate(glm::vec3(0.f, 0.f, 0.1f));
+                    knot->Translate(glm::vec3(0, 0, 0.1));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN) {  // If "down key" is pressed
                 if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                    objx += .1;  // Is shift pressed?
+                    knot->Translate(glm::vec3(0.1, 0, 0));
                 } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
                     if (windowEvent.key.keysym.mod & KMOD_ALT) {
                         camx += 0.1;
@@ -184,7 +177,7 @@ int main(int argc, char* argv[]) {
                         lookatz -= 0.1;
                     }
                 } else {
-                    knot->Translate(glm::vec3(0.f, 0.f, 0.1f));
+                    knot->Translate(glm::vec3(0, 0, -0.1));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT) {  // If "left key" is pressed
@@ -192,7 +185,7 @@ int main(int argc, char* argv[]) {
                     camy -= 0.1;
                     lookaty -= 0.1;
                 } else {
-                    knot->Translate(glm::vec3(0.f, -0.1f, 0.f));
+                    knot->Translate(glm::vec3(0, -0.1, 0));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT) {  // If "right key" is pressed
@@ -216,10 +209,9 @@ int main(int argc, char* argv[]) {
 
         timePassed = SDL_GetTicks() / 1000.f;
 
-        glm::mat4 view = glm::lookAt(glm::vec3(camx, camy, camz),           // Cam Position
-                                     glm::vec3(lookatx, lookaty, lookatz),  // Look at point
-                                     glm::vec3(0.0f, 0.0f, 1.0f));          // Up
-        glUniformMatrix4fv(ShaderManager::Attributes.view, 1, GL_FALSE, glm::value_ptr(view));
+        camera.SetPosition(glm::vec3(camx, camy, camz));
+        camera.SetLookAt(glm::vec3(lookatx, lookaty, lookatz));
+        camera.Update();
 
         glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 1.0f, 10.0f);  // FOV, aspect, near, far
         glUniformMatrix4fv(ShaderManager::Attributes.projection, 1, GL_FALSE, glm::value_ptr(proj));

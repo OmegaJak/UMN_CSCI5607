@@ -10,7 +10,7 @@ class Transformable {
 
     void Reset();
     void Rotate(float radians, const glm::vec3& around);
-    void Translate(glm::vec3 translate_by);
+    void Translate(const glm::vec3& translate_by);
     void Scale(const glm::vec3& scale);
 
    protected:

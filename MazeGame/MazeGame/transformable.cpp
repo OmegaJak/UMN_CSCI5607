@@ -14,7 +14,7 @@ void Transformable::Rotate(float radians, const glm::vec3& around) {
     transform_ = glm::rotate(transform_, radians, around);
 }
 
-void Transformable::Translate(glm::vec3 translate_by) {
+void Transformable::Translate(const glm::vec3& translate_by) {
     transform_ = glm::translate(transform_, translate_by);
 }
 

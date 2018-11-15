@@ -9,7 +9,7 @@ GameObject::GameObject(Model* model) : model_(model), texture_index_(UNTEXTURED)
     default_color_ = glm::vec3(1.f, 0.f, 1.f);
 }
 
-GameObject::~GameObject() {}
+GameObject::~GameObject() = default;
 
 void GameObject::SetTextureIndex(TEXTURE texture_index) {
     texture_index_ = texture_index;
