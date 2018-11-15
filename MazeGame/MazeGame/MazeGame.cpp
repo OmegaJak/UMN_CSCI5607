@@ -13,6 +13,7 @@
 // Binding multiple textures to one shader
 
 #include "constants.h"
+#include "game_object.h"
 #include "shader_manager.h"
 #include "texture_manager.h"
 const char* INSTRUCTIONS =
@@ -96,9 +97,27 @@ int main(int argc, char* argv[]) {
     }
 
     // Here we will load two different model files
-    Model* knot = new Model("models/knot.txt");
-    Model* teapot = new Model("models/teapot.txt");
+    Model* knot_model = new Model("models/knot.txt");
+    Model* teapot_model = new Model("models/teapot.txt");
 
+    // Initialize GameObjects
+    GameObject* knot = new GameObject(knot_model);
+    knot->Scale(glm::vec3(0.8, 0.8, 0.8));
+    knot->SetTextureIndex(TEX1);
+
+    GameObject* untextured_teapot = new GameObject(teapot_model);
+    untextured_teapot->SetColor(glm::vec3(1.f, 0.f, 0.f));
+
+    GameObject* textured_teapot = new GameObject(teapot_model);
+    textured_teapot->Translate(glm::vec3(-2, -1, -.4));
+    textured_teapot->SetTextureIndex(TEX0);
+
+    std::vector<Updatable*> updatables;
+    updatables.push_back(knot);
+    updatables.push_back(untextured_teapot);
+    updatables.push_back(textured_teapot);
+
+    // Load the textures
     TextureManager::InitTextures();
 
     // Build a Vertex Array Object (VAO) to store mapping of shader attributes to VBO
@@ -108,7 +127,7 @@ int main(int argc, char* argv[]) {
 
     ModelManager::InitVBO();
 
-    int texturedShader = ShaderManager::InitShader("textured-Vertex.glsl", "textured-Fragment.glsl");
+    ShaderManager::InitShader("textured-Vertex.glsl", "textured-Fragment.glsl");
 
     TextureManager::InitTextures();
 
@@ -150,7 +169,7 @@ int main(int argc, char* argv[]) {
                         lookatz += 0.1;
                     }
                 } else {
-                    objz += .1;
+                    knot->Translate(glm::vec3(0.f, 0.f, 0.1f));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN) {  // If "down key" is pressed
@@ -165,7 +184,7 @@ int main(int argc, char* argv[]) {
                         lookatz -= 0.1;
                     }
                 } else {
-                    objz -= .1;
+                    knot->Translate(glm::vec3(0.f, 0.f, 0.1f));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT) {  // If "left key" is pressed
@@ -173,7 +192,7 @@ int main(int argc, char* argv[]) {
                     camy -= 0.1;
                     lookaty -= 0.1;
                 } else {
-                    objy -= .1;
+                    knot->Translate(glm::vec3(0.f, -0.1f, 0.f));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT) {  // If "right key" is pressed
@@ -181,13 +200,11 @@ int main(int argc, char* argv[]) {
                     camy += 0.1;
                     lookaty += 0.1;
                 } else {
-                    objy += .1;
+                    knot->Translate(glm::vec3(0.f, 0.1f, 0.f));
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_c) {  // If "c" is pressed
-                colR = rand01();
-                colG = rand01();
-                colB = rand01();
+                untextured_teapot->SetColor(glm::vec3(rand01(), rand01(), rand01()));
             }
         }
 
@@ -195,7 +212,7 @@ int main(int argc, char* argv[]) {
         glClearColor(.2f, 0.4f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(texturedShader);
+        glUseProgram(ShaderManager::Textured_Shader);
 
         timePassed = SDL_GetTicks() / 1000.f;
 
@@ -210,7 +227,16 @@ int main(int argc, char* argv[]) {
         TextureManager::Update();
 
         glBindVertexArray(vao);
-        drawGeometry(texturedShader, teapot->vbo_vertex_start_index_, teapot->NumVerts(), knot->vbo_vertex_start_index_, knot->NumVerts());
+
+        // Rotate the teapot
+        untextured_teapot->Reset();
+        untextured_teapot->Rotate(timePassed * 3.14f / 2, glm::vec3(0.0f, 1.0f, 1.0f));
+        untextured_teapot->Rotate(timePassed * 3.14f / 4, glm::vec3(1.0f, 0.0f, 0.0f));
+
+        // Update each updatable (render gameobjects, etc)
+        for (Updatable* updatable : updatables) {
+            updatable->Update();
+        }
 
         SDL_GL_SwapWindow(window);  // Double buffering
     }
@@ -223,62 +249,4 @@ int main(int argc, char* argv[]) {
     SDL_GL_DeleteContext(context);
     SDL_Quit();
     return 0;
-}
-
-void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts) {
-    glm::vec3 colVec(colR, colG, colB);
-    glUniform3fv(ShaderManager::Attributes.color, 1, glm::value_ptr(colVec));
-
-    //************
-    // Draw model #1 the first time
-    // This model is stored in the VBO starting a offset model1_start and with model1_numVerts num of verticies
-    //*************
-
-    // Rotate model (matrix) based on how much time has passed
-    glm::mat4 model;
-    model = glm::rotate(model, timePassed * 3.14f / 2, glm::vec3(0.0f, 1.0f, 1.0f));
-    model = glm::rotate(model, timePassed * 3.14f / 4, glm::vec3(1.0f, 0.0f, 0.0f));
-    // model = glm::scale(model,glm::vec3(.2f,.2f,.2f)); //An example of scale
-    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));  // pass model matrix to shader
-
-    // Set which texture to use (-1 = no texture)
-    glUniform1i(ShaderManager::Attributes.texID, UNTEXTURED);
-
-    // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
-
-    //************
-    // Draw model #1 the second time
-    // This model is stored in the VBO starting a offset model1_start and with model1_numVerts num. of verticies
-    //*************
-
-    // Translate the model (matrix) left and back
-    model = glm::mat4();  // Load intensity
-    model = glm::translate(model, glm::vec3(-2, -1, -.4));
-    // model = glm::scale(model,2.f*glm::vec3(1.f,1.f,0.5f)); //scale example
-    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));
-
-    // Set which texture to use (0 = wood texture ... bound to GL_TEXTURE0)
-    glUniform1i(ShaderManager::Attributes.texID, TEX0);
-
-    // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
-
-    //************
-    // Draw model #2 once
-    // This model is stored in the VBO starting a offset model2_start and with model2_numVerts num of verticies
-    //*************
-
-    // Translate the model (matrix) based on where objx/y/z is
-    // ... these variables are set when the user presses the arrow keys
-    model = glm::mat4();
-    model = glm::scale(model, glm::vec3(.8f, .8f, .8f));  // scale this model
-    model = glm::translate(model, glm::vec3(objx, objy, objz));
-
-    // Set which texture to use (1 = brick texture ... bound to GL_TEXTURE1)
-    glUniform1i(ShaderManager::Attributes.texID, TEX1);
-    glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE, glm::value_ptr(model));
-
-    // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
 }

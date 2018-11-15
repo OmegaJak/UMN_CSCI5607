@@ -1,6 +1,7 @@
 #pragma once
+#include "glad.h"
 
-typedef enum { UNTEXTURED = -1, TEX0 = 0, TEX1 = 1 } TEXTURES;
+typedef enum { UNTEXTURED = -1, TEX0 = 0, TEX1 = 1 } TEXTURE;
 
 class TextureManager {
    public:
