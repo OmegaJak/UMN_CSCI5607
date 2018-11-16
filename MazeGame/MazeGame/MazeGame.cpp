@@ -55,9 +55,6 @@ int screenWidth = 800;
 int screenHeight = 600;
 float timePassed = 0;
 
-float camx = 3, camy = 0, camz = 0;
-float lookatx = 0, lookaty = 0, lookatz = 0;
-
 bool fullscreen = false;
 
 // srand(time(NULL));
@@ -126,54 +123,9 @@ int main(int argc, char* argv[]) {
             // List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
             // Scancode refers to a keyboard position, keycode refers to the letter (e.g., EU keyboards)
             if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_ESCAPE) quit = true;  // Exit event loop
-            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_f) {                  // If "f" is pressed
+            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_F11) {                // If F11 is pressed
                 fullscreen = !fullscreen;
                 SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
-            }
-
-            // SJG: Use key input to change the state of the object
-            //     We can use the ".mod" flag to see if modifiers such as shift are pressed
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_UP) {  // If "up key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
-                    if (windowEvent.key.keysym.mod & KMOD_ALT) {
-                        camx -= 0.1;
-                        lookatx -= 0.1;
-                    } else {
-                        camz += .1;
-                        lookatz += 0.1;
-                    }
-                } else {
-                }
-            }
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_DOWN) {  // If "down key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_SHIFT) {
-                } else if (windowEvent.key.keysym.mod & KMOD_CTRL) {
-                    if (windowEvent.key.keysym.mod & KMOD_ALT) {
-                        camx += 0.1;
-                        lookatx += 0.1;
-                    } else {
-                        camz -= .1;
-                        lookatz -= 0.1;
-                    }
-                } else {
-                }
-            }
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_LEFT) {  // If "left key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_CTRL) {
-                    camy -= 0.1;
-                    lookaty -= 0.1;
-                } else {
-                }
-            }
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_RIGHT) {  // If "right key" is pressed
-                if (windowEvent.key.keysym.mod & KMOD_CTRL) {
-                    camy += 0.1;
-                    lookaty += 0.1;
-                } else {
-                }
-            }
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_c) {  // If "c" is pressed
             }
         }
 
@@ -185,8 +137,6 @@ int main(int argc, char* argv[]) {
 
         timePassed = SDL_GetTicks() / 1000.f;
 
-        camera.SetPosition(glm::vec3(camx, camy, camz));
-        camera.SetLookAt(glm::vec3(lookatx, lookaty, lookatz));
         camera.Update();
 
         glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 1.0f, 10.0f);  // FOV, aspect, near, far
