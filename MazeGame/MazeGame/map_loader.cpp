@@ -51,21 +51,28 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
         exit(1);
     }
 
+    GameObject ground = GameObject(wall_model_);
+    ground.Scale(glm::vec3(1, 1, 0));
+    ground.Translate(glm::vec3(width / 2, height / 2, 0));
+    ground.Scale(glm::vec3(width, height, 1));
+    ground.material_.color_ = glm::vec3(0.8, 0.8, 0.8);
+    map_elements.push_back(ground);
+
     GameObject current_object;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             char current_char = lines[j][i];
             if (IsKey(current_char)) {
                 current_object = GameObject(key_model_);
-                current_object.Translate(glm::vec3(i, j, 1));
+                current_object.Translate(glm::vec3(i, j, 0.5));
             } else if (IsDoor(current_char)) {
                 current_object = GameObject(door_model_);
-                current_object.Translate(glm::vec3(i, j, 1));
+                current_object.Translate(glm::vec3(i, j, 0.5));
             } else {
                 switch (current_char) {
                     case 'W':
                         current_object = GameObject(wall_model_);
-                        current_object.Translate(glm::vec3(i, j, 1));
+                        current_object.Translate(glm::vec3(i, j, 0.5));
                         current_object.SetTextureIndex(TEX0);
                     case 'S':
                         break;
