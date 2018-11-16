@@ -16,7 +16,6 @@ MapLoader::~MapLoader() {}
 
 std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
     int width, height;
-    char c;
     std::vector<GameObject> map_elements;
 
     std::fstream file(filename);
@@ -52,10 +51,10 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
     }
 
     GameObject ground = GameObject(wall_model_);
-    ground.Scale(glm::vec3(1, 1, 0));
-    ground.Translate(glm::vec3(width / 2, height / 2, 0));
-    ground.Scale(glm::vec3(width, height, 1));
-    ground.material_.color_ = glm::vec3(0.8, 0.8, 0.8);
+    ground.transform.Scale(glm::vec3(1, 1, 0));
+    ground.transform.Translate(glm::vec3(width / 2, height / 2, 0));
+    ground.transform.Scale(glm::vec3(width, height, 1));
+    ground.material.color_ = glm::vec3(0.8, 0.8, 0.8);
     map_elements.push_back(ground);
 
     GameObject current_object;
@@ -64,15 +63,15 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
             char current_char = lines[j][i];
             if (IsKey(current_char)) {
                 current_object = GameObject(key_model_);
-                current_object.Translate(glm::vec3(i, j, 0.5));
+                current_object.transform.Translate(glm::vec3(i, j, 0.5));
             } else if (IsDoor(current_char)) {
                 current_object = GameObject(door_model_);
-                current_object.Translate(glm::vec3(i, j, 0.5));
+                current_object.transform.Translate(glm::vec3(i, j, 0.5));
             } else {
                 switch (current_char) {
                     case 'W':
                         current_object = GameObject(wall_model_);
-                        current_object.Translate(glm::vec3(i, j, 0.5));
+                        current_object.transform.Translate(glm::vec3(i, j, 0.5));
                         current_object.SetTextureIndex(TEX0);
                     case 'S':
                         break;
@@ -85,7 +84,7 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
                 }
             }
 
-            current_object.material_ = GetMaterialForCharacter(current_char);
+            current_object.material = GetMaterialForCharacter(current_char);
             map_elements.push_back(current_object);
         }
     }
@@ -96,15 +95,15 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
 Material MapLoader::GetMaterialForCharacter(char c) {
     switch (std::tolower(c)) {
         case 'a':
-            return Material(1, 0.9, 0);
+            return Material(1, 0.9f, 0);
         case 'b':
-            return Material(0.3, 0.5, 0.8);
+            return Material(0.3f, 0.5f, 0.8f);
         case 'c':
-            return Material(0.5, 0.7, 0.1);
+            return Material(0.5f, 0.7f, 0.1f);
         case 'd':
-            return Material(0.1, 0.2, 0.3);
+            return Material(0.1f, 0.2f, 0.3f);
         case 'e':
-            return Material(0.8, 0.2, 0.8);
+            return Material(0.8f, 0.2f, 0.8f);
         case 's':
             return Material(0, 1, 1);
         case 'g':

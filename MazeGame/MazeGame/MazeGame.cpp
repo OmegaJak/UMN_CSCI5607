@@ -4,8 +4,8 @@
 // This example demonstrates:
 // Loading multiple models (a cube and a knot)
 // Using multiple textures (wood and brick)
-// Instancing (the teapot is drawn in two locatons)
-// Continuous keyboard input - arrows (moves knot up/down/left/right continueous on being held)
+// Instancing (the teapot is drawn in two locations)
+// Continuous keyboard input - arrows (moves knot up/down/left/right continuous on being held)
 // Keyboard modifiers - shift (up/down arrows move knot in/out of screen when shift is pressed)
 // Single key events - pressing 'c' changes color of a random teapot
 // Mixing textures and colors for models

@@ -32,3 +32,12 @@ int Model::NumElements() const {
 int Model::NumVerts() const {
     return num_verts_;
 }
+
+std::vector<glm::vec4> Model::Vertices() const {
+    std::vector<glm::vec4> verts;
+    for (int i = POSITION_OFFSET; i < NumElements(); i += ATTRIBUTE_STRIDE) {
+        verts.push_back(glm::vec4(model_[i], model_[i + 1], model_[i + 2], 1.0));  // These are positions so w=1 for vec4s
+    }
+
+    return verts;
+}
