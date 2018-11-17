@@ -6,10 +6,13 @@
 #include "transformable.h"
 #include "updatable.h"
 
+class Map;
+
 class GameObject : public Updatable {
    public:
     GameObject();
-    explicit GameObject(Model* model);
+    GameObject(Model* model);
+    GameObject(Model* model, Map* map);
     virtual ~GameObject();
 
     void SetTextureIndex(TEXTURE texture_index);
@@ -30,4 +33,5 @@ class GameObject : public Updatable {
     std::shared_ptr<BoundingBox> bounding_box_;
     Model* model_;
     TEXTURE texture_index_;
+    Map* map_;
 };

@@ -1,5 +1,8 @@
+#define GLM_FORCE_RADIANS
+
 #include <SDL.h>
 #include "constants.h"
+#include "map.h"
 #include "player.h"
 
 Player::Player(Camera* camera, Map* map) : GameObject() {
@@ -69,9 +72,15 @@ void Player::Update() {
            bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
 }
 
+glm::vec3 Player::GetKeyPosition() {
+    return camera_->GetLookDirection();
+}
+
 void Player::SetTransformToCameraPosition() {
     transform->ResetLocalTransform();
-    transform->Translate(camera_->GetPosition());
+    // transform->ApplyMatrix(glm::rotate(glm::mat4(), camera_->GetTotalHorizontalRotation(), glm::vec3(0, 0, 1)));
+    transform->ApplyMatrix(camera_->GetTransformMatrix());
+
     InitBoundingBox(box_);
     bounding_box_->transform->ClearParent();
 }

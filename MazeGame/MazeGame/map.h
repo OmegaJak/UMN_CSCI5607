@@ -5,10 +5,9 @@
 #include "game_object.h"
 #include "goal.h"
 #include "key.h"
+#include "player.h"
 #include "spawn.h"
 #include "wall.h"
-
-class Player;
 
 class Map {
    public:
@@ -20,6 +19,8 @@ class Map {
 
     void UpdateAll();
     bool IntersectsAnySolidObjects(GameObject* object);
+    Player* IntersectsPlayer(GameObject* object);
+    Door* IntersectsDoor(GameObject* object);
 
     glm::vec3 SpawnPosition() const;
     glm::vec3 GoalPosition() const;

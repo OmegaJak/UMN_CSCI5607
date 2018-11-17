@@ -12,12 +12,17 @@ class Camera : public Updatable {
     glm::mat4 Translate(float right, float up, float forward);
 
     void SetPosition(const glm::vec3& position);
-    glm::vec3 GetPosition() const;
     void SetLookAt(const glm::vec3& look_at_position);
     void SetUp(const glm::vec3& up);
+
+    glm::mat4 GetTransformMatrix() const;
+    glm::vec3 GetLookDirection() const;
+    float GetTotalHorizontalRotation() const;
 
     void Update() override;
 
    private:
+    float total_horizontal_rotation = 0;
+
     glm::vec3 position_, look_at_, up_;
 };

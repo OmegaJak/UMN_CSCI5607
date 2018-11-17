@@ -5,16 +5,21 @@
 #include <gtc/type_ptr.hpp>
 #include "game_object.h"
 #include "glad.h"
+#include "map.h"
 #include "shader_manager.h"
 
 GameObject::GameObject() {
     model_ = nullptr;
+    map_ = nullptr;
     texture_index_ = UNTEXTURED;
     transform = std::make_shared<Transformable>();
 }
 
-GameObject::GameObject(Model* model) : GameObject() {
+GameObject::GameObject(Model* model) : GameObject(model, nullptr) {}
+
+GameObject::GameObject(Model* model, Map* map) : GameObject() {
     model_ = model;
+    map_ = map;
     texture_index_ = UNTEXTURED;
     material = Material(glm::vec3(1, 0, 1));
 

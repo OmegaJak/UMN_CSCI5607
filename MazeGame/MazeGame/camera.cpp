@@ -1,9 +1,12 @@
+#define GLM_FORCE_RADIANS
+
 #include <SDL.h>
 #include <gtc/type_ptr.hpp>
 #include "camera.h"
 #include "constants.h"
 #include "glad.h"
 #include "gtx/rotate_vector.hpp"
+#include "gtx/vector_angle.hpp"
 #include "shader_manager.h"
 
 Camera::Camera() {
@@ -26,7 +29,8 @@ glm::mat4 Camera::Rotate(float vertical_rotation, float horizontal_rotation, flo
 
     if (abs(horizontal_rotation) > ABSOLUTE_TOLERANCE) {
         look_at_ = glm::rotate(look_at_ - position_, -horizontal_rotation, up_) + position_;
-        rotation_matrix = glm::rotate(rotation_matrix, horizontal_rotation, up_);
+        rotation_matrix = glm::rotate(rotation_matrix, -horizontal_rotation, up_);
+        total_horizontal_rotation -= horizontal_rotation;
     }
 
     if (abs(roll_rotation) > ABSOLUTE_TOLERANCE) {
@@ -52,16 +56,29 @@ void Camera::SetPosition(const glm::vec3& position) {
     position_ = position;
 }
 
-glm::vec3 Camera::GetPosition() const {
-    return position_;
-}
-
 void Camera::SetLookAt(const glm::vec3& look_at_position) {
     look_at_ = look_at_position;
 }
 
 void Camera::SetUp(const glm::vec3& up) {
     up_ = up;
+}
+
+glm::mat4 Camera::GetTransformMatrix() const {
+    // return glm::inverse(glm::lookAt(position_, look_at_, up_));
+    glm::mat4 transform;
+    // float horizontal_rotation = glm::angle(GetLookDirection(), glm::vec3(-1, 0, 0));
+    // transform = glm::rotate(transform, horizontal_rotation, up_);
+    transform = glm::translate(transform, position_);
+    return transform;
+}
+
+glm::vec3 Camera::GetLookDirection() const {
+    return glm::normalize(look_at_ - position_);
+}
+
+float Camera::GetTotalHorizontalRotation() const {
+    return total_horizontal_rotation;
 }
 
 void Camera::Update() {

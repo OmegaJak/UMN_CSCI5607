@@ -44,6 +44,24 @@ bool Map::IntersectsAnySolidObjects(GameObject* object) {
     return false;
 }
 
+Player* Map::IntersectsPlayer(GameObject* object) {
+    if (object->IntersectsWith(*player_)) {
+        return player_;
+    }
+
+    return nullptr;
+}
+
+Door* Map::IntersectsDoor(GameObject* object) {
+    for (auto door : doors_) {
+        if (door->IntersectsWith(*object)) {
+            return door;
+        }
+    }
+
+    return nullptr;
+}
+
 glm::vec3 Map::SpawnPosition() const {
     if (spawn_ == nullptr) {
         printf("Can't get spawn position when we don't have a spawn...\n");

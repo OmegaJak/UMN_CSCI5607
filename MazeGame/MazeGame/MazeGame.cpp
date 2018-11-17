@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
     Camera camera = Camera();
 
     Player player(&camera, map);
+    map->Add(&player);
 
     // Load the textures
     TextureManager::InitTextures();
