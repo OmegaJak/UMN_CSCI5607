@@ -10,7 +10,7 @@
 GameObject::GameObject() {
     model_ = nullptr;
     texture_index_ = UNTEXTURED;
-    transform = new Transformable();
+    transform = std::make_shared<Transformable>();
 }
 
 GameObject::GameObject(Model* model) : GameObject() {
@@ -21,9 +21,7 @@ GameObject::GameObject(Model* model) : GameObject() {
     InitBoundingBox(model->Vertices());
 }
 
-GameObject::~GameObject() {
-    delete transform;
-}
+GameObject::~GameObject() = default;
 
 void GameObject::SetTextureIndex(TEXTURE texture_index) {
     texture_index_ = texture_index;
@@ -56,8 +54,7 @@ void GameObject::InitBoundingBox(const std::vector<glm::vec4>& vertices) {
         world_space_vertices.push_back(ToWorldSpace(vertex));
     }
 
-    // delete bounding_box_;
-    bounding_box_ = new BoundingBox(world_space_vertices);  // Then encompass all verts with a bounding box
+    bounding_box_ = std::make_shared<BoundingBox>(world_space_vertices);  // Then encompass all verts with a bounding box
     bounding_box_->transform->SetParent(transform);
 }
 

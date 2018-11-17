@@ -1,8 +1,9 @@
+#include <memory>
 #include "transformable.h"
 
 Transformable::Transformable() {
-    children_ = std::unordered_set<Transformable*>();
-    parent_ = nullptr;
+    children_ = std::unordered_set<std::shared_ptr<Transformable>>();
+    parent_ = std::weak_ptr<Transformable>();
     local_transform_ = glm::mat4();
     world_transform_ = glm::mat4();
     Reset();
@@ -12,18 +13,7 @@ Transformable::Transformable(const glm::vec3& position) : Transformable() {
     Translate(position);
 }
 
-Transformable::~Transformable() {
-    if (parent_ != nullptr) {
-        parent_->RemoveChild(this);
-    }
-
-    if (!children_.empty()) {
-        std::unordered_set<Transformable*> former_children = children_;
-        for (Transformable* child : former_children) {  // Can't iterate through the set we're currently modifying
-            child->ClearParent();
-        }
-    }
-}
+Transformable::~Transformable() = default;
 
 void Transformable::Reset() {
     ClearChildren();
@@ -60,16 +50,16 @@ void Transformable::ApplyMatrix(const glm::mat4 matrix) {
     RecalculateWorldTransform();
 }
 
-void Transformable::AddChild(Transformable* child) {
+void Transformable::AddChild(std::shared_ptr<Transformable> child) {
     children_.insert(child);
-    if (!child->IsParent(this)) {
-        child->SetParent(this);
+    if (!child->IsParent(shared_from_this())) {
+        child->SetParent(shared_from_this());
     }
 }
 
-void Transformable::RemoveChild(Transformable* child) {
+void Transformable::RemoveChild(std::shared_ptr<Transformable> child) {
     children_.erase(child);
-    if (child->IsParent(this)) {
+    if (child->IsParent(shared_from_this())) {
         child->ClearParent();
     }
 }
@@ -80,40 +70,40 @@ void Transformable::ClearChildren() {
     }
 }
 
-void Transformable::SetParent(Transformable* parent) {
+void Transformable::SetParent(std::shared_ptr<Transformable> parent) {
     if (parent == nullptr) {
         printf("Warning: SetParent was called with a null parent. Should call ClearParent() instead\n");
     }
 
     parent_ = parent;
-    if (!parent_->HasChild(this)) {
-        parent_->AddChild(this);
+    if (!parent->HasChild(shared_from_this())) {
+        parent->AddChild(shared_from_this());
     }
     RecalculateWorldTransform();
 }
 
 void Transformable::ClearParent() {
-    Transformable* former_parent = parent_;
-    parent_ = nullptr;
-    if (former_parent != nullptr && former_parent->HasChild(this)) {
-        former_parent->RemoveChild(this);
+    auto former_parent = parent_.lock();
+    parent_.reset();
+    if (former_parent && former_parent->HasChild(shared_from_this())) {
+        former_parent->RemoveChild(shared_from_this());
     }
     RecalculateWorldTransform();
 }
 
-bool Transformable::HasChild(Transformable* child) const {
+bool Transformable::HasChild(std::shared_ptr<Transformable> child) const {
     return children_.find(child) != children_.end();
 }
 
-bool Transformable::IsParent(Transformable* parent) const {
-    return parent_ == parent;
+bool Transformable::IsParent(std::shared_ptr<Transformable> parent) const {
+    return parent_.lock() == parent;
 }
 
 void Transformable::RecalculateWorldTransform() {
-    if (parent_ == nullptr) {
+    if (parent_.expired()) {
         world_transform_ = local_transform_;
     } else {
-        world_transform_ = parent_->world_transform_ * local_transform_;
+        world_transform_ = parent_.lock()->world_transform_ * local_transform_;
     }
     NotifyChildrenOfUpdate();
 }
@@ -121,12 +111,12 @@ void Transformable::RecalculateWorldTransform() {
 void Transformable::NotifyChildrenOfUpdate() {
     if (children_.size() == 0) return;
 
-    for (Transformable* child : children_) {
+    for (auto child : children_) {
         NotifyChildOfUpdate(child);
     }
 }
 
-void Transformable::NotifyChildOfUpdate(Transformable* child) {
+void Transformable::NotifyChildOfUpdate(std::shared_ptr<Transformable> child) {
     if (child == nullptr) {
         printf("A transform had a null child. Exiting...\n");
         exit(1);

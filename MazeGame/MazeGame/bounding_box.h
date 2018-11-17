@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <vector>
 #include "transformable.h"
 
@@ -19,13 +20,13 @@ class BoundingBox {
     glm::vec3 Max() const;
     glm::vec3 Min() const;
 
-    Transformable* transform;
+    std::shared_ptr<Transformable> transform;
 
    private:
     static bool Overlaps(double otherMin, double otherMax, double min, double max);
     static bool IsBetween(double val, double low, double high);
     void InitToBounds(glm::vec3 min, glm::vec3 max);
 
-    Transformable* min_;
-    Transformable* max_;
+    std::shared_ptr<Transformable> min_;
+    std::shared_ptr<Transformable> max_;
 };

@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include "gtc/matrix_transform.hpp"
 
-class Transformable {
+class Transformable : public std::enable_shared_from_this<Transformable> {
    public:
     Transformable();
     Transformable(const glm::vec3& position);
@@ -18,18 +18,18 @@ class Transformable {
     void Scale(const glm::vec3& scale);
     void ApplyMatrix(const glm::mat4 matrix);
 
-    void AddChild(Transformable* child);
-    void RemoveChild(Transformable* child);
+    void AddChild(std::shared_ptr<Transformable> child);
+    void RemoveChild(std::shared_ptr<Transformable> child);
     void ClearChildren();
-    void SetParent(Transformable* parent);
+    void SetParent(std::shared_ptr<Transformable> parent);
     void ClearParent();
-    bool HasChild(Transformable* child) const;
-    bool IsParent(Transformable* parent) const;
+    bool HasChild(std::shared_ptr<Transformable> child) const;
+    bool IsParent(std::shared_ptr<Transformable> parent) const;
 
     void RecalculateWorldTransform();
 
     void NotifyChildrenOfUpdate();
-    static void NotifyChildOfUpdate(Transformable* child);
+    static void NotifyChildOfUpdate(std::shared_ptr<Transformable> child);
 
     glm::mat4 LocalTransform() const;
     glm::mat4 WorldTransform() const;
@@ -41,6 +41,6 @@ class Transformable {
    private:
     glm::mat4 local_transform_;  // This Transformable's local transformation
     glm::mat4 world_transform_;  // This transform in world coordinates, with all parent transformations applied
-    Transformable* parent_;
-    std::unordered_set<Transformable*> children_;
+    std::weak_ptr<Transformable> parent_;
+    std::unordered_set<std::shared_ptr<Transformable>> children_;
 };

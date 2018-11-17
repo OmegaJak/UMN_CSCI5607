@@ -147,14 +147,14 @@ int main(int argc, char* argv[]) {
         for (int i = 1; i < map_elements.size(); i++) {
             if (player.IntersectsWith(*map_elements[i])) {
                 num_intersected++;
-                printf("Player intersected with bounding box: min: %f, %f, %f, max:: %f, %f, %f\n", map_elements[i]->bounding_box_->Min().x,
-                       map_elements[i]->bounding_box_->Min().y, map_elements[i]->bounding_box_->Min().z,
-                       map_elements[i]->bounding_box_->Max().x, map_elements[i]->bounding_box_->Max().y,
-                       map_elements[i]->bounding_box_->Max().z);
+                /*printf("Player intersected with bounding box: min: %f, %f, %f, max:: %f, %f, %f\n",
+                   map_elements[i]->bounding_box_->Min().x, map_elements[i]->bounding_box_->Min().y,
+                   map_elements[i]->bounding_box_->Min().z, map_elements[i]->bounding_box_->Max().x,
+                   map_elements[i]->bounding_box_->Max().y, map_elements[i]->bounding_box_->Max().z);*/
             }
         }
         // printf("Current position: %f, %f, %f", player.transform->X(), player.transform->Y(), player.transform->Z());
-        // printf("Current intersecting: %i\n", num_intersected);
+        printf("Current intersecting: %i\n", num_intersected);
         //}
 
         glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 10.0f);  // FOV, aspect, near, far

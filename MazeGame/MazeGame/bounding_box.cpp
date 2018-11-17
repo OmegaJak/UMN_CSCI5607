@@ -6,7 +6,7 @@ using std::max;
 using std::min;
 
 BoundingBox::BoundingBox() {
-    transform = new Transformable();
+    transform = std::make_shared<Transformable>();
 }
 
 BoundingBox::BoundingBox(std::vector<glm::vec4> points) : BoundingBox() {
@@ -23,11 +23,7 @@ BoundingBox::BoundingBox(std::vector<glm::vec4> points) : BoundingBox() {
     InitToBounds(glm::vec3(min_x, min_y, min_z), glm::vec3(max_x, max_y, max_z));
 }
 
-BoundingBox::~BoundingBox() {
-    delete transform;
-    delete min_;
-    delete max_;
-}
+BoundingBox::~BoundingBox() = default;
 
 void BoundingBox::ExpandToBound(const BoundingBox& other) {
     min_->ResetLocalTransform();
@@ -70,8 +66,8 @@ bool BoundingBox::IsBetween(double val, double low, double high) {
 }
 
 void BoundingBox::InitToBounds(glm::vec3 min, glm::vec3 max) {
-    min_ = new Transformable(min);
-    max_ = new Transformable(max);
+    min_ = std::make_shared<Transformable>(min);
+    max_ = std::make_shared<Transformable>(max);
 
     min_->SetParent(transform);
     max_->SetParent(transform);

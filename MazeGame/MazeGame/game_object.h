@@ -18,16 +18,13 @@ class GameObject : public Updatable {
     bool IntersectsWith(const GameObject& other) const;
 
     Material material;
-    Transformable* transform;
-
-    BoundingBox* bounding_box_;
+    std::shared_ptr<Transformable> transform;
 
    protected:
     void InitBoundingBox(const std::vector<glm::vec4>& vertices);
     glm::vec4 ToWorldSpace(const glm::vec4& model_coordinate) const;
 
+    std::shared_ptr<BoundingBox> bounding_box_;
     Model* model_;
     TEXTURE texture_index_;
-
-   private:
 };
