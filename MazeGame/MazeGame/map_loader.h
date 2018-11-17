@@ -10,16 +10,19 @@ class MapLoader {
     MapLoader();
     ~MapLoader();
 
-    std::vector<GameObject*> LoadMap(const std::string& filename);
+    Map* LoadMap(const std::string& filename);
 
    private:
     static Material GetMaterialForCharacter(char c);
     void LoadAssets();
 
+    static glm::vec3 GetPositionForCoordinate(int i, int j);
     static bool IsDoor(char c);
     static bool IsKey(char c);
 
     Model* wall_model_ = nullptr;
     Model* door_model_ = nullptr;
     Model* key_model_ = nullptr;
+    Model* start_model_ = nullptr;
+    Model* goal_model_ = nullptr;
 };

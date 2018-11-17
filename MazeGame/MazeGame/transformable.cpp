@@ -145,3 +145,7 @@ float Transformable::Y() const {
 float Transformable::Z() const {
     return world_transform_[3][2];
 }
+
+glm::vec3 Transformable::Position() const {
+    return glm::vec3(world_transform_[3]);
+}

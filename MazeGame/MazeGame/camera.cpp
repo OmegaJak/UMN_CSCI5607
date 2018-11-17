@@ -7,8 +7,8 @@
 #include "shader_manager.h"
 
 Camera::Camera() {
-    position_ = glm::vec3(3, 0, 0.5);
-    look_at_ = glm::vec3(0, 0, 0.5);
+    position_ = glm::vec3(0, 0, 0.5);
+    look_at_ = glm::vec3(3, 0, 0.5);
     up_ = glm::vec3(0, 0, 1);
 }
 

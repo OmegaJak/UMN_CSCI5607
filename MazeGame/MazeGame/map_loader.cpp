@@ -2,7 +2,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "goal.h"
+#include "map.h"
 #include "map_loader.h"
+#include "spawn.h"
+#include "wall.h"
 
 using std::cout;
 using std::endl;
@@ -14,9 +18,9 @@ MapLoader::MapLoader() {
 
 MapLoader::~MapLoader() {}
 
-std::vector<GameObject*> MapLoader::LoadMap(const string& filename) {
+Map* MapLoader::LoadMap(const string& filename) {
     int width, height;
-    std::vector<GameObject*> map_elements;
+    Map* map = new Map();
 
     std::fstream file(filename);
     if (file.fail()) {
@@ -55,45 +59,48 @@ std::vector<GameObject*> MapLoader::LoadMap(const string& filename) {
     ground->transform->Translate(glm::vec3((width / 2) + 0.5, (height / 2) + 0.5, 0));
     ground->transform->Scale(glm::vec3(width, height, 1));
     ground->material.color_ = glm::vec3(0.8, 0.8, 0.8);
-    map_elements.push_back(ground);
+    map->Add(ground);
 
     GameObject* current_object;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             char current_char = lines[j][i];
+            glm::vec3 base_position = GetPositionForCoordinate(i, j);
             if (IsKey(current_char)) {
-                current_object = new GameObject(key_model_);
-                current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
-                current_object->material = GetMaterialForCharacter(current_char);
-                map_elements.push_back(current_object);
+                current_object = new Key(key_model_);
+                current_object->transform->Translate(base_position);
             } else if (IsDoor(current_char)) {
-                current_object = new GameObject(door_model_);
-                current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
-                current_object->material = GetMaterialForCharacter(current_char);
-                map_elements.push_back(current_object);
+                current_object = new Door(door_model_);
+                current_object->transform->Translate(base_position);
             } else {
                 switch (current_char) {
                     case 'W':
-                        current_object = new GameObject(wall_model_);
-                        current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
+                        current_object = new Wall(wall_model_);
+                        current_object->transform->Translate(base_position);
                         current_object->SetTextureIndex(TEX0);
-                        current_object->material = GetMaterialForCharacter(current_char);
-                        map_elements.push_back(current_object);
                         break;
                     case 'S':
+                        current_object = new Spawn(start_model_);
+                        current_object->transform->Translate(base_position);
                         break;
                     case 'G':
+                        current_object = new Goal(goal_model_);
+                        current_object->transform->Translate(base_position);
                         break;
                     case '0':
                         continue;
                     default:
-                        break;
+                        printf("Unrecognized character \'%c\'", current_char);
+                        continue;
                 }
             }
+
+            current_object->material = GetMaterialForCharacter(current_char);
+            map->Add(current_object);
         }
     }
 
-    return map_elements;
+    return map;
 }
 
 Material MapLoader::GetMaterialForCharacter(char c) {
@@ -121,6 +128,11 @@ void MapLoader::LoadAssets() {
     wall_model_ = new Model("models/cube.txt");
     door_model_ = new Model("models/knot.txt");
     key_model_ = new Model("models/teapot.txt");
+    start_model_ = goal_model_ = key_model_;
+}
+
+glm::vec3 MapLoader::GetPositionForCoordinate(int i, int j) {
+    return glm::vec3(i, j, 0) + glm::vec3(0.5);
 }
 
 bool MapLoader::IsDoor(char c) {

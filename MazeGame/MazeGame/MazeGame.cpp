@@ -16,6 +16,7 @@
 #include "camera.h"
 #include "constants.h"
 #include "game_object.h"
+#include "map.h"
 #include "map_loader.h"
 #include "player.h"
 #include "shader_manager.h"
@@ -49,6 +50,7 @@ const char* INSTRUCTIONS =
 #include <cstdio>
 #include <string>
 
+#include "map.h"
 #include "model_manager.h"
 
 using namespace std;
@@ -92,9 +94,10 @@ int main(int argc, char* argv[]) {
     }
 
     MapLoader map_loader;
-    std::vector<GameObject*> map_elements = map_loader.LoadMap("map1.txt");
+    Map* map = map_loader.LoadMap("map1.txt");
     Camera camera = Camera();
-    Player player(&camera);
+
+    Player player(&camera, map);
 
     // Load the textures
     TextureManager::InitTextures();
@@ -143,18 +146,18 @@ int main(int argc, char* argv[]) {
         camera.Update();
 
         // if (SDL_GetTicks() % 2000 ) {
-        int num_intersected = 0;
-        for (int i = 1; i < map_elements.size(); i++) {
-            if (player.IntersectsWith(*map_elements[i])) {
-                num_intersected++;
-                /*printf("Player intersected with bounding box: min: %f, %f, %f, max:: %f, %f, %f\n",
-                   map_elements[i]->bounding_box_->Min().x, map_elements[i]->bounding_box_->Min().y,
-                   map_elements[i]->bounding_box_->Min().z, map_elements[i]->bounding_box_->Max().x,
-                   map_elements[i]->bounding_box_->Max().y, map_elements[i]->bounding_box_->Max().z);*/
-            }
-        }
+        // int num_intersected = 0;
+        // for (int i = 1; i < map_elements.size(); i++) {
+        //    if (player.IntersectsWith(*map_elements[i])) {
+        //        num_intersected++;
+        //        /*printf("Player intersected with bounding box: min: %f, %f, %f, max:: %f, %f, %f\n",
+        //           map_elements[i]->bounding_box_->Min().x, map_elements[i]->bounding_box_->Min().y,
+        //           map_elements[i]->bounding_box_->Min().z, map_elements[i]->bounding_box_->Max().x,
+        //           map_elements[i]->bounding_box_->Max().y, map_elements[i]->bounding_box_->Max().z);*/
+        //    }
+        //}
         // printf("Current position: %f, %f, %f", player.transform->X(), player.transform->Y(), player.transform->Z());
-        printf("Current intersecting: %i\n", num_intersected);
+        // printf("Current intersecting: %i\n", num_intersected);
         //}
 
         glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 10.0f);  // FOV, aspect, near, far
@@ -164,10 +167,7 @@ int main(int argc, char* argv[]) {
 
         glBindVertexArray(vao);
 
-        // Update each updatable (render gameobjects, etc)
-        for (GameObject* game_object : map_elements) {
-            game_object->Update();
-        }
+        map->UpdateAll();
 
         SDL_GL_SwapWindow(window);  // Double buffering
     }

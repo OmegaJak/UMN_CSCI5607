@@ -1,10 +1,12 @@
 #pragma once
+#include <vector>
 #include "camera.h"
 #include "game_object.h"
+#include "map.h"
 
 class Player : public GameObject {
    public:
-    explicit Player(Camera* camera);
+    Player(Camera* camera, Map* map);
 
     void Update() override;
 
@@ -12,5 +14,6 @@ class Player : public GameObject {
     void SetTransformToCameraPosition();
 
     Camera* camera_;
+    Map* map_;
     std::vector<glm::vec4> box_;
 };

@@ -37,6 +37,7 @@ class Transformable : public std::enable_shared_from_this<Transformable> {
     float X() const;
     float Y() const;
     float Z() const;
+    glm::vec3 Position() const;
 
    private:
     glm::mat4 local_transform_;  // This Transformable's local transformation

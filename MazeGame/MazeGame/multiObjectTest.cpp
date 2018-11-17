@@ -361,7 +361,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     glUniform1i(uniTexID, -1);
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
+    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Spawn Vertex, Num Verticies)
 
     //************
     // Draw model #1 the second time
@@ -378,7 +378,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     glUniform1i(uniTexID, 0);
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
+    glDrawArrays(GL_TRIANGLES, model1_start, model1_numVerts);  //(Primitive Type, Spawn Vertex, Num Verticies)
 
     //************
     // Draw model #2 once
@@ -396,7 +396,7 @@ void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int 
     glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
 
     // Draw an instance of the model (at the position & orientation specified by the model matrix above)
-    glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);  //(Primitive Type, Start Vertex, Num Verticies)
+    glDrawArrays(GL_TRIANGLES, model2_start, model2_numVerts);  //(Primitive Type, Spawn Vertex, Num Verticies)
 }
 
 // Create a NULL-terminated string by reading the provided file

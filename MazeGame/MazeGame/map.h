@@ -1,17 +1,35 @@
-//#pragma once
-//#include <vector>
-//#include "game_object.h"
-//
-// using std::vector;
-//
-// class Map {
-//   public:
-//    Map() = default;
-//    Map(vector<GameObject*> walls, vector<GameObject*> doors, vector<GameObject*> keys);
-//    ~Map();
-//
-//    void AddWall(GameObject* wall);
-//
-//   private:
-//    vector<GameObject*> walls_, doors_, keys_;
-//};
+#pragma once
+#include <detail/type_vec3.hpp>
+#include <vector>
+#include "door.h"
+#include "game_object.h"
+#include "goal.h"
+#include "key.h"
+#include "spawn.h"
+#include "wall.h"
+
+class Player;
+
+class Map {
+   public:
+    Map();
+    ~Map();
+
+    void Add(GameObject* object);
+    void Init();
+
+    void UpdateAll();
+    bool IntersectsAnySolidObjects(GameObject* object);
+
+    glm::vec3 SpawnPosition() const;
+    glm::vec3 GoalPosition() const;
+
+   private:
+    std::vector<GameObject*> all_elements_;
+    std::vector<Wall*> walls_;
+    std::vector<Door*> doors_;
+    std::vector<Key*> keys_;
+    Spawn* spawn_;
+    Goal* goal_;
+    Player* player_;
+};
