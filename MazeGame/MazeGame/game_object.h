@@ -15,15 +15,19 @@ class GameObject : public Updatable {
     void SetTextureIndex(TEXTURE texture_index);
 
     void Update() override;
+    bool IntersectsWith(const GameObject& other) const;
 
     Material material;
-    Transformable transform;
+    Transformable* transform;
 
-   private:
-    void InitBoundingBox();
+    BoundingBox* bounding_box_;
+
+   protected:
+    void InitBoundingBox(const std::vector<glm::vec4>& vertices);
     glm::vec4 ToWorldSpace(const glm::vec4& model_coordinate) const;
 
     Model* model_;
     TEXTURE texture_index_;
-    BoundingBox bounding_box_;
+
+   private:
 };

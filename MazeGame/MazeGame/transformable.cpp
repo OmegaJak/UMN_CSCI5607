@@ -3,6 +3,8 @@
 Transformable::Transformable() {
     children_ = std::unordered_set<Transformable*>();
     parent_ = nullptr;
+    local_transform_ = glm::mat4();
+    world_transform_ = glm::mat4();
     Reset();
 }
 
@@ -10,7 +12,18 @@ Transformable::Transformable(const glm::vec3& position) : Transformable() {
     Translate(position);
 }
 
-Transformable::~Transformable() = default;
+Transformable::~Transformable() {
+    if (parent_ != nullptr) {
+        parent_->RemoveChild(this);
+    }
+
+    if (!children_.empty()) {
+        std::unordered_set<Transformable*> former_children = children_;
+        for (Transformable* child : former_children) {  // Can't iterate through the set we're currently modifying
+            child->ClearParent();
+        }
+    }
+}
 
 void Transformable::Reset() {
     ClearChildren();
@@ -28,6 +41,10 @@ void Transformable::Rotate(float radians, const glm::vec3& around) {
     RecalculateWorldTransform();
 }
 
+void Transformable::Translate(float x, float y, float z) {
+    Translate(glm::vec3(x, y, z));
+}
+
 void Transformable::Translate(const glm::vec3& translate_by) {
     local_transform_ = glm::translate(local_transform_, translate_by);
     RecalculateWorldTransform();
@@ -35,6 +52,11 @@ void Transformable::Translate(const glm::vec3& translate_by) {
 
 void Transformable::Scale(const glm::vec3& scale) {
     local_transform_ = glm::scale(local_transform_, scale);
+    RecalculateWorldTransform();
+}
+
+void Transformable::ApplyMatrix(const glm::mat4 matrix) {
+    local_transform_ = matrix * local_transform_;
     RecalculateWorldTransform();
 }
 
@@ -92,11 +114,13 @@ void Transformable::RecalculateWorldTransform() {
         world_transform_ = local_transform_;
     } else {
         world_transform_ = parent_->world_transform_ * local_transform_;
-        NotifyChildrenOfUpdate();
     }
+    NotifyChildrenOfUpdate();
 }
 
 void Transformable::NotifyChildrenOfUpdate() {
+    if (children_.size() == 0) return;
+
     for (Transformable* child : children_) {
         NotifyChildOfUpdate(child);
     }
@@ -120,14 +144,14 @@ glm::mat4 Transformable::WorldTransform() const {
 }
 
 float Transformable::X() const {
-    return world_transform_[0][3];  // Only translations (stored in the last column of the matrix) will come through if the Transformable is
-                                    // interpreted as a position
+    return world_transform_[3][0];  // Only translations (stored in the last column of the matrix) will come through if the
+                                    // Transformable is interpreted as a position. GLM stores such that the first index is the first column
 }
 
 float Transformable::Y() const {
-    return world_transform_[1][3];
+    return world_transform_[3][1];
 }
 
 float Transformable::Z() const {
-    return world_transform_[2][3];
+    return world_transform_[3][2];
 }

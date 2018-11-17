@@ -13,8 +13,10 @@ class Transformable {
     void Reset();
     void ResetLocalTransform();
     void Rotate(float radians, const glm::vec3& around);
+    void Translate(float x, float y, float z);
     void Translate(const glm::vec3& translate_by);
     void Scale(const glm::vec3& scale);
+    void ApplyMatrix(const glm::mat4 matrix);
 
     void AddChild(Transformable* child);
     void RemoveChild(Transformable* child);

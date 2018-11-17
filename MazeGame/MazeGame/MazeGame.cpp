@@ -12,10 +12,12 @@
 // Phong lighting
 // Binding multiple textures to one shader
 
+#include "bounding_box.h"
 #include "camera.h"
 #include "constants.h"
 #include "game_object.h"
 #include "map_loader.h"
+#include "player.h"
 #include "shader_manager.h"
 #include "texture_manager.h"
 const char* INSTRUCTIONS =
@@ -90,7 +92,9 @@ int main(int argc, char* argv[]) {
     }
 
     MapLoader map_loader;
-    std::vector<GameObject> map_elements = map_loader.LoadMap("map1.txt");
+    std::vector<GameObject*> map_elements = map_loader.LoadMap("map1.txt");
+    Camera camera = Camera();
+    Player player(&camera);
 
     // Load the textures
     TextureManager::InitTextures();
@@ -105,8 +109,6 @@ int main(int argc, char* argv[]) {
     ShaderManager::InitShader("textured-Vertex.glsl", "textured-Fragment.glsl");
 
     TextureManager::InitTextures();
-
-    Camera camera = Camera();
 
     glBindVertexArray(0);  // Unbind the VAO in case we want to create a new one
 
@@ -137,9 +139,25 @@ int main(int argc, char* argv[]) {
 
         timePassed = SDL_GetTicks() / 1000.f;
 
+        player.Update();
         camera.Update();
 
-        glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 1.0f, 10.0f);  // FOV, aspect, near, far
+        // if (SDL_GetTicks() % 2000 ) {
+        int num_intersected = 0;
+        for (int i = 1; i < map_elements.size(); i++) {
+            if (player.IntersectsWith(*map_elements[i])) {
+                num_intersected++;
+                printf("Player intersected with bounding box: min: %f, %f, %f, max:: %f, %f, %f\n", map_elements[i]->bounding_box_->Min().x,
+                       map_elements[i]->bounding_box_->Min().y, map_elements[i]->bounding_box_->Min().z,
+                       map_elements[i]->bounding_box_->Max().x, map_elements[i]->bounding_box_->Max().y,
+                       map_elements[i]->bounding_box_->Max().z);
+            }
+        }
+        // printf("Current position: %f, %f, %f", player.transform->X(), player.transform->Y(), player.transform->Z());
+        // printf("Current intersecting: %i\n", num_intersected);
+        //}
+
+        glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 10.0f);  // FOV, aspect, near, far
         glUniformMatrix4fv(ShaderManager::Attributes.projection, 1, GL_FALSE, glm::value_ptr(proj));
 
         TextureManager::Update();
@@ -147,8 +165,8 @@ int main(int argc, char* argv[]) {
         glBindVertexArray(vao);
 
         // Update each updatable (render gameobjects, etc)
-        for (GameObject game_object : map_elements) {
-            game_object.Update();
+        for (GameObject* game_object : map_elements) {
+            game_object->Update();
         }
 
         SDL_GL_SwapWindow(window);  // Double buffering

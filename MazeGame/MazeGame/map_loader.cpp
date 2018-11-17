@@ -14,9 +14,9 @@ MapLoader::MapLoader() {
 
 MapLoader::~MapLoader() {}
 
-std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
+std::vector<GameObject*> MapLoader::LoadMap(const string& filename) {
     int width, height;
-    std::vector<GameObject> map_elements;
+    std::vector<GameObject*> map_elements;
 
     std::fstream file(filename);
     if (file.fail()) {
@@ -50,29 +50,36 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
         exit(1);
     }
 
-    GameObject ground = GameObject(wall_model_);
-    ground.transform.Scale(glm::vec3(1, 1, 0));
-    ground.transform.Translate(glm::vec3(width / 2, height / 2, 0));
-    ground.transform.Scale(glm::vec3(width, height, 1));
-    ground.material.color_ = glm::vec3(0.8, 0.8, 0.8);
+    GameObject* ground = new GameObject(wall_model_);
+    ground->transform->Scale(glm::vec3(1, 1, 0));
+    ground->transform->Translate(glm::vec3((width / 2) + 0.5, (height / 2) + 0.5, 0));
+    ground->transform->Scale(glm::vec3(width, height, 1));
+    ground->material.color_ = glm::vec3(0.8, 0.8, 0.8);
     map_elements.push_back(ground);
 
-    GameObject current_object;
+    GameObject* current_object;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
             char current_char = lines[j][i];
             if (IsKey(current_char)) {
-                current_object = GameObject(key_model_);
-                current_object.transform.Translate(glm::vec3(i, j, 0.5));
+                current_object = new GameObject(key_model_);
+                current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
+                current_object->material = GetMaterialForCharacter(current_char);
+                map_elements.push_back(current_object);
             } else if (IsDoor(current_char)) {
-                current_object = GameObject(door_model_);
-                current_object.transform.Translate(glm::vec3(i, j, 0.5));
+                current_object = new GameObject(door_model_);
+                current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
+                current_object->material = GetMaterialForCharacter(current_char);
+                map_elements.push_back(current_object);
             } else {
                 switch (current_char) {
                     case 'W':
-                        current_object = GameObject(wall_model_);
-                        current_object.transform.Translate(glm::vec3(i, j, 0.5));
-                        current_object.SetTextureIndex(TEX0);
+                        current_object = new GameObject(wall_model_);
+                        current_object->transform->Translate(glm::vec3(i + 0.5f, j + 0.5f, 0.5));
+                        current_object->SetTextureIndex(TEX0);
+                        current_object->material = GetMaterialForCharacter(current_char);
+                        map_elements.push_back(current_object);
+                        break;
                     case 'S':
                         break;
                     case 'G':
@@ -83,9 +90,6 @@ std::vector<GameObject> MapLoader::LoadMap(const string& filename) {
                         break;
                 }
             }
-
-            current_object.material = GetMaterialForCharacter(current_char);
-            map_elements.push_back(current_object);
         }
     }
 

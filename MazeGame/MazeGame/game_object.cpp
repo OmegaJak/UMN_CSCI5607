@@ -10,16 +10,20 @@
 GameObject::GameObject() {
     model_ = nullptr;
     texture_index_ = UNTEXTURED;
+    transform = new Transformable();
 }
 
-GameObject::GameObject(Model* model) : model_(model), texture_index_(UNTEXTURED) {
+GameObject::GameObject(Model* model) : GameObject() {
+    model_ = model;
+    texture_index_ = UNTEXTURED;
     material = Material(glm::vec3(1, 0, 1));
-    transform = Transformable();
 
-    InitBoundingBox();
+    InitBoundingBox(model->Vertices());
 }
 
-GameObject::~GameObject() = default;
+GameObject::~GameObject() {
+    delete transform;
+}
 
 void GameObject::SetTextureIndex(TEXTURE texture_index) {
     texture_index_ = texture_index;
@@ -32,8 +36,8 @@ void GameObject::Update() {
     }
 
     glUniformMatrix4fv(ShaderManager::Attributes.model, 1, GL_FALSE,
-                       glm::value_ptr(transform.WorldTransform()));  // pass model matrix to shader
-    glUniform1i(ShaderManager::Attributes.texID, texture_index_);    // Set which texture to use
+                       glm::value_ptr(transform->WorldTransform()));  // pass model matrix to shader
+    glUniform1i(ShaderManager::Attributes.texID, texture_index_);     // Set which texture to use
     if (texture_index_ == UNTEXTURED) {
         glUniform3fv(ShaderManager::Attributes.color, 1, glm::value_ptr(material.color_));  // Update the color, if necessary
     }
@@ -41,17 +45,22 @@ void GameObject::Update() {
     glDrawArrays(GL_TRIANGLES, model_->vbo_vertex_start_index_, model_->NumVerts());
 }
 
-void GameObject::InitBoundingBox() {
-    std::vector<glm::vec4> vertices = model_->Vertices();  // These are in model space
-    std::vector<glm::vec4> world_space_vertices;           // We want them in world space
-    world_space_vertices.reserve(vertices.size());         // Preallocate for efficiency
-    for (const auto& vertex : vertices) {                  // So convert them one by one
+bool GameObject::IntersectsWith(const GameObject& other) const {
+    return bounding_box_->ContainsOrIntersects(*other.bounding_box_);
+}
+
+void GameObject::InitBoundingBox(const std::vector<glm::vec4>& vertices) {
+    std::vector<glm::vec4> world_space_vertices;    // We want the verts in world space
+    world_space_vertices.reserve(vertices.size());  // Preallocate for efficiency
+    for (const auto& vertex : vertices) {           // Convert them one by one
         world_space_vertices.push_back(ToWorldSpace(vertex));
     }
 
-    bounding_box_ = BoundingBox(world_space_vertices);  // Then encompass all verts with a bounding box
+    // delete bounding_box_;
+    bounding_box_ = new BoundingBox(world_space_vertices);  // Then encompass all verts with a bounding box
+    bounding_box_->transform->SetParent(transform);
 }
 
 glm::vec4 GameObject::ToWorldSpace(const glm::vec4& model_coordinate) const {
-    return transform.WorldTransform() * model_coordinate;
+    return transform->WorldTransform() * model_coordinate;
 }

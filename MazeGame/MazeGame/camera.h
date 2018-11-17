@@ -8,10 +8,11 @@ class Camera : public Updatable {
     Camera();
     ~Camera() override;
 
-    void Rotate(float vertical_rotation, float horizontal_rotation, float roll_rotation = 0);
-    void Translate(float right, float up, float forward);
+    glm::mat4 Rotate(float vertical_rotation, float horizontal_rotation, float roll_rotation = 0);
+    glm::mat4 Translate(float right, float up, float forward);
 
     void SetPosition(const glm::vec3& position);
+    glm::vec3 GetPosition() const;
     void SetLookAt(const glm::vec3& look_at_position);
     void SetUp(const glm::vec3& up);
 
