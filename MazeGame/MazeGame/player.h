@@ -10,6 +10,8 @@ class Player : public GameObject {
 
     void Update() override;
 
+    void RemoveKey();
+
    private:
     void RegenerateBoundingBox();
     void InitializeKeyLocation(Key* key);

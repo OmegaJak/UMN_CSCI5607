@@ -80,8 +80,13 @@ void Player::Update() {
     Key* key = map_->FirstIntersectedKey(this);
     if (key != nullptr && held_key_ == nullptr) {
         held_key_ = key;
+        held_key_->SetHolder(this);
         InitializeKeyLocation(held_key_);
     }
+}
+
+void Player::RemoveKey() {
+    held_key_ = nullptr;
 }
 
 void Player::InitializeKeyLocation(Key* key) {

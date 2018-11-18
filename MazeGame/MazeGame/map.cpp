@@ -60,9 +60,9 @@ Key* Map::FirstIntersectedKey(GameObject* object) {
     return nullptr;
 }
 
-Door* Map::IntersectsDoor(GameObject* object) {
+Door* Map::IntersectsDoorWithId(GameObject* object, char id) {
     for (auto door : doors_) {
-        if (door->IntersectsWith(*object)) return door;
+        if (door->MatchesId(id) && door->IntersectsWith(*object)) return door;
     }
 
     return nullptr;

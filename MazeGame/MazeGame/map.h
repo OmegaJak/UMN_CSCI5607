@@ -21,7 +21,7 @@ class Map {
     bool IntersectsAnySolidObjects(GameObject* object);
     Player* IntersectsPlayer(GameObject* object);
     Key* FirstIntersectedKey(GameObject* object);
-    Door* IntersectsDoor(GameObject* object);
+    Door* IntersectsDoorWithId(GameObject* object, char id);
 
     glm::vec3 SpawnPosition() const;
     glm::vec3 GoalPosition() const;

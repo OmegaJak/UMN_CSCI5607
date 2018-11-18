@@ -3,10 +3,16 @@
 
 class Door : public GameObject {
    public:
-    Door(Model* model) : GameObject(model) {}
+    Door(Model* model, char id);
     ~Door() = default;
 
     bool IsSolid() override {
         return true;
     }
+
+    bool MatchesId(char id);
+    void GoAway();
+
+   private:
+    char id_;
 };
