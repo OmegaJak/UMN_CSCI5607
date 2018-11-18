@@ -45,6 +45,10 @@ void Transformable::Scale(const glm::vec3& scale) {
     RecalculateWorldTransform();
 }
 
+void Transformable::Scale(float scale) {
+    Scale(glm::vec3(scale, scale, scale));
+}
+
 void Transformable::ApplyMatrix(const glm::mat4 matrix) {
     local_transform_ = matrix * local_transform_;
     RecalculateWorldTransform();

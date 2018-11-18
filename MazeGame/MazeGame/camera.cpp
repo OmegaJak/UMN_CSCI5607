@@ -51,8 +51,8 @@ void Camera::SetLookAt(const glm::vec3& look_at_position) {
     look_at_->ResetAndSetTranslation(look_at_position - transform->WorldPosition());
 }
 
-glm::vec3 Camera::GetLookPosition() const {
-    return look_at_->LocalPosition();
+glm::vec3 Camera::GetNormalizedLookPosition() const {
+    return glm::normalize(look_at_->LocalPosition());
 }
 
 float Camera::GetTotalHorizontalRotation() const {

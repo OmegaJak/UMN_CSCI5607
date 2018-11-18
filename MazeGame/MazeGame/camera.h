@@ -16,7 +16,7 @@ class Camera : public Updatable {
     void SetPosition(const glm::vec3& position);
     void SetLookAt(const glm::vec3& look_at_position);
 
-    glm::vec3 GetLookPosition() const;
+    glm::vec3 GetNormalizedLookPosition() const;
     float GetTotalHorizontalRotation() const;
 
     void Update() override;

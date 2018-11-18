@@ -26,14 +26,11 @@ BoundingBox::BoundingBox(std::vector<glm::vec4> points) : BoundingBox() {
 BoundingBox::~BoundingBox() = default;
 
 void BoundingBox::ExpandToBound(const BoundingBox& other) {
-    min_->ResetLocalTransform();
-    max_->ResetLocalTransform();
-
     glm::vec3 new_min = glm::vec3(min(min_->X(), other.min_->X()), min(min_->Y(), other.min_->Y()), min(min_->Z(), other.min_->Z()));
     glm::vec3 new_max = glm::vec3(max(max_->X(), other.max_->X()), max(max_->Y(), other.max_->Y()), max(max_->Z(), other.max_->Z()));
 
-    min_->Translate(new_min);
-    max_->Translate(new_max);
+    min_->ResetAndSetTranslation(new_min);
+    max_->ResetAndSetTranslation(new_max);
 }
 
 void BoundingBox::ExpandToBound(const std::vector<BoundingBox> bounding_boxes) {

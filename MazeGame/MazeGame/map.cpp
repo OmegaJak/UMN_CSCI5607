@@ -52,11 +52,17 @@ Player* Map::IntersectsPlayer(GameObject* object) {
     return nullptr;
 }
 
+Key* Map::FirstIntersectedKey(GameObject* object) {
+    for (auto key : keys_) {
+        if (key->IntersectsWith(*object)) return key;
+    }
+
+    return nullptr;
+}
+
 Door* Map::IntersectsDoor(GameObject* object) {
     for (auto door : doors_) {
-        if (door->IntersectsWith(*object)) {
-            return door;
-        }
+        if (door->IntersectsWith(*object)) return door;
     }
 
     return nullptr;

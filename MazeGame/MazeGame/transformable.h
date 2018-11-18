@@ -10,12 +10,11 @@ class Transformable : public std::enable_shared_from_this<Transformable> {
     Transformable(const glm::vec3& position);
     virtual ~Transformable();
 
-    void Reset();
-    void ResetLocalTransform();
     void Rotate(float radians, const glm::vec3& around);
     void Translate(float x, float y, float z);
     void Translate(const glm::vec3& translate_by);
     void Scale(const glm::vec3& scale);
+    void Scale(float scale);
     void ApplyMatrix(const glm::mat4 matrix);
     void ResetAndSetTranslation(const glm::vec3& translation);
 
@@ -42,6 +41,9 @@ class Transformable : public std::enable_shared_from_this<Transformable> {
     glm::vec3 LocalPosition() const;
 
    private:
+    void Reset();
+    void ResetLocalTransform();
+
     glm::mat4 local_transform_;  // This Transformable's local transformation
     glm::mat4 world_transform_;  // This transform in world coordinates, with all parent transformations applied
     std::weak_ptr<Transformable> parent_;

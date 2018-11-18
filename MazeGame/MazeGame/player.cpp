@@ -40,9 +40,12 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
 
     transform->SetParent(camera->transform);
     RegenerateBoundingBox();
+
+    held_key_ = nullptr;
 }
 
 void Player::Update() {
+    //// Player movement ////
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
     if (key_state[SDL_SCANCODE_RIGHT]) {
         camera_->Rotate(0, -CAMERA_ROTATION_SPEED);
@@ -72,10 +75,21 @@ void Player::Update() {
 
     printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
            bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
+
+    //// Key logic ////
+    Key* key = map_->FirstIntersectedKey(this);
+    if (key != nullptr && held_key_ == nullptr) {
+        held_key_ = key;
+        InitializeKeyLocation(held_key_);
+    }
 }
 
-glm::vec3 Player::GetKeyPosition() {
-    return camera_->GetLookPosition();
+void Player::InitializeKeyLocation(Key* key) {
+    held_key_->transform->ResetAndSetTranslation(camera_->GetNormalizedLookPosition() * 0.6f);
+    held_key_->transform->Translate(0, 0, -0.2);
+    held_key_->transform->Scale(0.3f);
+
+    held_key_->transform->SetParent(transform);
 }
 
 void Player::RegenerateBoundingBox() {

@@ -2,6 +2,7 @@
 #include <vector>
 #include "camera.h"
 #include "game_object.h"
+#include "key.h"
 
 class Player : public GameObject {
    public:
@@ -9,11 +10,11 @@ class Player : public GameObject {
 
     void Update() override;
 
-    glm::vec3 GetKeyPosition();
-
    private:
     void RegenerateBoundingBox();
+    void InitializeKeyLocation(Key* key);
 
     Camera* camera_;
     std::vector<glm::vec4> box_;
+    Key* held_key_;
 };
