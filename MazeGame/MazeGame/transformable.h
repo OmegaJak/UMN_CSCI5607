@@ -17,6 +17,7 @@ class Transformable : public std::enable_shared_from_this<Transformable> {
     void Translate(const glm::vec3& translate_by);
     void Scale(const glm::vec3& scale);
     void ApplyMatrix(const glm::mat4 matrix);
+    void ResetAndSetTranslation(const glm::vec3& translation);
 
     void AddChild(std::shared_ptr<Transformable> child);
     void RemoveChild(std::shared_ptr<Transformable> child);
@@ -37,7 +38,8 @@ class Transformable : public std::enable_shared_from_this<Transformable> {
     float X() const;
     float Y() const;
     float Z() const;
-    glm::vec3 Position() const;
+    glm::vec3 WorldPosition() const;
+    glm::vec3 LocalPosition() const;
 
    private:
     glm::mat4 local_transform_;  // This Transformable's local transformation

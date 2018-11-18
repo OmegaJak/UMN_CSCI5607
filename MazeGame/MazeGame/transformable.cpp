@@ -50,6 +50,11 @@ void Transformable::ApplyMatrix(const glm::mat4 matrix) {
     RecalculateWorldTransform();
 }
 
+void Transformable::ResetAndSetTranslation(const glm::vec3& translation) {
+    ResetLocalTransform();
+    Translate(translation);
+}
+
 void Transformable::AddChild(std::shared_ptr<Transformable> child) {
     children_.insert(child);
     if (!child->IsParent(shared_from_this())) {
@@ -146,6 +151,10 @@ float Transformable::Z() const {
     return world_transform_[3][2];
 }
 
-glm::vec3 Transformable::Position() const {
+glm::vec3 Transformable::WorldPosition() const {
     return glm::vec3(world_transform_[3]);
+}
+
+glm::vec3 Transformable::LocalPosition() const {
+    return glm::vec3(local_transform_[3]);
 }

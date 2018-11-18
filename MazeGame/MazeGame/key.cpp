@@ -9,11 +9,10 @@ void Key::Update() {
     player = map_->IntersectsPlayer(this);
     if (player && !player_) player_ = player;  // The player just walked into this key
 
-    if (player_) {
+    if (player_ && !transform->IsParent(player_->transform)) {
         transform->ResetLocalTransform();
         transform->Translate(player_->GetKeyPosition());
-
-        if (!transform->IsParent(player_->transform)) transform->SetParent(player_->transform);
+        transform->SetParent(player_->transform);
     }
 
     printf("Key position: %f, %f, %f\n", transform->X(), transform->Y(), transform->Z());

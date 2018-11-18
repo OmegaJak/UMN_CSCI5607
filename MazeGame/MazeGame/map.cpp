@@ -67,7 +67,7 @@ glm::vec3 Map::SpawnPosition() const {
         printf("Can't get spawn position when we don't have a spawn...\n");
         exit(1);
     }
-    return spawn_->transform->Position();
+    return spawn_->transform->WorldPosition();
 }
 
 glm::vec3 Map::GoalPosition() const {
@@ -75,5 +75,5 @@ glm::vec3 Map::GoalPosition() const {
         printf("Can't get goal position when we don't have a goal...\n");
         exit(1);
     }
-    return goal_->transform->Position();
+    return goal_->transform->WorldPosition();
 }

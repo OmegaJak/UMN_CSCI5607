@@ -37,15 +37,17 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
     glm::vec3 look_position = map_->GoalPosition();
     look_position.z = start_position.z;
     camera->SetLookAt(look_position);
-    SetTransformToCameraPosition();
+
+    transform->SetParent(camera->transform);
+    RegenerateBoundingBox();
 }
 
 void Player::Update() {
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
     if (key_state[SDL_SCANCODE_RIGHT]) {
-        camera_->Rotate(0, CAMERA_ROTATION_SPEED);
-    } else if (key_state[SDL_SCANCODE_LEFT]) {
         camera_->Rotate(0, -CAMERA_ROTATION_SPEED);
+    } else if (key_state[SDL_SCANCODE_LEFT]) {
+        camera_->Rotate(0, CAMERA_ROTATION_SPEED);
     }
 
     float movement_forward = 0, movement_right = 0;
@@ -61,11 +63,11 @@ void Player::Update() {
     }
     camera_->Translate(movement_right, 0, movement_forward);
 
-    SetTransformToCameraPosition();
+    RegenerateBoundingBox();
 
     if (map_->IntersectsAnySolidObjects(this)) {
         camera_->Translate(-movement_right, 0, -movement_forward);  // Reverse the camera movement
-        SetTransformToCameraPosition();
+        RegenerateBoundingBox();
     }
 
     printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
@@ -73,14 +75,10 @@ void Player::Update() {
 }
 
 glm::vec3 Player::GetKeyPosition() {
-    return camera_->GetLookDirection();
+    return camera_->GetLookPosition();
 }
 
-void Player::SetTransformToCameraPosition() {
-    transform->ResetLocalTransform();
-    // transform->ApplyMatrix(glm::rotate(glm::mat4(), camera_->GetTotalHorizontalRotation(), glm::vec3(0, 0, 1)));
-    transform->ApplyMatrix(camera_->GetTransformMatrix());
-
+void Player::RegenerateBoundingBox() {
     InitBoundingBox(box_);
     bounding_box_->transform->ClearParent();
 }

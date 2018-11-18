@@ -12,7 +12,7 @@ class Player : public GameObject {
     glm::vec3 GetKeyPosition();
 
    private:
-    void SetTransformToCameraPosition();
+    void RegenerateBoundingBox();
 
     Camera* camera_;
     std::vector<glm::vec4> box_;
