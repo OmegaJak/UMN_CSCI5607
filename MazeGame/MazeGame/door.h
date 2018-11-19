@@ -13,6 +13,10 @@ class Door : public GameObject {
     bool MatchesId(char id);
     void GoAway();
 
+    void Update() override;
+
    private:
     char id_;
+    bool is_going_away = false;
+    float scale = 1.0f;
 };

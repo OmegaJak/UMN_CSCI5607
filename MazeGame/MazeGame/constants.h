@@ -25,3 +25,7 @@ const float GRAVITY = 0.0015f;
 const float JUMP_VELOCITY = 0.04f;
 const float GROUND_LEVEL = 0.0f;
 const float JUMPING_LATERAL_MOVEMENT_FACTOR = 0.04f;
+
+const float DOOR_SHRINK_FACTOR = 0.9f;
+const float MIN_DOOR_SCALE = 0.005f;
+const float DOOR_ROTATION_SPEED = 0.1f;
