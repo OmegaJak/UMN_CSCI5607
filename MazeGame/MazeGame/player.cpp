@@ -73,8 +73,8 @@ void Player::Update() {
         RegenerateBoundingBox();
     }
 
-    printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
-           bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
+    // printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
+    //       bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
 
     //// Key logic ////
     Key* key = map_->FirstIntersectedKey(this);
