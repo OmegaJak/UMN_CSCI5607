@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "constants.h"
 #include "goal.h"
 #include "map.h"
 #include "map_loader.h"
@@ -56,7 +57,7 @@ Map* MapLoader::LoadMap(const string& filename) {
 
     GameObject* ground = new GameObject(wall_model_);
     ground->transform->Scale(glm::vec3(1, 1, 0));
-    ground->transform->Translate(glm::vec3((width / 2) + 0.5, (height / 2) + 0.5, 0));
+    ground->transform->Translate(glm::vec3((width / 2) + 0.5, (height / 2) + 0.5, GROUND_LEVEL));
     ground->transform->Scale(glm::vec3(width, height, 1));
     ground->material.color_ = glm::vec3(0.8, 0.8, 0.8);
     map->Add(ground);
@@ -132,7 +133,7 @@ void MapLoader::LoadAssets() {
 }
 
 glm::vec3 MapLoader::GetPositionForCoordinate(int i, int j) {
-    return glm::vec3(i, j, 0) + glm::vec3(0.5);
+    return glm::vec3(i, j, 0) + glm::vec3(0.5) + glm::vec3(0, 0, GROUND_LEVEL);
 }
 
 bool MapLoader::IsDoor(char c) {

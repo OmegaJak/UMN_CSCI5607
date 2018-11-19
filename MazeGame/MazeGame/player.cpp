@@ -1,6 +1,8 @@
 #define GLM_FORCE_RADIANS
+#define NOMINMAX
 
 #include <SDL.h>
+#include <algorithm>
 #include "constants.h"
 #include "map.h"
 #include "player.h"
@@ -19,19 +21,18 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
     }
 
     float num = 0.25f;
-    float half_height = 0.25f;
     box_ = std::vector<glm::vec4>(8);
-    box_[0] = glm::vec4(-num, -num, -half_height, 1);
-    box_[1] = glm::vec4(num, -num, -half_height, 1);
-    box_[2] = glm::vec4(num, num, -half_height, 1);
-    box_[3] = glm::vec4(-num, num, -half_height, 1);
-    box_[4] = glm::vec4(-num, -num, half_height, 1);
-    box_[5] = glm::vec4(num, -num, half_height, 1);
-    box_[6] = glm::vec4(num, num, half_height, 1);
-    box_[7] = glm::vec4(-num, num, half_height, 1);
+    box_[0] = glm::vec4(-num, -num, -PLAYER_HALF_HEIGHT, 1);
+    box_[1] = glm::vec4(num, -num, -PLAYER_HALF_HEIGHT, 1);
+    box_[2] = glm::vec4(num, num, -PLAYER_HALF_HEIGHT, 1);
+    box_[3] = glm::vec4(-num, num, -PLAYER_HALF_HEIGHT, 1);
+    box_[4] = glm::vec4(-num, -num, PLAYER_HALF_HEIGHT, 1);
+    box_[5] = glm::vec4(num, -num, PLAYER_HALF_HEIGHT, 1);
+    box_[6] = glm::vec4(num, num, PLAYER_HALF_HEIGHT, 1);
+    box_[7] = glm::vec4(-num, num, PLAYER_HALF_HEIGHT, 1);
 
     glm::vec3 start_position = map_->SpawnPosition();
-    start_position.z = 2 * half_height;
+    start_position.z = START_CAMERA_Z;
     camera->SetPosition(start_position);
 
     glm::vec3 look_position = map_->GoalPosition();
@@ -45,6 +46,18 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
 }
 
 void Player::Update() {
+    //// Jump logic ////
+    if (!on_ground) {
+        vertical_velocity -= GRAVITY;
+        if (transform->Z() + vertical_velocity < START_CAMERA_Z) {
+            vertical_velocity = START_CAMERA_Z - transform->Z();
+            on_ground = true;
+        }
+    } else {
+        forward_velocity = 0;
+        right_velocity = 0;
+    }
+
     //// Player movement ////
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
     if (key_state[SDL_SCANCODE_RIGHT]) {
@@ -53,28 +66,44 @@ void Player::Update() {
         camera_->Rotate(0, CAMERA_ROTATION_SPEED);
     }
 
-    float movement_forward = 0, movement_right = 0;
+    float move_speed = CAMERA_MOVE_SPEED;
+    if (!on_ground && !stuck_in_object) {
+        move_speed = move_speed * JUMPING_LATERAL_MOVEMENT_FACTOR;
+    }
+
     if (key_state[SDL_SCANCODE_W]) {
-        movement_forward += CAMERA_MOVE_SPEED;  // movement forward
+        forward_velocity += move_speed;  // movement forward
     } else if (key_state[SDL_SCANCODE_S]) {
-        movement_forward -= CAMERA_MOVE_SPEED;
+        forward_velocity -= move_speed;
     }
     if (key_state[SDL_SCANCODE_D]) {
-        movement_right += CAMERA_MOVE_SPEED;
+        right_velocity += move_speed;
     } else if (key_state[SDL_SCANCODE_A]) {
-        movement_right -= CAMERA_MOVE_SPEED;
+        right_velocity -= move_speed;
     }
-    camera_->Translate(movement_right, 0, movement_forward);
+
+    // Clamp the forward and right velocities
+    forward_velocity = std::max(std::min(forward_velocity, CAMERA_MOVE_SPEED), -CAMERA_MOVE_SPEED);
+    right_velocity = std::max(std::min(right_velocity, CAMERA_MOVE_SPEED), -CAMERA_MOVE_SPEED);
+
+    camera_->Translate(right_velocity, vertical_velocity, forward_velocity);
 
     RegenerateBoundingBox();
 
     if (map_->IntersectsAnySolidObjects(this)) {
-        camera_->Translate(-movement_right, 0, -movement_forward);  // Reverse the camera movement
+        camera_->Translate(-right_velocity, -vertical_velocity, -forward_velocity);  // Undo the movement
         RegenerateBoundingBox();
+
+        right_velocity = 0;
+        forward_velocity = 0;
+        stuck_in_object = true;
+    } else {
+        stuck_in_object = false;
     }
 
     // printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
     //       bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
+    printf("Player z: %f\n", transform->Z());
 
     //// Key logic ////
     Key* key = map_->FirstIntersectedKey(this);
@@ -83,10 +112,23 @@ void Player::Update() {
         held_key_->SetHolder(this);
         InitializeKeyLocation(held_key_);
     }
+
+    //// Reset movement variables ////
+    if (on_ground) {
+        vertical_velocity = 0;
+    }
+    on_ground = transform->Z() <= START_CAMERA_Z;
 }
 
 void Player::RemoveKey() {
     held_key_ = nullptr;
+}
+
+void Player::Jump() {
+    if (on_ground) {
+        vertical_velocity = JUMP_VELOCITY;
+        on_ground = false;
+    }
 }
 
 void Player::InitializeKeyLocation(Key* key) {

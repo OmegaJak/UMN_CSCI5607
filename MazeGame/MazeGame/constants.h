@@ -18,3 +18,10 @@ const float CAMERA_ROTATION_SPEED = 0.03f;
 const float CAMERA_MOVE_SPEED = 0.05f;
 
 const float ABSOLUTE_TOLERANCE = 0.00001f;
+
+const float PLAYER_HALF_HEIGHT = 0.25f;
+const float START_CAMERA_Z = 2 * PLAYER_HALF_HEIGHT;
+const float GRAVITY = 0.0015f;
+const float JUMP_VELOCITY = 0.04f;
+const float GROUND_LEVEL = 0.0f;
+const float JUMPING_LATERAL_MOVEMENT_FACTOR = 0.04f;

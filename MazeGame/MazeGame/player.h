@@ -11,6 +11,7 @@ class Player : public GameObject {
     void Update() override;
 
     void RemoveKey();
+    void Jump();
 
    private:
     void RegenerateBoundingBox();
@@ -19,4 +20,8 @@ class Player : public GameObject {
     Camera* camera_;
     std::vector<glm::vec4> box_;
     Key* held_key_;
+
+    float vertical_velocity = 0.0f, forward_velocity = 0.0f, right_velocity = 0.0f;
+    bool on_ground = true;
+    bool stuck_in_object = false;
 };

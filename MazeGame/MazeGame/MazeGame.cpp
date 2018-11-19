@@ -135,9 +135,12 @@ int main(int argc, char* argv[]) {
                 fullscreen = !fullscreen;
                 SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
             }
+            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_SPACE) {
+                player.Jump();
+            }
 
             if (windowEvent.type == SDL_MOUSEMOTION) {
-                printf("Mouse movement (xrel, yrel): (%i, %i)\n", windowEvent.motion.xrel, windowEvent.motion.yrel);
+                // printf("Mouse movement (xrel, yrel): (%i, %i)\n", windowEvent.motion.xrel, windowEvent.motion.yrel);
                 float factor = 0.002f;
                 camera.Rotate(0, -windowEvent.motion.xrel * factor);
             }
