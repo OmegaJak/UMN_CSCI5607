@@ -89,8 +89,9 @@ Map* MapLoader::LoadMap(const string& filename) {
                         current_object->transform->Translate(base_position);
                         break;
                     case 'G':
-                        current_object = new Goal(goal_model_);
+                        current_object = new Goal(goal_model_, map);
                         current_object->transform->Translate(base_position);
+                        current_object->transform->Rotate(0.1, glm::vec3(0, 0, 1));
                         break;
                     case '0':
                         continue;
@@ -133,7 +134,8 @@ void MapLoader::LoadAssets() {
     wall_model_ = new Model("models/cube.txt");
     door_model_ = new Model("models/knot.txt");
     key_model_ = new Model("models/mjolnir.obj");
-    start_model_ = goal_model_ = new Model("models/teapot.txt");
+    start_model_ = new Model("models/teapot.txt");
+    goal_model_ = new Model("models/goal_crystal.obj");
 }
 
 glm::vec3 MapLoader::GetPositionForCoordinate(int i, int j) {
