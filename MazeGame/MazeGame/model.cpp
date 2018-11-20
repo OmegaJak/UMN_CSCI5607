@@ -14,7 +14,7 @@ using std::vector;
 Model::Model(const string& file) {
     unsigned int dot_position = file.find_last_of('.');
     if (dot_position == string::npos) {
-        printf("Given file did not have an extension. Exiting...\n");
+        printf("Given file \"%s\" did not have an extension. Exiting...\n", file.c_str());
         exit(1);
     }
 
@@ -24,7 +24,7 @@ Model::Model(const string& file) {
     } else if (extension == "obj") {
         LoadObj(file);
     } else {
-        printf("Unrecognized file extension \"%s\". Exiting...\n", extension.c_str());
+        printf("Unrecognized file extension \"%s\" for file \"%s\". Exiting...\n", extension.c_str(), file.c_str());
         exit(1);
     }
 
@@ -56,7 +56,7 @@ void Model::LoadObj(const std::string& filename) {
 
     FILE* file = fopen(filename.c_str(), "r");
     if (file == nullptr) {
-        printf("Failed to open file. Exiting...\n");
+        printf("Failed to open file \"%s\". Exiting...\n", filename.c_str());
         exit(1);
     }
 
@@ -84,7 +84,7 @@ void Model::LoadObj(const std::string& filename) {
             int matches = fscanf(file, "%d//%d %d//%d %d//%d\n", &vertex_index[0], &normal_index[0], &vertex_index[1], &normal_index[1],
                                  &vertex_index[2], &normal_index[2]);
             if (matches != 6) {
-                printf("File can't be read by this simple parser. Exiting...\n");
+                printf("File \"%s\" can't be read by this simple parser. Exiting...\n", filename.c_str());
                 exit(1);
             }
 
