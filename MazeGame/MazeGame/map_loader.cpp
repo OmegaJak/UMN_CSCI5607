@@ -58,13 +58,7 @@ Map* MapLoader::LoadMap(const string& filename) {
         exit(1);
     }
 
-    GameObject* ground = new GameObject(wall_model_);
-    ground->transform->Scale(glm::vec3(1, 1, 0));
-    ground->transform->Translate(glm::vec3((width / 2) + 0.5, (height / 2) + 0.5, GROUND_LEVEL));
-    ground->transform->Scale(glm::vec3(width, height, 1));
-    ground->material.color_ = glm::vec3(0.8, 0.8, 0.8);
-    map->Add(ground);
-
+    bool add_ground = false;
     GameObject* current_object;
     for (int i = 0; i < width; i++) {
         for (int j = 0; j < height; j++) {
@@ -73,9 +67,11 @@ Map* MapLoader::LoadMap(const string& filename) {
             if (IsKey(current_char)) {
                 current_object = new Key(key_model_, map, current_char, glm::vec2(base_position));
                 // Key transforms itself
+                add_ground = true;
             } else if (IsDoor(current_char)) {
                 current_object = new Door(door_model_, current_char);
                 current_object->transform->Translate(base_position);
+                add_ground = true;
             } else {
                 switch (current_char) {
                     case 'W':
@@ -87,14 +83,17 @@ Map* MapLoader::LoadMap(const string& filename) {
                         current_object = new Spawn(start_model_);
                         current_object->transform->Translate(glm::vec3(base_position.x, base_position.y, 0));
                         current_object->transform->Scale(0.2f);
+                        add_ground = true;
                         break;
                     case 'G':
                         current_object = new Goal(goal_model_, map);
                         current_object->transform->Translate(base_position);
                         current_object->transform->Rotate(0.1, glm::vec3(0, 0, 1));
+                        add_ground = true;
                         break;
                     case '0':
-                        continue;
+                        current_object = GetGround(base_position);
+                        break;
                     default:
                         printf("Unrecognized character \'%c\'", current_char);
                         continue;
@@ -103,6 +102,13 @@ Map* MapLoader::LoadMap(const string& filename) {
 
             current_object->material = GetMaterialForCharacter(current_char);
             map->Add(current_object);
+
+            if (add_ground) {
+                current_object = GetGround(base_position);
+                current_object->material = GetMaterialForCharacter(current_char);
+                map->Add(current_object);
+                add_ground = false;
+            }
         }
     }
 
@@ -136,6 +142,14 @@ void MapLoader::LoadAssets() {
     key_model_ = new Model("models/mjolnir.obj");
     start_model_ = new Model("models/sphere.txt");
     goal_model_ = new Model("models/goal_crystal.obj");
+}
+
+GameObject* MapLoader::GetGround(glm::vec3 base_position) const {
+    GameObject* ground = new Wall(wall_model_);
+    ground->transform->Translate(glm::vec3(base_position.x, base_position.y, -0.5));
+    ground->SetTextureIndex(TEX1);
+
+    return ground;
 }
 
 glm::vec3 MapLoader::GetPositionForCoordinate(int i, int j) {

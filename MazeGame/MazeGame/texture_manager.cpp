@@ -5,11 +5,11 @@
 #include "texture_manager.h"
 
 void TextureManager::InitTextures() {
-    // Allocate Texture 0 (Wood)
-    InitTexture(&tex0, "wood.bmp");
+    // Allocate Texture 0
+    InitTexture(&tex0, "stone_wall.bmp");
 
-    // Allocate Texture 1 (Brick)
-    InitTexture(&tex1, "brick.bmp");
+    // Allocate Texture 1
+    InitTexture(&tex1, "stone_floor.bmp");
 }
 
 void TextureManager::Update() {

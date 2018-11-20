@@ -15,6 +15,7 @@ class MapLoader {
    private:
     static Material GetMaterialForCharacter(char c);
     void LoadAssets();
+    GameObject* GetGround(glm::vec3 base_position) const;
 
     static glm::vec3 GetPositionForCoordinate(int i, int j);
     static bool IsDoor(char c);
