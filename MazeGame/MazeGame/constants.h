@@ -34,3 +34,4 @@ const float MIN_DOOR_SCALE = 0.005f;
 const float DOOR_ROTATION_SPEED = 0.1f;
 const float KEY_ROTATION_SPEED = 0.005f;
 const float KEY_HEIGHT = 0.15f;
+const int KEY_DROP_PICKUP_COOLDOWN_MS = 3500;

@@ -13,10 +13,12 @@ class Key : public GameObject {
     void GoAway();
     void SetHolder(Player* player);
     void Drop();
+    bool CanBePickedUp();
 
    private:
     void InitTransform();
 
     char id_;
     Player* holder_;
+    int drop_time_ = 0;
 };

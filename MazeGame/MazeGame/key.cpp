@@ -43,6 +43,11 @@ void Key::SetHolder(Player* player) {
 void Key::Drop() {
     holder_ = nullptr;
     InitTransform();
+    drop_time_ = SDL_GetTicks();
+}
+
+bool Key::CanBePickedUp() {
+    return SDL_GetTicks() - drop_time_ > KEY_DROP_PICKUP_COOLDOWN_MS;
 }
 
 void Key::InitTransform() {

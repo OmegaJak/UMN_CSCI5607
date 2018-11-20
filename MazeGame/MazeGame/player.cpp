@@ -113,7 +113,7 @@ void Player::Update() {
 
     //// Key logic ////
     Key* key = map_->FirstIntersectedKey(this);
-    if (key != nullptr && held_key_ == nullptr) {
+    if (key != nullptr && held_key_ == nullptr && key->CanBePickedUp()) {
         held_key_ = key;
         held_key_->SetHolder(this);
         InitializeKeyLocation(held_key_);
