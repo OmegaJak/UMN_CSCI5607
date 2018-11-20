@@ -55,8 +55,8 @@ const char* INSTRUCTIONS =
 
 using namespace std;
 
-int screenWidth = 800;
-int screenHeight = 600;
+int screenWidth = 1536;
+int screenHeight = 864;
 float timePassed = 0;
 
 bool fullscreen = false;
@@ -78,6 +78,12 @@ int main(int argc, char* argv[]) {
 
     // Create a window (offsetx, offsety, width, height, flags)
     SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+
+    // Maximize the window
+    SDL_SetWindowResizable(window, SDL_TRUE);                // Allow resizing
+    SDL_MaximizeWindow(window);                              // Maximize
+    SDL_GetWindowSize(window, &screenWidth, &screenHeight);  // Get the new size
+    SDL_SetWindowResizable(window, SDL_FALSE);               // Disable future resizing
 
     // Create a context to draw in
     SDL_GLContext context = SDL_GL_CreateContext(window);
@@ -136,7 +142,7 @@ int main(int argc, char* argv[]) {
                 } else if (windowEvent.key.keysym.sym == SDLK_F11) {  // If F11 is pressed
                     fullscreen = !fullscreen;
                     SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
-                } else if (windowEvent.key.keysym.sym == SDLK_c) {
+                } else if (windowEvent.key.keysym.sym == SDLK_LCTRL) {
                     player.UnCrouch();
                 } else if (windowEvent.key.keysym.sym == SDLK_g) {
                     player.DropKey();
@@ -145,15 +151,26 @@ int main(int argc, char* argv[]) {
             if (windowEvent.type == SDL_KEYDOWN) {
                 if (windowEvent.key.keysym.sym == SDLK_SPACE) {
                     player.Jump();
-                } else if (windowEvent.key.keysym.sym == SDLK_c) {
+                } else if (windowEvent.key.keysym.sym == SDLK_LCTRL) {
                     player.Crouch();
                 }
             }
 
-            if (windowEvent.type == SDL_MOUSEMOTION) {
+            if (windowEvent.type == SDL_MOUSEMOTION && SDL_GetRelativeMouseMode() == SDL_TRUE) {
                 // printf("Mouse movement (xrel, yrel): (%i, %i)\n", windowEvent.motion.xrel, windowEvent.motion.yrel);
                 float factor = 0.002f;
                 camera.Rotate(0, -windowEvent.motion.xrel * factor);
+            }
+
+            switch (windowEvent.window.event) {
+                case SDL_WINDOWEVENT_FOCUS_LOST:
+                    SDL_Log("Window focus lost");
+                    SDL_SetRelativeMouseMode(SDL_FALSE);
+                    break;
+                case SDL_WINDOWEVENT_FOCUS_GAINED:
+                    SDL_Log("Window focus gained");
+                    SDL_SetRelativeMouseMode(SDL_TRUE);
+                    break;
             }
         }
 
@@ -168,7 +185,7 @@ int main(int argc, char* argv[]) {
         player.Update();
         camera.Update();
 
-        glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 1000.0f);  // FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f / 3, screenWidth / (float)screenHeight, 0.1f, 1000.0f);  // FOV, aspect, near, far
         glUniformMatrix4fv(ShaderManager::Attributes.projection, 1, GL_FALSE, glm::value_ptr(proj));
 
         TextureManager::Update();
