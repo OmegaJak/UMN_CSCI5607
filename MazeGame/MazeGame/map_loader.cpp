@@ -118,7 +118,7 @@ Material MapLoader::GetMaterialForCharacter(char c) {
         case 'c':
             return Material(0.5f, 0.7f, 0.1f);
         case 'd':
-            return Material(0.1f, 0.2f, 0.3f);
+            return Material(0.1f, 0.2f, 0.1f);
         case 'e':
             return Material(0.8f, 0.2f, 0.8f);
         case 's':

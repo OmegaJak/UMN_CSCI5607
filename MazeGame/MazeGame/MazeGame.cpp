@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
     }
 
     MapLoader map_loader;
-    Map* map = map_loader.LoadMap("map1.txt");
+    Map* map = map_loader.LoadMap("map2.txt");
     Camera camera = Camera();
 
     Player player(&camera, map);
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
         player.Update();
         camera.Update();
 
-        glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 10.0f);  // FOV, aspect, near, far
+        glm::mat4 proj = glm::perspective(3.14f / 4, screenWidth / (float)screenHeight, 0.1f, 1000.0f);  // FOV, aspect, near, far
         glUniformMatrix4fv(ShaderManager::Attributes.projection, 1, GL_FALSE, glm::value_ptr(proj));
 
         TextureManager::Update();
