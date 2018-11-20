@@ -86,7 +86,8 @@ Map* MapLoader::LoadMap(const string& filename) {
                         break;
                     case 'S':
                         current_object = new Spawn(start_model_);
-                        current_object->transform->Translate(base_position);
+                        current_object->transform->Translate(glm::vec3(base_position.x, base_position.y, 0));
+                        current_object->transform->Scale(0.2f);
                         break;
                     case 'G':
                         current_object = new Goal(goal_model_, map);
@@ -134,7 +135,7 @@ void MapLoader::LoadAssets() {
     wall_model_ = new Model("models/cube.txt");
     door_model_ = new Model("models/knot.txt");
     key_model_ = new Model("models/mjolnir.obj");
-    start_model_ = new Model("models/teapot.txt");
+    start_model_ = new Model("models/sphere.txt");
     goal_model_ = new Model("models/goal_crystal.obj");
 }
 
