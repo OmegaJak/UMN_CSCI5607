@@ -1,3 +1,6 @@
+#include <SDL.h>
+#include <cmath>
+#include "constants.h"
 #include "key.h"
 #include "map.h"
 #include "player.h"
@@ -13,6 +16,13 @@ void Key::Update() {
         GoAway();
         holder_->RemoveKey();
         holder_ = nullptr;
+    }
+
+    if (holder_ == nullptr) {
+        transform->Rotate(KEY_ROTATION_SPEED, glm::vec3(0, 1, 0));
+
+        int time = SDL_GetTicks();
+        transform->Translate(0, cos(time / 700.0f) / 1000, 0);
     }
 
     GameObject::Update();

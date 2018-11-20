@@ -1,4 +1,7 @@
+#define _USE_MATH_DEFINES
+
 #include <cctype>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -69,7 +72,8 @@ Map* MapLoader::LoadMap(const string& filename) {
             glm::vec3 base_position = GetPositionForCoordinate(i, j);
             if (IsKey(current_char)) {
                 current_object = new Key(key_model_, map, current_char);
-                current_object->transform->Translate(base_position);
+                current_object->transform->Translate(glm::vec3(base_position.x, base_position.y, 0.15));
+                current_object->transform->Rotate(M_PI / 2, glm::vec3(1, 0, 0));
             } else if (IsDoor(current_char)) {
                 current_object = new Door(door_model_, current_char);
                 current_object->transform->Translate(base_position);
@@ -117,7 +121,7 @@ Material MapLoader::GetMaterialForCharacter(char c) {
         case 'e':
             return Material(0.8f, 0.2f, 0.8f);
         case 's':
-            return Material(0, 1, 1);
+            return Material(0, 1, 0);
         case 'g':
             return Material(1, 1, 0);
         default:
@@ -128,8 +132,8 @@ Material MapLoader::GetMaterialForCharacter(char c) {
 void MapLoader::LoadAssets() {
     wall_model_ = new Model("models/cube.txt");
     door_model_ = new Model("models/knot.txt");
-    key_model_ = new Model("models/teapot.txt");
-    start_model_ = goal_model_ = key_model_;
+    key_model_ = new Model("models/mjolnir.obj");
+    start_model_ = goal_model_ = new Model("models/teapot.txt");
 }
 
 glm::vec3 MapLoader::GetPositionForCoordinate(int i, int j) {

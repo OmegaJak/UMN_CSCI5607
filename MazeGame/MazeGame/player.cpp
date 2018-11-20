@@ -20,7 +20,7 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
         exit(1);
     }
 
-    float num = 0.25f;
+    float num = 0.11f;
     box_ = std::vector<glm::vec4>(8);
     box_[0] = glm::vec4(-num, -num, -PLAYER_HALF_HEIGHT, 1);
     box_[1] = glm::vec4(num, -num, -PLAYER_HALF_HEIGHT, 1);
@@ -103,7 +103,7 @@ void Player::Update() {
 
     // printf("Player bounds: min: %f, %f, %f, max:: %f, %f, %f\n", bounding_box_->Min().x, bounding_box_->Min().y, bounding_box_->Min().z,
     //       bounding_box_->Max().x, bounding_box_->Max().y, bounding_box_->Max().z);
-    printf("Player z: %f\n", transform->Z());
+    // printf("Player z: %f\n", transform->Z());
 
     //// Key logic ////
     Key* key = map_->FirstIntersectedKey(this);
@@ -135,6 +135,7 @@ void Player::InitializeKeyLocation(Key* key) {
     held_key_->transform->ResetAndSetTranslation(camera_->GetNormalizedLookPosition() * 0.6f);
     held_key_->transform->Translate(0, 0, -0.2);
     held_key_->transform->Scale(0.3f);
+    held_key_->transform->Rotate(M_PI / 2, glm::vec3(1, 0, 0));
 
     held_key_->transform->SetParent(transform);
 }

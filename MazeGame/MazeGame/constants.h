@@ -15,7 +15,7 @@ const int VALUES_PER_TEXCOORD = 2;
 const int TEXCOORD_OFFSET = 3;
 
 const float CAMERA_ROTATION_SPEED = 0.03f;
-const float CAMERA_MOVE_SPEED = 0.05f;
+const float CAMERA_MOVE_SPEED = 0.03f;
 
 const float ABSOLUTE_TOLERANCE = 0.00001f;
 
@@ -29,3 +29,4 @@ const float JUMPING_LATERAL_MOVEMENT_FACTOR = 0.04f;
 const float DOOR_SHRINK_FACTOR = 0.9f;
 const float MIN_DOOR_SCALE = 0.005f;
 const float DOOR_ROTATION_SPEED = 0.1f;
+const float KEY_ROTATION_SPEED = 0.005f;

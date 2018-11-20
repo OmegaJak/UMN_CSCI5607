@@ -7,7 +7,8 @@ class Model {
    public:
     explicit Model(const std::string& file);
 
-    void Load(const std::string& file);
+    void LoadTxt(const std::string& file);
+    void LoadObj(const std::string& file);
 
     int NumElements() const;
     int NumVerts() const;
