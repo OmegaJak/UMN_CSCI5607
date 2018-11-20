@@ -61,17 +61,20 @@ void Player::Update() {
         right_velocity = 0;
     }
 
+    float move_speed = CAMERA_MOVE_SPEED;
+    if (!on_ground && !stuck_in_object) {
+        move_speed = move_speed * JUMPING_LATERAL_MOVEMENT_FACTOR;
+    }
+    if (crouching) {
+        move_speed *= CROUCH_SPEED_FACTOR;
+    }
+
     //// Player movement ////
     const Uint8* key_state = SDL_GetKeyboardState(NULL);
     if (key_state[SDL_SCANCODE_RIGHT]) {
         camera_->Rotate(0, -CAMERA_ROTATION_SPEED);
     } else if (key_state[SDL_SCANCODE_LEFT]) {
         camera_->Rotate(0, CAMERA_ROTATION_SPEED);
-    }
-
-    float move_speed = CAMERA_MOVE_SPEED;
-    if (!on_ground && !stuck_in_object) {
-        move_speed = move_speed * JUMPING_LATERAL_MOVEMENT_FACTOR;
     }
 
     if (key_state[SDL_SCANCODE_W]) {
@@ -86,8 +89,8 @@ void Player::Update() {
     }
 
     // Clamp the forward and right velocities
-    forward_velocity = std::max(std::min(forward_velocity, CAMERA_MOVE_SPEED), -CAMERA_MOVE_SPEED);
-    right_velocity = std::max(std::min(right_velocity, CAMERA_MOVE_SPEED), -CAMERA_MOVE_SPEED);
+    forward_velocity = std::max(std::min(forward_velocity, MAX_MOVE_SPEED), -MAX_MOVE_SPEED);
+    right_velocity = std::max(std::min(right_velocity, MAX_MOVE_SPEED), -MAX_MOVE_SPEED);
 
     camera_->Translate(right_velocity, vertical_velocity, forward_velocity);
 
