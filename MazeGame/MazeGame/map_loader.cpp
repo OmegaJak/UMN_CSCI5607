@@ -152,7 +152,7 @@ void MapLoader::LoadAssets() {
 }
 
 GameObject* MapLoader::GetGround(glm::vec3 base_position) const {
-    GameObject* ground = new Wall(wall_model_);
+    GameObject* ground = new Wall(wall_model_, false);
     ground->transform->Translate(glm::vec3(base_position.x, base_position.y, -0.5));
     ground->SetTextureIndex(TEX1);
 
