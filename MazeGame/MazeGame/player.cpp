@@ -20,7 +20,7 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
         exit(1);
     }
 
-    float num = 0.11f;
+    float num = 0.15f;
     box_ = std::vector<glm::vec4>(8);
     box_[0] = glm::vec4(-num, -num, -PLAYER_HALF_HEIGHT, 1);
     box_[1] = glm::vec4(num, -num, -PLAYER_HALF_HEIGHT, 1);
@@ -161,10 +161,11 @@ bool Player::IsCrouching() const {
 }
 
 void Player::InitializeKeyLocation(Key* key) {
-    held_key_->transform->ResetAndSetTranslation(camera_->GetNormalizedLookPosition() * 0.6f);
-    held_key_->transform->Translate(0, 0, -0.2);
+    held_key_->transform->ResetAndSetTranslation(camera_->GetNormalizedLookPosition() * 0.2f);
+    held_key_->transform->Translate(0, 0, -0.1);
     held_key_->transform->Scale(0.3f);
     held_key_->transform->Rotate(M_PI / 2, glm::vec3(1, 0, 0));
+    held_key_->transform->Rotate(3 * M_PI / 4, glm::vec3(0, 0, 1));
 
     held_key_->transform->SetParent(transform);
 }
