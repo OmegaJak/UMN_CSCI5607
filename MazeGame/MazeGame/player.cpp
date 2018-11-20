@@ -123,7 +123,14 @@ void Player::Update() {
     on_ground = transform->Z() <= base_player_height;
 }
 
-void Player::RemoveKey() {
+void Player::UseKey() {
+    held_key_ = nullptr;
+}
+
+void Player::DropKey() {
+    if (held_key_ == nullptr) return;
+
+    held_key_->Drop();
     held_key_ = nullptr;
 }
 

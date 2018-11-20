@@ -6,14 +6,17 @@ class Player;
 
 class Key : public GameObject {
    public:
-    explicit Key(Model* model, Map* map, char id);
+    explicit Key(Model* model, Map* map, char id, glm::vec2 pos);
     ~Key() = default;
 
     void Update() override;
     void GoAway();
     void SetHolder(Player* player);
+    void Drop();
 
    private:
+    void InitTransform();
+
     char id_;
     Player* holder_;
 };

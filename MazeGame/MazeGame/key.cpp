@@ -5,8 +5,11 @@
 #include "map.h"
 #include "player.h"
 
-Key::Key(Model* model, Map* map, char id) : GameObject(model, map) {
+Key::Key(Model* model, Map* map, char id, glm::vec2 pos) : GameObject(model, map) {
     id_ = id;
+
+    transform->Translate(glm::vec3(pos.x, pos.y, 0));
+    InitTransform();
 }
 
 void Key::Update() {
@@ -14,7 +17,7 @@ void Key::Update() {
     if (holder_ != nullptr && door != nullptr) {
         door->GoAway();
         GoAway();
-        holder_->RemoveKey();
+        holder_->UseKey();
         holder_ = nullptr;
     }
 
@@ -35,4 +38,16 @@ void Key::GoAway() {
 
 void Key::SetHolder(Player* player) {
     holder_ = player;
+}
+
+void Key::Drop() {
+    holder_ = nullptr;
+    InitTransform();
+}
+
+void Key::InitTransform() {
+    glm::vec2 previous_pos = glm::vec2(transform->X(), transform->Y());
+    transform->ClearParent();
+    transform->ResetAndSetTranslation(glm::vec3(previous_pos, KEY_HEIGHT));
+    transform->Rotate(M_PI / 2, glm::vec3(1, 0, 0));
 }

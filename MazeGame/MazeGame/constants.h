@@ -31,3 +31,4 @@ const float DOOR_SHRINK_FACTOR = 0.9f;
 const float MIN_DOOR_SCALE = 0.005f;
 const float DOOR_ROTATION_SPEED = 0.1f;
 const float KEY_ROTATION_SPEED = 0.005f;
+const float KEY_HEIGHT = 0.15f;

@@ -71,9 +71,8 @@ Map* MapLoader::LoadMap(const string& filename) {
             char current_char = lines[j][i];
             glm::vec3 base_position = GetPositionForCoordinate(i, j);
             if (IsKey(current_char)) {
-                current_object = new Key(key_model_, map, current_char);
-                current_object->transform->Translate(glm::vec3(base_position.x, base_position.y, 0.15));
-                current_object->transform->Rotate(M_PI / 2, glm::vec3(1, 0, 0));
+                current_object = new Key(key_model_, map, current_char, glm::vec2(base_position));
+                // Key transforms itself
             } else if (IsDoor(current_char)) {
                 current_object = new Door(door_model_, current_char);
                 current_object->transform->Translate(base_position);

@@ -10,7 +10,8 @@ class Player : public GameObject {
 
     void Update() override;
 
-    void RemoveKey();
+    void UseKey();
+    void DropKey();
     void Jump();
     void Crouch();
     void UnCrouch();

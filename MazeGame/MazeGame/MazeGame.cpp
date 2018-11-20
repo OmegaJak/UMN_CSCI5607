@@ -138,6 +138,8 @@ int main(int argc, char* argv[]) {
                     SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
                 } else if (windowEvent.key.keysym.sym == SDLK_c) {
                     player.UnCrouch();
+                } else if (windowEvent.key.keysym.sym == SDLK_g) {
+                    player.DropKey();
                 }
             }
             if (windowEvent.type == SDL_KEYDOWN) {
