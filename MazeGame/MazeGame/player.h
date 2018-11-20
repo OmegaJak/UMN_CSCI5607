@@ -12,6 +12,9 @@ class Player : public GameObject {
 
     void RemoveKey();
     void Jump();
+    void Crouch();
+    void UnCrouch();
+    bool IsCrouching() const;
 
    private:
     void RegenerateBoundingBox();
@@ -24,4 +27,5 @@ class Player : public GameObject {
     float vertical_velocity = 0.0f, forward_velocity = 0.0f, right_velocity = 0.0f;
     bool on_ground = true;
     bool stuck_in_object = false;
+    bool crouching = false;
 };

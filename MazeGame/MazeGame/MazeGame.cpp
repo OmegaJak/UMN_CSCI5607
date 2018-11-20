@@ -130,13 +130,22 @@ int main(int argc, char* argv[]) {
             if (windowEvent.type == SDL_QUIT) quit = true;
             // List of keycodes: https://wiki.libsdl.org/SDL_Keycode - You can catch many special keys
             // Scancode refers to a keyboard position, keycode refers to the letter (e.g., EU keyboards)
-            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_ESCAPE) quit = true;  // Exit event loop
-            if (windowEvent.type == SDL_KEYUP && windowEvent.key.keysym.sym == SDLK_F11) {                // If F11 is pressed
-                fullscreen = !fullscreen;
-                SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
+            if (windowEvent.type == SDL_KEYUP) {  // Exit event loop
+                if (windowEvent.key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                } else if (windowEvent.key.keysym.sym == SDLK_F11) {  // If F11 is pressed
+                    fullscreen = !fullscreen;
+                    SDL_SetWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN : 0);  // Toggle fullscreen
+                } else if (windowEvent.key.keysym.sym == SDLK_c) {
+                    player.UnCrouch();
+                }
             }
-            if (windowEvent.type == SDL_KEYDOWN && windowEvent.key.keysym.sym == SDLK_SPACE) {
-                player.Jump();
+            if (windowEvent.type == SDL_KEYDOWN) {
+                if (windowEvent.key.keysym.sym == SDLK_SPACE) {
+                    player.Jump();
+                } else if (windowEvent.key.keysym.sym == SDLK_c) {
+                    player.Crouch();
+                }
             }
 
             if (windowEvent.type == SDL_MOUSEMOTION) {

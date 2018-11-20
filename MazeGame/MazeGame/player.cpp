@@ -46,11 +46,14 @@ Player::Player(Camera* camera, Map* map) : GameObject() {
 }
 
 void Player::Update() {
+    float base_player_height = START_CAMERA_Z;
+    if (crouching) base_player_height -= CROUCH_DISTANCE;
+
     //// Jump logic ////
     if (!on_ground) {
         vertical_velocity -= GRAVITY;
-        if (transform->Z() + vertical_velocity < START_CAMERA_Z) {
-            vertical_velocity = START_CAMERA_Z - transform->Z();
+        if (transform->Z() + vertical_velocity < base_player_height) {
+            vertical_velocity = base_player_height - transform->Z();
             on_ground = true;
         }
     } else {
@@ -117,7 +120,7 @@ void Player::Update() {
     if (on_ground) {
         vertical_velocity = 0;
     }
-    on_ground = transform->Z() <= START_CAMERA_Z;
+    on_ground = transform->Z() <= base_player_height;
 }
 
 void Player::RemoveKey() {
@@ -129,6 +132,22 @@ void Player::Jump() {
         vertical_velocity = JUMP_VELOCITY;
         on_ground = false;
     }
+}
+
+void Player::Crouch() {
+    if (!crouching) {
+        crouching = true;
+        camera_->transform->Translate(0, 0, -CROUCH_DISTANCE);
+    }
+}
+
+void Player::UnCrouch() {
+    crouching = false;
+    camera_->transform->Translate(0, 0, CROUCH_DISTANCE);
+}
+
+bool Player::IsCrouching() const {
+    return crouching;
 }
 
 void Player::InitializeKeyLocation(Key* key) {
