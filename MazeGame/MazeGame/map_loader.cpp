@@ -76,6 +76,7 @@ Map* MapLoader::LoadMap(const string& filename) {
                 switch (current_char) {
                     case 'W':
                         current_object = new Wall(wall_model_);
+                        current_object->transform->Scale(glm::vec3(1, 1, 1.3));
                         current_object->transform->Translate(base_position);
                         current_object->SetTextureIndex(TEX0);
                         break;
@@ -109,6 +110,12 @@ Map* MapLoader::LoadMap(const string& filename) {
                 map->Add(current_object);
                 add_ground = false;
             }
+
+            // Add ceiling
+            current_object = GetGround(base_position);
+            current_object->transform->Translate(glm::vec3(0, 0, 2.3));
+            current_object->material = GetMaterialForCharacter(current_char);
+            map->Add(current_object);
         }
     }
 
