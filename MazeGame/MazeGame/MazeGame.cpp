@@ -1,21 +1,8 @@
-// Multi-Object, Multi-Texture Example
-// Stephen J. Guy, 2018
-
-// This example demonstrates:
-// Loading multiple models (a cube and a knot)
-// Using multiple textures (wood and brick)
-// Instancing (the teapot is drawn in two locations)
-// Continuous keyboard input - arrows (moves knot up/down/left/right continuous on being held)
-// Keyboard modifiers - shift (up/down arrows move knot in/out of screen when shift is pressed)
-// Single key events - pressing 'c' changes color of a random teapot
-// Mixing textures and colors for models
-// Phong lighting
-// Binding multiple textures to one shader
+// MazeGame, Jackson Kruger, 2018
+// Credit to Stephen J. Guy, 2018 for the foundations
 
 #include "bounding_box.h"
 #include "camera.h"
-#include "constants.h"
-#include "game_object.h"
 #include "map.h"
 #include "map_loader.h"
 #include "player.h"
@@ -23,10 +10,15 @@
 #include "texture_manager.h"
 const char* INSTRUCTIONS =
     "***************\n"
-    "This demo shows multiple objects being draw at once along with user interaction.\n"
+    "This is a game made by Jackson Kruger for CSCI 5607 at the University of Minnesota.\n"
     "\n"
-    "Up/down/left/right - Moves the knot.\n"
-    "c - Changes to teapot to a random color.\n"
+    "Controls:\n"
+    "WASD - Player movement\n"
+    "Space - Player jump\n"
+    "Left ctrl - Player crouch\n"
+    "g - Drop key\n"
+    "Esc - Quit\n"
+    "F11 - Fullscreen\n"
     "***************\n";
 
 const char* USAGE =
@@ -36,9 +28,6 @@ const char* USAGE =
     "-m map\n"
     "   This map must be in the root of the directory the game's being run from.\n"
     "   Example: -m map1.txt\n";
-
-// Mac OS build: g++ multiObjectTest.cpp -x c glad/glad.c -g -F/Library/Frameworks -framework SDL2 -framework OpenGL -o MultiObjTest
-// Linux build:  g++ multiObjectTest.cpp -x c glad/glad.c -g -lSDL2 -lSDL2main -lGL -ldl -I/usr/include/SDL2/ -o MultiObjTest
 
 #include "glad.h"  //Include order can matter here
 #if defined(__APPLE__) || defined(__linux__)
@@ -80,11 +69,12 @@ int main(int argc, char* argv[]) {
     // Parse command-line arguments
     bool window_size_specified = false;
     std::string map_file = "map2.txt";
+    int result;
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
                 case 'w':
-                    int result = sscanf_s(argv[++i], "%ix%i", &screenWidth, &screenHeight);
+                    result = sscanf_s(argv[++i], "%ix%i", &screenWidth, &screenHeight);
                     if (result == 2) {
                         window_size_specified = true;
                     } else {
