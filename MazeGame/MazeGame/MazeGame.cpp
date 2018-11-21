@@ -29,6 +29,14 @@ const char* INSTRUCTIONS =
     "c - Changes to teapot to a random color.\n"
     "***************\n";
 
+const char* USAGE =
+    "Usage:\n"
+    "-w \'width\'x\'height\'\n"
+    "   Example: -m 800x600\n"
+    "-m map\n"
+    "   This map must be in the root of the directory the game's being run from.\n"
+    "   Example: -m map1.txt\n";
+
 // Mac OS build: g++ multiObjectTest.cpp -x c glad/glad.c -g -F/Library/Frameworks -framework SDL2 -framework OpenGL -o MultiObjTest
 // Linux build:  g++ multiObjectTest.cpp -x c glad/glad.c -g -lSDL2 -lSDL2main -lGL -ldl -I/usr/include/SDL2/ -o MultiObjTest
 
@@ -69,6 +77,31 @@ float rand01() {
 void drawGeometry(int shaderProgram, int model1_start, int model1_numVerts, int model2_start, int model2_numVerts);
 
 int main(int argc, char* argv[]) {
+    // Parse command-line arguments
+    bool window_size_specified = false;
+    std::string map_file = "map2.txt";
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            switch (argv[i][1]) {
+                case 'w':
+                    int result = sscanf_s(argv[++i], "%ix%i", &screenWidth, &screenHeight);
+                    if (result == 2) {
+                        window_size_specified = true;
+                    } else {
+                        printf("%s\n", USAGE);
+                        exit(1);
+                    }
+                    break;
+                case 'm':
+                    map_file = argv[++i];
+                    break;
+                default:
+                    printf("%s\n", USAGE);
+                    exit(1);
+            }
+        }
+    }
+
     SDL_Init(SDL_INIT_VIDEO);  // Initialize Graphics (for OpenGL)
 
     // Ask SDL to get a recent version of OpenGL (3.2 or greater)
@@ -79,11 +112,13 @@ int main(int argc, char* argv[]) {
     // Create a window (offsetx, offsety, width, height, flags)
     SDL_Window* window = SDL_CreateWindow("My OpenGL Program", 100, 100, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
 
-    // Maximize the window
-    SDL_SetWindowResizable(window, SDL_TRUE);                // Allow resizing
-    SDL_MaximizeWindow(window);                              // Maximize
-    SDL_GetWindowSize(window, &screenWidth, &screenHeight);  // Get the new size
-    SDL_SetWindowResizable(window, SDL_FALSE);               // Disable future resizing
+    // Maximize the window if no size was specified
+    if (!window_size_specified) {
+        SDL_SetWindowResizable(window, SDL_TRUE);                // Allow resizing
+        SDL_MaximizeWindow(window);                              // Maximize
+        SDL_GetWindowSize(window, &screenWidth, &screenHeight);  // Get the new size
+        SDL_SetWindowResizable(window, SDL_FALSE);               // Disable future resizing
+    }
 
     // Create a context to draw in
     SDL_GLContext context = SDL_GL_CreateContext(window);
@@ -102,7 +137,7 @@ int main(int argc, char* argv[]) {
     }
 
     MapLoader map_loader;
-    Map* map = map_loader.LoadMap("map2.txt");
+    Map* map = map_loader.LoadMap(map_file);
     Camera camera = Camera();
 
     Player player(&camera, map);
